@@ -36,8 +36,6 @@ public class clientGui {
 	DefaultListModel model = new DefaultListModel();
 	private JLabel lblActiveUsers;
 	private JButton btnNewButton_3;
-	private JButton btnNewButton_4;
-	private JButton btnNewButton_5;
 	private ArrayList<String> selectedActiveUsersToGroup = new ArrayList<String>();
 	private JTextField textField_1;
 	public class clientMain extends Thread{
@@ -71,11 +69,10 @@ public class clientGui {
 	    			    for (int i = 0; i < selectedIx.length; i++) {
 	    			    	userInput += (String) list.getModel().getElementAt(selectedIx[i]) + ",";
 	    			    }
-	                	
+	                	userInput += textField.getText() ;
 	                	dos.writeUTF(userInput + ":AdminOfGroup:"+textField.getText() +":GroupName:"+ textField_1.getText() );
 	                	userInput = "";
-	                	groupGui newgroup = new groupGui();
-	                	newgroup.main();
+	                	
 	                	btnNewButton_3.setEnabled(true);
 	                }
 	              
@@ -102,6 +99,11 @@ public class clientGui {
 	                	{
 	                		model.addElement(response.split(":")[1]);
 	                		list.setModel(model);
+	                	}
+	                	else if(response.contains("OpenGroupGui")){
+	                		String []res = response.split(":");
+	                		groupGui newgroup = new groupGui();
+		                	newgroup.main(res[1]);
 	                	}
 	                	else
 	                	{
@@ -256,14 +258,6 @@ public class clientGui {
 		});
 		btnNewButton_3.setBounds(10, 248, 117, 23);
 		frame.getContentPane().add(btnNewButton_3);
-		
-		btnNewButton_4 = new JButton("Active Groups");
-		btnNewButton_4.setBounds(10, 282, 117, 23);
-		frame.getContentPane().add(btnNewButton_4);
-		
-		btnNewButton_5 = new JButton("Active Users");
-		btnNewButton_5.setBounds(135, 282, 106, 23);
-		frame.getContentPane().add(btnNewButton_5);
 		
 		textField_1 = new JTextField();
 		textField_1.setBounds(135, 249, 86, 20);

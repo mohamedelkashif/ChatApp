@@ -113,7 +113,16 @@ public class serverGui {
 		                }
 		                else if(AN.contains("CreateGroup")){
 		                	String []order = AN.split(":");
-		                	txtrServerLogs.append("\n new group added: name:"+order[5]);
+		                	txtrServerLogs.append("\n new group added: name:" +order[5]+ " admin:"+ order[3]);
+		                	String []sendees = order[1].split(",");
+		                	for(String se : sendees){
+		                		for(int i= 0; i < usernames.size() ; i++){
+		                			if(se.equals(usernames.get(i))){
+		                				doses.get(i).writeUTF("OpenGroupGui:"+order[5]+"&users&"+order[1]);
+		                			}
+		                		}
+		                	}
+		      
 		                }
 		                else
 		                {
