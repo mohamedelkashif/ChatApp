@@ -111,6 +111,10 @@ public class serverGui {
 		                	
 		                	
 		                }
+		                else if(AN.contains("CreateGroup")){
+		                	String []order = AN.split(":");
+		                	txtrServerLogs.append("\n new group added: name:"+order[5]);
+		                }
 		                else
 		                {
 			                for (DataOutputStream data : doses)

@@ -14,6 +14,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.Scanner;
 import java.awt.event.ActionEvent;
 import javax.swing.JList;
@@ -34,7 +35,11 @@ public class clientGui {
 	private JList list;
 	DefaultListModel model = new DefaultListModel();
 	private JLabel lblActiveUsers;
-	
+	private JButton btnNewButton_3;
+	private JButton btnNewButton_4;
+	private JButton btnNewButton_5;
+	private ArrayList<String> selectedActiveUsersToGroup = new ArrayList<String>();
+	private JTextField textField_1;
 	public class clientMain extends Thread{
 		public clientMain() {
 	        
@@ -51,7 +56,7 @@ public class clientGui {
 	            String userInput;
 	            
 	            while (true) {
-	                
+	                //System.out.print(selectedActiveUsersToGroup);
 	                //read from the user
 	            	//System.out.println("sent status"+btnNewButton_2.isEnabled());
 	                if(!btnNewButton_2.isEnabled()){
@@ -59,6 +64,19 @@ public class clientGui {
 	                dos.writeUTF(userInput);
 	                btnNewButton_2.setEnabled(true);
 	                }
+	                if(!btnNewButton_3.isEnabled()){
+	                	userInput = "CreateGroup:";
+	    				int[] selectedIx = list.getSelectedIndices();      
+
+	    			    for (int i = 0; i < selectedIx.length; i++) {
+	    			    	userInput += (String) list.getModel().getElementAt(selectedIx[i]) + ",";
+	    			    }
+	                	
+	                	dos.writeUTF(userInput + ":AdminOfGroup:"+textField.getText() +":GroupName:"+ textField_1.getText() );
+	                	userInput = "";
+	                	btnNewButton_3.setEnabled(true);
+	                }
+	              
 	                String response = "";
 	                //read the response from the server
 	                //dis.read
@@ -136,7 +154,7 @@ public class clientGui {
 	 */
 	private void initialize() {
 		frame = new JFrame();
-		frame.setBounds(100, 100, 450, 300);
+		frame.setBounds(100, 100, 450, 351);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(null);
 		
@@ -215,6 +233,40 @@ public class clientGui {
 		lblActiveUsers = new JLabel("Active Users");
 		lblActiveUsers.setBounds(10, 55, 103, 14);
 		frame.getContentPane().add(lblActiveUsers);
+		
+		btnNewButton_3 = new JButton("Create A Group");
+		btnNewButton_3.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				
+				if(!textField_1.getText().equals(""))
+				{
+					btnNewButton_3.setEnabled(false);
+					textField_1.setEnabled(false);
+				}
+				else
+				{
+					JOptionPane.showMessageDialog(frame,
+						    "please enter a groupname.",
+						    "Connection error",
+						    JOptionPane.ERROR_MESSAGE);
+				}
+			}
+		});
+		btnNewButton_3.setBounds(10, 248, 117, 23);
+		frame.getContentPane().add(btnNewButton_3);
+		
+		btnNewButton_4 = new JButton("Active Groups");
+		btnNewButton_4.setBounds(10, 282, 117, 23);
+		frame.getContentPane().add(btnNewButton_4);
+		
+		btnNewButton_5 = new JButton("Active Users");
+		btnNewButton_5.setBounds(135, 282, 106, 23);
+		frame.getContentPane().add(btnNewButton_5);
+		
+		textField_1 = new JTextField();
+		textField_1.setBounds(135, 249, 86, 20);
+		frame.getContentPane().add(textField_1);
+		textField_1.setColumns(10);
 		
 		
 		
