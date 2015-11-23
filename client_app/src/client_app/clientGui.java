@@ -21,6 +21,11 @@ import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.AbstractListModel;
 
 public class clientGui {
 	
@@ -29,6 +34,7 @@ public class clientGui {
 	JButton btnNewButton_1;
 	Socket client;
 	JTextArea textArea;
+	JLabel lblAll;
 	private JFrame frame;
 	private JTextField textField;
 	private JList list;
@@ -54,10 +60,29 @@ public class clientGui {
 	                
 	                //read from the user
 	            	//System.out.println("sent status"+btnNewButton_2.isEnabled());
-	                if(!btnNewButton_2.isEnabled()){
-	                userInput = textArea_1.getText() ;
-	                dos.writeUTF(userInput);
-	                btnNewButton_2.setEnabled(true);
+	                if(!btnNewButton_2.isEnabled())
+	                {
+		                userInput = textArea_1.getText();
+		                //userInput = "create"
+		                /*if(lblAll.getText().equals("All") && !!userInput.equals(""))
+		                {
+		                	dos.writeUTF(textField.getText()+"sendto"+"All:"+userInput );
+		                }
+		                else if(lblAll.getText().equals(list.getSelectedValue().toString()) && 
+		                		!userInput.equals(""))
+		                {
+		                	dos.writeUTF(textField.getText()+"sendto"+list.getSelectedValue()
+		                	.toString()+","+textField.getText()+": "+userInput);
+		                }*/
+		                if(!userInput.equals(""))
+		                {
+		                	//dos.writeUTF(textField.getText()+"sendto"+lblAll.getText()
+		                	//.toString()+","+textField.getText()+": "+userInput);*/
+		                dos.writeUTF(textField.getText()+"sendto"+lblAll.getText()
+	                	.toString()+","+textField.getText()+": "+userInput);
+		                }
+		                btnNewButton_2.setEnabled(true);
+		                
 	                }
 	                String response = "";
 	                //read the response from the server
@@ -83,11 +108,14 @@ public class clientGui {
 	                		model.addElement(response.split(":")[1]);
 	                		list.setModel(model);
 	                	}
-	                	else
+	                	else if (response.contains(":"))
 	                	{
+	                		String[] s = response.split(":");
+	                		lblAll.setText(s[0]);
 	                		//System.out.println(response);
 		                	textArea.append(response+"\n");
 	                	}
+	                	else;
 	                	
 	                }
 	                //Print response
@@ -189,8 +217,8 @@ public class clientGui {
 		textArea.setBounds(135, 78, 289, 135);
 		frame.getContentPane().add(textArea);
 		
-		JLabel lblAll = new JLabel("All");
-		lblAll.setBounds(145, 57, 46, 14);
+		lblAll = new JLabel("All");
+		lblAll.setBounds(135, 58, 46, 14);
 		frame.getContentPane().add(lblAll);
 		
 		btnNewButton_2 = new JButton("Send");
@@ -209,7 +237,29 @@ public class clientGui {
 		
 		
 		list = new JList();
+		list.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				lblAll.setText(list.getSelectedValue().toString());
+			}
+		});
+		list.setModel(new AbstractListModel() {
+			String[] values = new String[] {};
+			public int getSize() {
+				return values.length;
+			}
+			public Object getElementAt(int index) {
+				return values[index];
+			}
+		});
+		list.addListSelectionListener(new ListSelectionListener() {
+			public void valueChanged(ListSelectionEvent e) {
+				String selection = list.getSelectedValue().toString();
+				
+			}
+		});
 		list.setBounds(10, 78, 103, 159);
+		
 		frame.getContentPane().add(list);
 		
 		lblActiveUsers = new JLabel("Active Users");

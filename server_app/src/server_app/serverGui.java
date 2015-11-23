@@ -21,6 +21,11 @@ import javax.swing.ListModel;
 import javax.swing.ListSelectionModel;
 import javax.swing.JScrollPane;
 import javax.swing.JLabel;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.AbstractListModel;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 public class serverGui {
 	ServerSocket sv;
@@ -81,6 +86,7 @@ public class serverGui {
 		            doses.add(dos);
 		            while (true) {
 		                String AN = dis.readUTF();
+		                System.out.println(AN);
 		                if(AN.contains("newClient"))
 		                {
 		                	String []user = AN.split(":");
@@ -111,14 +117,27 @@ public class serverGui {
 		                	
 		                	
 		                }
-		                else
+		                else if (AN.contains("sendto"))
 		                {
-			                for (DataOutputStream data : doses)
+		                	String[] message = AN.split("sendto");
+		                	String[] att = message[1].split(",");
+		                	System.out.println(att[0]);
+			                /*for (DataOutputStream data : doses)
 			                {
-			                	data.writeUTF(AN);
+			                	System.out.println(data.toString());
+			                	if(data.equals(att[0]))
+			                		data.writeUTF(att[1]);
+			                }*/
+		                	for (int i =0;i<usernames.size();i++)
+		                	{
+			                	System.out.println(usernames.get(i));
+			                	if(usernames.get(i).equals(att[0]) && !att[1].equals(""))
+			                		
+			                		doses.get(i).writeUTF(att[1]);
 			                }
 			                txtrServerLogs.append("\n"+"Sent Stuff to the clients");
 		                }
+		                else;
 		            }
 		            //Close/release resources
 		            //dis.close();
@@ -174,6 +193,15 @@ public class serverGui {
 		list_panel.setLayout(null);
 		
 		list = new JList();
+		list.setModel(new AbstractListModel() {
+			String[] values = new String[] {};
+			public int getSize() {
+				return values.length;
+			}
+			public Object getElementAt(int index) {
+				return values[index];
+			}
+		});
 		list.setBounds(10, 35, 105, 205);
 		list_panel.add(list);
 		
