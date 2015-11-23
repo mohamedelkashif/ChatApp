@@ -1,6 +1,10 @@
 package client_app;
 
+import java.awt.Component;
 import java.awt.EventQueue;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.net.Socket;
 
 import javax.swing.JFrame;
 import javax.swing.DefaultListModel;
@@ -9,21 +13,85 @@ import javax.swing.JTextField;
 import javax.swing.JTextPane;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
+import javax.swing.JTextArea;
 
 public class groupGui {
 
 	private JFrame frame;
 	private JTextField textField_1;
-	public static String groupname;
+	JButton btnSend;
+	JTextArea textArea;
+	public static  String groupname = "uu&users&nn,mm";
 	DefaultListModel model = new DefaultListModel();
+	public class groupMain extends Thread{
+		public groupMain() {
+	        
+	    }
+		public void run() {
+		 try {
+	            //1.Create Client Socket and connect to the server
+	            Socket group = new Socket("127.0.0.1", 1234);
+	            //2.if accepted create IO streams
+	            DataOutputStream dos = new DataOutputStream(group.getOutputStream());
+	            DataInputStream dis = new DataInputStream(group.getInputStream());
+	            String userInput;
+	            
+	            while (true) {
+	                
+					//System.out.print(selectedActiveUsersToGroup);
+	                //read from the user
+	            	//System.out.println("sent status"+btnNewButton_2.isEnabled());
+	                if(!btnSend.isEnabled()){
+	                userInput = textField_1.getText() ;
+	                System.out.println(userInput);
+	                dos.writeUTF(userInput);
+	                btnSend.setEnabled(true);
+	                }
+
+	              
+	                String response = "";
+	                //read the response from the server
+	                //dis.read
+	                //if(dis.readUTF() != null)
+	               // {
+	                
+	                if(dis.available() >0)
+	                {
+	                	//System.out.println(dis.available());
+	                	response = dis.readUTF();
+	                	
+	                		//System.out.println(response);
+		                	textArea.append(response+"\n");
+	                	
+	                	
+	                }
+	                //Print response
+	                
+	                //}
+	            }
+	            
+	            //dis.close();
+	            //dos.close();
+	            //client.close();
+
+	        } catch (Exception e) {
+	            System.out.println(e.getMessage());
+	        }
+		}
+		
+	}
 	/**
 	 * Launch the application.
 	 */
-	public static void main(String args) {
+	public static void main() {
+		//groupname = args;
+		//System.out.println("m*"+args);
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					groupname = args;
+					
 					groupGui window = new groupGui();
 					window.frame.setVisible(true);
 					
@@ -40,6 +108,7 @@ public class groupGui {
 	 */
 	public groupGui() {
 		initialize();
+		
 	}
 
 	/**
@@ -51,11 +120,12 @@ public class groupGui {
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(null);
 		
-		JTextPane textPane_1 = new JTextPane();
-		textPane_1.setBounds(148, 40, 276, 170);
-		frame.getContentPane().add(textPane_1);
-		
-		JButton btnSend = new JButton("Send");
+		 btnSend = new JButton("Send");
+		btnSend.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				btnSend.setEnabled(false);
+			}
+		});
 		btnSend.setBounds(158, 221, 89, 23);
 		frame.getContentPane().add(btnSend);
 		
@@ -78,10 +148,14 @@ public class groupGui {
 		list.setBounds(10, 68, 103, 159);
 		frame.getContentPane().add(list);
 		String []actusers = resp[2].split(",");
-		for(String actuser:actusers){
-			model.addElement(actuser);
+		for(int i = 0 ; i < actusers.length ; i++){
+			model.addElement(actusers[i]);
 			
 		}
 		list.setModel(model);
+		
+		 textArea = new JTextArea();
+		textArea.setBounds(151, 11, 273, 193);
+		frame.getContentPane().add(textArea);
 	}
 }

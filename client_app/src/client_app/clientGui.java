@@ -6,6 +6,9 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import java.awt.BorderLayout;
 import javax.swing.JTextField;
+
+import client_app.groupGui.groupMain;
+
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import java.awt.event.ActionListener;
@@ -102,8 +105,10 @@ public class clientGui {
 	                	}
 	                	else if(response.contains("OpenGroupGui")){
 	                		String []res = response.split(":");
+	                		System.out.println(res[1]);
 	                		groupGui newgroup = new groupGui();
-		                	newgroup.main(res[1]);
+		                //	newgroup.main(res[1]);
+	                		newgroup.main();
 	                	}
 	                	else
 	                	{
@@ -246,6 +251,8 @@ public class clientGui {
 				{
 					btnNewButton_3.setEnabled(false);
 					textField_1.setEnabled(false);
+					groupMain groupThread = new groupGui().new groupMain();
+					groupThread.start();
 				}
 				else
 				{
