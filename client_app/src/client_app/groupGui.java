@@ -21,8 +21,8 @@ public class groupGui {
 
 	private JFrame frame;
 	private JTextField textField_1;
-	JButton btnSend;
-	JTextArea textArea;
+	private JButton btnSend;
+	private JTextArea textArea;
 	public static  String groupname = "uu&users&nn,mm";
 	DefaultListModel model = new DefaultListModel();
 	public class groupMain extends Thread{
@@ -39,10 +39,8 @@ public class groupGui {
 	            String userInput;
 	            
 	            while (true) {
-	                
-					//System.out.print(selectedActiveUsersToGroup);
 	                //read from the user
-	            	//System.out.println("sent status"+btnNewButton_2.isEnabled());
+	            	System.out.println("sent status"+btnSend.isEnabled());
 	                if(!btnSend.isEnabled()){
 	                userInput = textField_1.getText() ;
 	                System.out.println(userInput);
@@ -62,7 +60,7 @@ public class groupGui {
 	                	//System.out.println(dis.available());
 	                	response = dis.readUTF();
 	                	
-	                		//System.out.println(response);
+	                		System.out.println(response);
 		                	textArea.append(response+"\n");
 	                	
 	                	
