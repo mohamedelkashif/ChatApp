@@ -33,7 +33,8 @@ public class serverGui {
 	private JFrame frame;
 	JButton btnNewButton_1;
 	JTextArea txtrServerLogs;
-	ArrayList<DataOutputStream> doses = new ArrayList<>();
+	//ArrayList<DataOutputStream> doses = new ArrayList<>();
+	ArrayList<Socket> clients = new ArrayList<>();
 	ArrayList<String> usernames = new ArrayList<>();
 	JPanel list_panel;
 	DefaultListModel model = new DefaultListModel();
@@ -83,7 +84,8 @@ public class serverGui {
 		        try {
 		        	DataOutputStream dos = new DataOutputStream(client.getOutputStream());
 		            DataInputStream dis = new DataInputStream(client.getInputStream());
-		            doses.add(dos);
+		            //doses.add(dos);
+		            clients.add(client);
 		            while (true) {
 		                String AN = dis.readUTF();
 		                System.out.println(AN);
@@ -107,10 +109,11 @@ public class serverGui {
 		                		dos.writeUTF("activeUsers"+active);
 		                		System.out.println(active);
 		                	}
-		                	for(DataOutputStream data :doses)
+		                	for(Socket c :clients)
 		                	{
-		                		if(data != dos)
+		                		if(c != client)
 		                		{
+		                			DataOutputStream data = new DataOutputStream(c.getOutputStream());
 		                			data.writeUTF("updateUsers:"+user[1]);
 		                		}
 		                	}
@@ -132,8 +135,13 @@ public class serverGui {
 		                	{
 			                	System.out.println(usernames.get(i));
 			                	if(usernames.get(i).equals(att[0]) && !att[1].equals(""))
-			                		
-			                		doses.get(i).writeUTF(att[1]);
+			                	{
+			                		DataOutputStream data = new DataOutputStream(clients.get(i)
+			                				.getOutputStream());
+			                		String Message = att[1];
+		                			data.writeUTF(Message);
+		                			Message = "";
+			                	}
 			                }
 			                txtrServerLogs.append("\n"+"Sent Stuff to the clients");
 		                }
@@ -146,6 +154,7 @@ public class serverGui {
 		        } catch (Exception e) {
 		            System.out.println(e.getMessage());
 		        }
+		        
 		    }
 
 	}
