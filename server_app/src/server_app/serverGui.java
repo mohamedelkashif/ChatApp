@@ -89,7 +89,7 @@ public class serverGui {
 		                System.out.println(AN);
 		                if(AN.contains("newClient"))
 		                {
-		                	String []user = AN.split(":");
+		                	String []user = AN.split(":",2);
 		                	System.out.println(user[1]);
 		                	usernames.add(user[1]);
 		                	model.addElement(user[1]);
@@ -119,8 +119,8 @@ public class serverGui {
 		                }
 		                else if (AN.contains("sendto"))
 		                {
-		                	String[] message = AN.split("sendto");
-		                	String[] att = message[1].split(",");
+		                	String[] message = AN.split("sendto",2);
+		                	String[] att = message[1].split(",",2);
 		                	System.out.println(att[0]);
 			                /*for (DataOutputStream data : doses)
 			                {

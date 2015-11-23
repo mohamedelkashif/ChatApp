@@ -79,7 +79,7 @@ public class clientGui {
 		                	//dos.writeUTF(textField.getText()+"sendto"+lblAll.getText()
 		                	//.toString()+","+textField.getText()+": "+userInput);*/
 		                dos.writeUTF(textField.getText()+"sendto"+lblAll.getText()
-	                	.toString()+","+textField.getText()+": "+userInput);
+	                	.toString().split(": ")[1]+","+textField.getText()+": "+userInput);
 		                }
 		                btnNewButton_2.setEnabled(true);
 		                
@@ -96,7 +96,7 @@ public class clientGui {
 	                	response = dis.readUTF();
 	                	if(response.contains("activeUsers"))
 	                	{
-	                		String[] users= response.split(",");
+	                		String[] users= response.split(",",2);
 	                		for(int i= 1 ;i<users.length;i++)
 	                		{
 	                			model.addElement(users[i]);
@@ -105,13 +105,13 @@ public class clientGui {
 	                	}
 	                	else if(response.contains("updateUsers"))
 	                	{
-	                		model.addElement(response.split(":")[1]);
+	                		model.addElement(response.split(":",2)[1]);
 	                		list.setModel(model);
 	                	}
 	                	else if (response.contains(":"))
 	                	{
-	                		String[] s = response.split(":");
-	                		lblAll.setText(s[0]);
+	                		String[] s = response.split(":",2);
+	                		lblAll.setText("Chat with : "+s[0]);
 	                		//System.out.println(response);
 		                	textArea.append(response+"\n");
 	                	}
@@ -217,8 +217,8 @@ public class clientGui {
 		textArea.setBounds(135, 78, 289, 135);
 		frame.getContentPane().add(textArea);
 		
-		lblAll = new JLabel("All");
-		lblAll.setBounds(135, 58, 46, 14);
+		lblAll = new JLabel("Chat with : None");
+		lblAll.setBounds(135, 58, 188, 14);
 		frame.getContentPane().add(lblAll);
 		
 		btnNewButton_2 = new JButton("Send");
@@ -240,7 +240,7 @@ public class clientGui {
 		list.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				lblAll.setText(list.getSelectedValue().toString());
+				lblAll.setText("Chat with : "+list.getSelectedValue().toString());
 			}
 		});
 		list.setModel(new AbstractListModel() {
