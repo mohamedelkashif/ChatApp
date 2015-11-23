@@ -74,6 +74,8 @@ public class clientGui {
 	                	
 	                	dos.writeUTF(userInput + ":AdminOfGroup:"+textField.getText() +":GroupName:"+ textField_1.getText() );
 	                	userInput = "";
+	                	groupGui newgroup = new groupGui();
+	                	newgroup.main();
 	                	btnNewButton_3.setEnabled(true);
 	                }
 	              
