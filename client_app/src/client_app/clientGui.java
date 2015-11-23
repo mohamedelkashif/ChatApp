@@ -6,6 +6,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import java.awt.BorderLayout;
 import javax.swing.JTextField;
+import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import java.awt.event.ActionListener;
 import java.io.DataInputStream;
@@ -16,8 +17,10 @@ import java.net.Socket;
 import java.util.Scanner;
 import java.awt.event.ActionEvent;
 import javax.swing.JList;
+import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
 import javax.swing.JLabel;
+import javax.swing.JScrollPane;
 
 public class clientGui {
 	
@@ -26,6 +29,11 @@ public class clientGui {
 	JButton btnNewButton_1;
 	Socket client;
 	JTextArea textArea;
+	private JFrame frame;
+	private JTextField textField;
+	private JList list;
+	DefaultListModel model = new DefaultListModel();
+	private JLabel lblActiveUsers;
 	
 	public class clientMain extends Thread{
 		public clientMain() {
@@ -39,6 +47,7 @@ public class clientGui {
 	            DataOutputStream dos = new DataOutputStream(client.getOutputStream());
 	            DataInputStream dis = new DataInputStream(client.getInputStream());
 	            //Scanner sc = new Scanner(System.in);
+	            dos.writeUTF("newClient:"+textField.getText());
 	            String userInput;
 	            
 	            while (true) {
@@ -60,8 +69,26 @@ public class clientGui {
 	                {
 	                	//System.out.println(dis.available());
 	                	response = dis.readUTF();
-	                	//System.out.println(response);
-	                	textArea.append(response+"\n");
+	                	if(response.contains("activeUsers"))
+	                	{
+	                		String[] users= response.split(",");
+	                		for(int i= 1 ;i<users.length;i++)
+	                		{
+	                			model.addElement(users[i]);
+	                		}
+	                		list.setModel(model);
+	                	}
+	                	else if(response.contains("updateUsers"))
+	                	{
+	                		model.addElement(response.split(":")[1]);
+	                		list.setModel(model);
+	                	}
+	                	else
+	                	{
+	                		//System.out.println(response);
+		                	textArea.append(response+"\n");
+	                	}
+	                	
 	                }
 	                //Print response
 	                
@@ -79,8 +106,7 @@ public class clientGui {
 		
 	}
 
-	private JFrame frame;
-	private JTextField textField;
+	
 
 	/**
 	 * Launch the application.
@@ -116,17 +142,28 @@ public class clientGui {
 		
 		textField = new JTextField();
 		textField.setToolTipText("Enter your username ");
-		textField.setBounds(27, 24, 86, 20);
+		textField.setBounds(10, 24, 86, 20);
 		frame.getContentPane().add(textField);
 		textField.setColumns(10);
 		
 		JButton btnNewButton = new JButton("Connect");
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				btnNewButton.setEnabled(false);
-				btnNewButton_1.setEnabled(true);
-				clientMain clientThread = new  clientMain();
-				clientThread.start();
+				if(!textField.getText().equals(""))
+				{
+					btnNewButton.setEnabled(false);
+					btnNewButton_1.setEnabled(true);
+					clientMain clientThread = new  clientMain();
+					clientThread.start();
+					textField.setEnabled(false);
+				}
+				else
+				{
+					JOptionPane.showMessageDialog(frame,
+						    "please enter a username.",
+						    "Connection error",
+						    JOptionPane.ERROR_MESSAGE);
+				}
 			}
 		});
 		btnNewButton.setBounds(135, 23, 89, 23);
@@ -148,10 +185,6 @@ public class clientGui {
 		btnNewButton_1.setBounds(234, 23, 106, 23);
 		frame.getContentPane().add(btnNewButton_1);
 		
-		JList list = new JList();
-		list.setBounds(27, 55, 86, 183);
-		frame.getContentPane().add(list);
-		
 		textArea = new JTextArea();
 		textArea.setBounds(135, 78, 289, 135);
 		frame.getContentPane().add(textArea);
@@ -172,5 +205,18 @@ public class clientGui {
 		textArea_1 = new JTextArea();
 		textArea_1.setBounds(242, 229, 182, 15);
 		frame.getContentPane().add(textArea_1);
+		
+		
+		
+		list = new JList();
+		list.setBounds(10, 78, 103, 159);
+		frame.getContentPane().add(list);
+		
+		lblActiveUsers = new JLabel("Active Users");
+		lblActiveUsers.setBounds(10, 55, 103, 14);
+		frame.getContentPane().add(lblActiveUsers);
+		
+		
+		
 	}
 }

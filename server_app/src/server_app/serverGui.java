@@ -6,6 +6,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import java.awt.BorderLayout;
 import javax.swing.JList;
+import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import java.awt.event.ActionListener;
 import java.io.DataInputStream;
@@ -16,6 +17,10 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.awt.event.ActionEvent;
 import javax.swing.JTextArea;
+import javax.swing.ListModel;
+import javax.swing.ListSelectionModel;
+import javax.swing.JScrollPane;
+import javax.swing.JLabel;
 
 public class serverGui {
 	ServerSocket sv;
@@ -23,7 +28,12 @@ public class serverGui {
 	private JFrame frame;
 	JButton btnNewButton_1;
 	JTextArea txtrServerLogs;
-	ArrayList<DataOutputStream> doses = new ArrayList();
+	ArrayList<DataOutputStream> doses = new ArrayList<>();
+	ArrayList<String> usernames = new ArrayList<>();
+	JPanel list_panel;
+	DefaultListModel model = new DefaultListModel();
+	JList list;
+	//DefaultListModel<String> model = new DefaultListModel<>();
 	public class serverMain extends Thread{
 		ServerSocket sv;
 		public JTextArea jx ;
@@ -42,7 +52,7 @@ public class serverGui {
 	                //2.Listen for Clients
 	                Socket c;
 	                c = sv.accept();
-	                txtrServerLogs.append("\n New Client Arrived");
+	                //txtrServerLogs.append("\n New Client Arrived");
 	                clientListener ch = new clientListener(c);
 	                ch.start();
 
@@ -71,14 +81,44 @@ public class serverGui {
 		            doses.add(dos);
 		            while (true) {
 		                String AN = dis.readUTF();
-		                txtrServerLogs.append("\n"+AN);
-		                for (DataOutputStream data : doses)
+		                if(AN.contains("newClient"))
 		                {
-		                	data.writeUTF(AN);
+		                	String []user = AN.split(":");
+		                	System.out.println(user[1]);
+		                	usernames.add(user[1]);
+		                	model.addElement(user[1]);
+		                	list.setModel(model);
+		                	txtrServerLogs.append("\n new user added:"+user[1]);
+		                	dos.writeUTF("connection successfull!");
+		                	String active = "";
+		                	for(String userx:usernames)
+		                	{
+		                		if(!userx.equals(user[1]))
+		                		active = active+","+userx;
+		                	}
+		                	if(!active.equals(""))
+		                	{
+		                		dos.writeUTF("activeUsers"+active);
+		                		System.out.println(active);
+		                	}
+		                	for(DataOutputStream data :doses)
+		                	{
+		                		if(data != dos)
+		                		{
+		                			data.writeUTF("updateUsers:"+user[1]);
+		                		}
+		                	}
+		                	
+		                	
 		                }
-		                
-		                txtrServerLogs.append("\n"+"Sent Stuff to the clients");
-
+		                else
+		                {
+			                for (DataOutputStream data : doses)
+			                {
+			                	data.writeUTF(AN);
+			                }
+			                txtrServerLogs.append("\n"+"Sent Stuff to the clients");
+		                }
 		            }
 		            //Close/release resources
 		            //dis.close();
@@ -128,15 +168,21 @@ public class serverGui {
 		frame.getContentPane().add(panel, BorderLayout.CENTER);
 		panel.setLayout(null);
 		
-		JPanel list_panel = new JPanel();
-		list_panel.setBounds(0, 0, 125, 262);
+		list_panel = new JPanel();
+		list_panel.setBounds(0, 0, 125, 251);
 		panel.add(list_panel);
+		list_panel.setLayout(null);
 		
-		JList list = new JList();
+		list = new JList();
+		list.setBounds(10, 35, 105, 205);
 		list_panel.add(list);
 		
+		JLabel lblActiveUsers = new JLabel("Active Users");
+		lblActiveUsers.setBounds(10, 11, 105, 14);
+		list_panel.add(lblActiveUsers);
+		
 		JPanel connection_panel = new JPanel();
-		connection_panel.setBounds(127, 0, 307, 38);
+		connection_panel.setBounds(127, 0, 297, 38);
 		panel.add(connection_panel);
 		
 		JButton btnNewButton = new JButton("Connect");
@@ -196,7 +242,7 @@ public class serverGui {
 		connection_panel.add(btnNewButton_1);
 		btnNewButton_1.setEnabled(false);
 		JPanel log = new JPanel();
-		log.setBounds(127, 39, 307, 186);
+		log.setBounds(127, 39, 297, 186);
 		panel.add(log);
 		log.setLayout(null);
 		
@@ -207,7 +253,7 @@ public class serverGui {
 		log.add(txtrServerLogs);
 		
 		JPanel contol_users_panel = new JPanel();
-		contol_users_panel.setBounds(126, 226, 308, 36);
+		contol_users_panel.setBounds(126, 226, 298, 36);
 		panel.add(contol_users_panel);
 		
 		JButton btnDeleteUser = new JButton("Delete User");
