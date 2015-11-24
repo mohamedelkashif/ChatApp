@@ -20,11 +20,12 @@ import javax.swing.JTextArea;
 public class groupGui {
 
 	private JFrame frame;
-	private JTextField textField_1;
 	private JButton btnSend;
 	private JTextArea textArea;
 	public static  String groupname = "uu&users&nn,mm";
+	Socket group;
 	DefaultListModel model = new DefaultListModel();
+	private JTextArea textArea_1;
 	public class groupMain extends Thread{
 		public groupMain() {
 	        
@@ -32,7 +33,7 @@ public class groupGui {
 		public void run() {
 		 try {
 	            //1.Create Client Socket and connect to the server
-	            Socket group = new Socket("127.0.0.1", 1234);
+	            group = new Socket("127.0.0.1", 1234);
 	            //2.if accepted create IO streams
 	            DataOutputStream dos = new DataOutputStream(group.getOutputStream());
 	            DataInputStream dis = new DataInputStream(group.getInputStream());
@@ -40,9 +41,9 @@ public class groupGui {
 	            
 	            while (true) {
 	                //read from the user
-	            	System.out.println("sent status"+btnSend.isEnabled());
+	            	System.out.println("sent status"+btnSend.isEnabled()+textArea_1.getText());
 	                if(!btnSend.isEnabled()){
-	                userInput = textField_1.getText() ;
+	                userInput = textArea_1.getText() ;
 	                System.out.println(userInput);
 	                dos.writeUTF(userInput);
 	                btnSend.setEnabled(true);
@@ -127,11 +128,6 @@ public class groupGui {
 		btnSend.setBounds(158, 221, 89, 23);
 		frame.getContentPane().add(btnSend);
 		
-		textField_1 = new JTextField();
-		textField_1.setBounds(257, 221, 167, 20);
-		frame.getContentPane().add(textField_1);
-		textField_1.setColumns(10);
-		
 		JLabel lblActiveGroups = new JLabel("Active User in Group");
 		lblActiveGroups.setBounds(10, 43, 103, 14);
 		frame.getContentPane().add(lblActiveGroups);
@@ -155,5 +151,9 @@ public class groupGui {
 		 textArea = new JTextArea();
 		textArea.setBounds(151, 11, 273, 193);
 		frame.getContentPane().add(textArea);
+		
+		textArea_1 = new JTextArea();
+		textArea_1.setBounds(257, 221, 167, 21);
+		frame.getContentPane().add(textArea_1);
 	}
 }
