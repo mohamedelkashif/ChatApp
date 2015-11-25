@@ -64,7 +64,7 @@ public class clientGui {
 	            	//System.out.println("sent status"+btnNewButton_2.isEnabled());
 	                if(!btnNewButton_2.isEnabled()){
 	                userInput = textArea_1.getText() ;
-	                dos.writeUTF(userInput);
+	                dos.writeUTF("$From"+textField.getText()+"$:"+userInput);
 	                btnNewButton_2.setEnabled(true);
 	                }
 	                if(!btnNewButton_3.isEnabled()){

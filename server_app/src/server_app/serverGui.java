@@ -161,9 +161,10 @@ public class serverGui {
 		                }
 		                else
 		                {
+		                	
 			                for (DataOutputStream data : doses)
 			                {
-			                	data.writeUTF(AN);
+			                	data.writeUTF(AN.split(":")[1]);
 			                }
 			                txtrServerLogs.append("\n"+"Sent Stuff to the clients");
 		                }
