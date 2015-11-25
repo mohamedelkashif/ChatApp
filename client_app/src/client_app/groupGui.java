@@ -26,6 +26,7 @@ public class groupGui {
 	Socket group;
 	DefaultListModel model = new DefaultListModel();
 	private JTextArea textArea_1;
+	
 	public class groupMain extends Thread{
 		public groupMain() {
 	        
@@ -33,15 +34,17 @@ public class groupGui {
 		public void run() {
 		 try {
 	            //1.Create Client Socket and connect to the server
-	            group = new Socket("127.0.0.1", 1234);
+	            group = new Socket("127.0.0.1", 1235);
+	            System.out.println(group.isConnected());
 	            //2.if accepted create IO streams
 	            DataOutputStream dos = new DataOutputStream(group.getOutputStream());
-	            DataInputStream dis = new DataInputStream(group.getInputStream());
+	            DataInputStream  dis = new DataInputStream(group.getInputStream());
+	            
 	            String userInput;
 	            
 	            while (true) {
 	                //read from the user
-	            	System.out.println("sent status"+btnSend.isEnabled()+textArea_1.getText());
+	            	//System.out.println("sent status"+btnSend.isEnabled()+textArea_1.getText());
 	                if(!btnSend.isEnabled()){
 	                userInput = textArea_1.getText() ;
 	                System.out.println(userInput);
@@ -84,8 +87,8 @@ public class groupGui {
 	/**
 	 * Launch the application.
 	 */
-	public static void main() {
-		//groupname = args;
+	public static void main(String args) {
+		groupname = args;
 		//System.out.println("m*"+args);
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {

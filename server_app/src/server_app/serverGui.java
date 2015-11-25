@@ -24,7 +24,9 @@ import javax.swing.JLabel;
 
 public class serverGui {
 	ServerSocket sv;
+	ServerSocket gsv;
 	serverMain servermain;
+	serverMain groupservermain;
 	private JFrame frame;
 	JButton btnNewButton_1;
 	JTextArea txtrServerLogs;
@@ -51,7 +53,7 @@ public class serverGui {
 	            	
 	                //2.Listen for Clients
 	                Socket c;
-	                c = sv.accept();
+	                c = sv.accept();	             
 	                //txtrServerLogs.append("\n New Client Arrived");
 	                clientListener ch = new clientListener(c);
 	                ch.start();
@@ -81,6 +83,7 @@ public class serverGui {
 		            doses.add(dos);
 		            while (true) {
 		                String AN = dis.readUTF();
+		                System.out.println(AN);
 		                if(AN.contains("newClient"))
 		                {
 		                	String []user = AN.split(":");
@@ -144,7 +147,7 @@ public class serverGui {
 
 	}
 
-
+	
 	/**
 	 * Launch the application.
 	 */
@@ -223,10 +226,16 @@ public class serverGui {
 				btnNewButton.setEnabled(false);
 				
 				try {
-					
+					//Client Server Socket 	
 					sv = new ServerSocket(1234);
+					//servermain = new serverMain(sv);
+					//servermain.start();
+					//Group Server socket
+					gsv = new ServerSocket(1235);
 					servermain = new serverMain(sv);
 					servermain.start();
+					 groupservermain = new serverMain(gsv);
+					groupservermain.start();
 					//txtrServerLogs.setText(txtrServerLogs.getText()+"\n"+servermain.message);
 					btnNewButton_1.setEnabled(true);
 				} catch (IOException e1) {
