@@ -41,6 +41,8 @@ public class clientGui {
 	private JButton btnNewButton_3;
 	private ArrayList<String> selectedActiveUsersToGroup = new ArrayList<String>();
 	private JTextField textField_1;
+	DataOutputStream dos;
+	DataInputStream dis;
 	public class clientMain extends Thread{
 		public clientMain() {
 	        
@@ -50,8 +52,8 @@ public class clientGui {
 	            //1.Create Client Socket and connect to the server
 	            client = new Socket("127.0.0.1", 1234);
 	            //2.if accepted create IO streams
-	            DataOutputStream dos = new DataOutputStream(client.getOutputStream());
-	            DataInputStream dis = new DataInputStream(client.getInputStream());
+	             dos = new DataOutputStream(client.getOutputStream());
+	             dis = new DataInputStream(client.getInputStream());
 	            //Scanner sc = new Scanner(System.in);
 	            dos.writeUTF("newClient:"+textField.getText());
 	            String userInput;
@@ -102,6 +104,13 @@ public class clientGui {
 	                	{
 	                		model.addElement(response.split(":")[1]);
 	                		list.setModel(model);
+	                	}
+	                	else if(response.contains("Disconnect"))
+	                	{
+	                		//for()
+	                		model.removeElement(response.split(":")[1]);
+	                		list.setModel(model);
+	                		textArea.setText(response.split(":")[1] +" "+"Removed");
 	                	}
 	                	else if(response.contains("OpenGroupGui")){
 	                		String []res = response.split(":");
@@ -202,11 +211,16 @@ public class clientGui {
 				btnNewButton.setEnabled(true);
 				btnNewButton_1.setEnabled(false);
 				try {
+					dos.writeUTF("Disconnect:"+textField.getText());
+					
 					client.close();
+					textArea.setText("Connection lost !");
 				} catch (IOException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
+				btnNewButton.setEnabled(true);
+				btnNewButton_1.setEnabled(false);
 			}
 		});
 		btnNewButton_1.setBounds(234, 23, 106, 23);

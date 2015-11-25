@@ -124,6 +124,35 @@ public class serverGui {
 		                	}
 		      
 		                }
+		                else if(AN.contains("Disconnect"))
+		                {
+		                	String []user = AN.split(":");
+		                	System.out.println(user[1]);
+		                	//usernames.remove(user[1]);
+		                	model.removeElement(user[1]);
+		                	list.setModel(model);
+		                	txtrServerLogs.append("\n user removed:"+user[1]);
+		                	dos.writeUTF("connection lost!");
+		                	for (int i=0; i<usernames.size();i++)
+		                	{
+		                		System.out.println("username:"+usernames.get(i));
+		                		if(usernames.get(i).equals(user[1]))
+		                		{
+		                			System.out.println(doses.size());
+		                			
+		                			doses.remove(i);
+		                			usernames.remove(i);
+		                			System.out.println(",ndvnk");
+		                			
+		                			System.out.println(doses.size());
+		                		
+		                		}
+		                	}
+		                	for(DataOutputStream data : doses){
+		                	//System.out.println(doses.size());
+		                	data.writeUTF("Disconnect:"+user[1]);
+		                	}
+		                }
 		                else
 		                {
 			                for (DataOutputStream data : doses)
