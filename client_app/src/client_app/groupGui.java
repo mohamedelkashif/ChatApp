@@ -20,13 +20,13 @@ import javax.swing.JTextArea;
 public class groupGui {
 
 	private JFrame frame;
-	private JButton btnSend;
-	private JTextArea textArea;
+	static JTextArea textAregroupmessg;
 	public static  String groupname = "uu&users&nn,mm";
 	Socket group;
 	DefaultListModel model = new DefaultListModel();
-	private JTextArea textArea_1;
-	
+	static JTextArea textAreaGroup;
+	 static JButton btnNewButton;
+	 static String userInputingroup;
 	public class groupMain extends Thread{
 		public groupMain() {
 	        
@@ -35,21 +35,20 @@ public class groupGui {
 		 try {
 	            //1.Create Client Socket and connect to the server
 	            group = new Socket("127.0.0.1", 1235);
-	            System.out.println(group.isConnected());
+	            
 	            //2.if accepted create IO streams
 	            DataOutputStream dos = new DataOutputStream(group.getOutputStream());
 	            DataInputStream  dis = new DataInputStream(group.getInputStream());
 	            
-	            String userInput;
 	            
 	            while (true) {
 	                //read from the user
-	            	//System.out.println("sent status"+btnSend.isEnabled()+textArea_1.getText());
-	                if(!btnSend.isEnabled()){
-	                userInput = textArea_1.getText() ;
-	                System.out.println(userInput);
-	                dos.writeUTF(userInput);
-	                btnSend.setEnabled(true);
+	            	//System.out.println("ts");
+	                if(!btnNewButton.isEnabled()){
+	                	userInputingroup = textAreaGroup.getText() ;
+	               // System.out.println("gr"+userInputingroup);
+	                dos.writeUTF(userInputingroup);
+	                	btnNewButton.setEnabled(true);
 	                }
 
 	              
@@ -65,7 +64,7 @@ public class groupGui {
 	                	response = dis.readUTF();
 	                	
 	                		System.out.println(response);
-		                	textArea.append(response+"\n");
+		                	textAregroupmessg.append(response+"\n");
 	                	
 	                	
 	                }
@@ -122,15 +121,6 @@ public class groupGui {
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(null);
 		
-		 btnSend = new JButton("Send");
-		btnSend.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				btnSend.setEnabled(false);
-			}
-		});
-		btnSend.setBounds(158, 221, 89, 23);
-		frame.getContentPane().add(btnSend);
-		
 		JLabel lblActiveGroups = new JLabel("Active User in Group");
 		lblActiveGroups.setBounds(10, 43, 103, 14);
 		frame.getContentPane().add(lblActiveGroups);
@@ -141,22 +131,31 @@ public class groupGui {
 		String []resp = groupname.split("&");
 		textPane_2.setText(resp[0]);
 		
-		JList list = new JList();
-		list.setBounds(10, 68, 103, 159);
-		frame.getContentPane().add(list);
+		JList listactiveusersingroup = new JList();
+		listactiveusersingroup.setBounds(10, 68, 103, 159);
+		frame.getContentPane().add(listactiveusersingroup);
 		String []actusers = resp[2].split(",");
 		for(int i = 0 ; i < actusers.length ; i++){
 			model.addElement(actusers[i]);
 			
 		}
-		list.setModel(model);
+		listactiveusersingroup.setModel(model);
 		
-		 textArea = new JTextArea();
-		textArea.setBounds(151, 11, 273, 193);
-		frame.getContentPane().add(textArea);
+		 textAregroupmessg = new JTextArea();
+		textAregroupmessg.setBounds(158, 17, 273, 193);
+		frame.getContentPane().add(textAregroupmessg);
 		
-		textArea_1 = new JTextArea();
-		textArea_1.setBounds(257, 221, 167, 21);
-		frame.getContentPane().add(textArea_1);
+		textAreaGroup = new JTextArea();
+		textAreaGroup.setBounds(257, 221, 167, 21);
+		frame.getContentPane().add(textAreaGroup);
+		
+		btnNewButton = new JButton("Send To group");
+		btnNewButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				btnNewButton.setEnabled(false);
+			}
+		});
+		btnNewButton.setBounds(158, 222, 89, 23);
+		frame.getContentPane().add(btnNewButton);
 	}
 }
