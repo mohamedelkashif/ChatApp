@@ -33,6 +33,8 @@ public class serverGui {
 	JPanel list_panel;
 	DefaultListModel model = new DefaultListModel();
 	JList list;
+	DataInputStream dis ;
+	DataOutputStream dos;
 	//DefaultListModel<String> model = new DefaultListModel<>();
 	public class serverMain extends Thread{
 		ServerSocket sv;
@@ -75,8 +77,8 @@ public class serverGui {
 
 		    public void run() {
 		        try {
-		        	DataOutputStream dos = new DataOutputStream(client.getOutputStream());
-		            DataInputStream dis = new DataInputStream(client.getInputStream());
+		        	 dos = new DataOutputStream(client.getOutputStream());
+		             dis = new DataInputStream(client.getInputStream());
 		            doses.add(dos);
 		            while (true) {
 		                String AN = dis.readUTF();
@@ -100,6 +102,7 @@ public class serverGui {
 		                		dos.writeUTF("activeUsers"+active);
 		                		System.out.println(active);
 		                	}
+		                	
 		                	for(DataOutputStream data :doses)
 		                	{
 		                		if(data != dos)
@@ -160,7 +163,9 @@ public class serverGui {
 			                }
 			                txtrServerLogs.append("\n"+"Sent Stuff to the clients");
 		                }
+		                
 		            }
+		            
 		            //Close/release resources
 		            //dis.close();
 		           // dos.close();
@@ -304,6 +309,19 @@ public class serverGui {
 		panel.add(contol_users_panel);
 		
 		JButton btnDeleteUser = new JButton("Delete User");
+		btnDeleteUser.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				try {
+					dos.writeUTF("Ban:"+list.getSelectedValue().toString());
+					//String x = list.getSelectedValue().toString();
+					//System.out.println(x);
+					txtrServerLogs.setText("Client deleted");
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		});
 		contol_users_panel.add(btnDeleteUser);
 	}
 }

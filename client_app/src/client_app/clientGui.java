@@ -36,6 +36,8 @@ public class clientGui {
 	private JFrame frame;
 	private JTextField textField;
 	private JList list;
+	ArrayList<DataOutputStream> doses = new ArrayList<>();
+	ArrayList<String> usernames = new ArrayList<>();
 	DefaultListModel model = new DefaultListModel();
 	private JLabel lblActiveUsers;
 	private JButton btnNewButton_3;
@@ -57,11 +59,13 @@ public class clientGui {
 	             dos = new DataOutputStream(client.getOutputStream());
 	             dis = new DataInputStream(client.getInputStream());
 	            //Scanner sc = new Scanner(System.in);
+	            
 	            dos.writeUTF("newClient:"+textField.getText());
 	            String userInput;
-	            
-	            while (true) {
-	                //System.out.print(selectedActiveUsersToGroup);
+	           doses.add(dos);
+	            	while (true) {
+	            		
+	       //System.out.print(selectedActiveUsersToGroup);
 	                //read from the user
 	            	//System.out.println("sent status"+btnNewButton_2.isEnabled());
 	                if(!btnNewButton_2.isEnabled()){
@@ -82,17 +86,21 @@ public class clientGui {
 	                	
 	                	btnNewButton_3.setEnabled(true);
 	                }
+	                
 	              
 	                String response = "";
 	                //read the response from the server
 	                //dis.read
 	                //if(dis.readUTF() != null)
 	               // {
-	                
+	                //String server = dis.readUTF();
+            		//System.out.println(server);
+            		
 	                if(dis.available() >0)
 	                {
 	                	//System.out.println(dis.available());
 	                	response = dis.readUTF();
+	                	System.out.println(response);
 	                	if(response.contains("activeUsers"))
 	                	{
 	                		String[] users= response.split(",");
@@ -114,6 +122,45 @@ public class clientGui {
 	                		list.setModel(model);
 	                		textArea.setText(response.split(":")[1] +" "+"Removed");
 	                	}
+	                	/*else if(response.contains("Ban"))
+	                	{
+	                		//for()
+	                		model.removeElement(response.split(":")[1]);
+	                		//list.remove(list);
+	                		list.setModel(model);
+	                		textArea.setText(response.split(":")[1] +" "+"Removed");
+	                	}*/
+	                	else if(response.contains("Ban"))
+	            		{
+	            			String []user = response.split(":");
+		                	System.out.println(user[1]);
+		                	//usernames.remove(user[1]);
+		                	model.removeElement(user[1]);
+		                	list.setModel(model);
+		                	textArea.append("\n user removed:"+user[1]);
+		                	dos.writeUTF("connection lost!");
+		                	for (int i=0; i<usernames.size();i++)
+		                	{
+		                		System.out.println("username:"+usernames.get(i));
+		                		if(usernames.get(i).equals(user[1]))
+		                		{
+		                			System.out.println(doses.size());
+		                			
+		                			doses.remove(i);
+		                			usernames.remove(i);
+		                			System.out.println(",ndvnk");
+		                			
+		                			System.out.println(doses.size());
+		                		
+		                		}
+		                	}
+		                	for(DataOutputStream data : doses){
+			                	//System.out.println(doses.size());
+			                	data.writeUTF("Disconnect:"+user[1]);
+			                	}
+	            		}
+
+	                	
 	                	else if(response.contains("OpenGroupGui")){
 	                		String []res = response.split(":");
 	                		System.out.println(res[1]);
@@ -128,9 +175,11 @@ public class clientGui {
 	                	}
 	                	
 	                }
+	                
 	                //Print response
 	                
 	                //}
+	                
 	            }
 	            
 	            //dis.close();
