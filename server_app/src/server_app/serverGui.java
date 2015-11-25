@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.awt.event.ActionEvent;
 import javax.swing.JTextArea;
 import javax.swing.ListModel;
@@ -32,6 +33,9 @@ public class serverGui {
 	JTextArea txtrServerLogs;
 	ArrayList<DataOutputStream> doses = new ArrayList<>();
 	ArrayList<String> usernames = new ArrayList<>();
+	ArrayList<String> groups = new ArrayList<>();
+	HashMap<String,ArrayList<DataOutputStream>> dosesofgroups = new HashMap<>();
+	ArrayList<DataOutputStream> dosesofAgroup = new ArrayList<>();
 	JPanel list_panel;
 	DefaultListModel model = new DefaultListModel();
 	JList list;
@@ -80,12 +84,14 @@ public class serverGui {
 		        try {
 		        	DataOutputStream dos = new DataOutputStream(client.getOutputStream());
 		            DataInputStream dis = new DataInputStream(client.getInputStream());
-		            doses.add(dos);
+		            
+		            
 		            while (true) {
 		                String AN = dis.readUTF();
 		                System.out.println(AN);
 		                if(AN.contains("newClient"))
 		                {
+		                	doses.add(dos);
 		                	String []user = AN.split(":");
 		                	System.out.println(user[1]);
 		                	usernames.add(user[1]);
@@ -116,7 +122,10 @@ public class serverGui {
 		                }
 		                else if(AN.contains("CreateGroup")){
 		                	String []order = AN.split(":");
+		                	dosesofAgroup.add(dos);
+				            dosesofgroups.put(order[5], dosesofAgroup);
 		                	txtrServerLogs.append("\n new group added: name:" +order[5]+ " admin:"+ order[3]);
+		                	groups.add(order[5]);
 		                	String []sendees = order[1].split(",");
 		                	for(String se : sendees){
 		                		for(int i= 0; i < usernames.size() ; i++){
@@ -126,6 +135,10 @@ public class serverGui {
 		                		}
 		                	}
 		      
+		                }else if(AN.contains("FromGroup")){
+		                	String []groupOb = AN.split(":");
+		                	String groupname = groupOb[1];
+		                	
 		                }
 		                else
 		                {

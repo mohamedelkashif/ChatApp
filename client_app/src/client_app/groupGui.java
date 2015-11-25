@@ -19,9 +19,10 @@ import javax.swing.JTextArea;
 
 public class groupGui {
 
-	private JFrame frame;
+	private  JFrame frame;
 	static JTextArea textAregroupmessg;
-	public static  String groupname = "uu&users&nn,mm";
+	public static  String groupreq = "uu&users&nn,mm";
+	static String groupname ;
 	Socket group;
 	DefaultListModel model = new DefaultListModel();
 	static JTextArea textAreaGroup;
@@ -47,7 +48,7 @@ public class groupGui {
 	                if(!btnNewButton.isEnabled()){
 	                	userInputingroup = textAreaGroup.getText() ;
 	               // System.out.println("gr"+userInputingroup);
-	                dos.writeUTF(userInputingroup);
+	                dos.writeUTF("FromGroup:"+ groupname +":"+ userInputingroup);
 	                	btnNewButton.setEnabled(true);
 	                }
 
@@ -87,7 +88,9 @@ public class groupGui {
 	 * Launch the application.
 	 */
 	public static void main(String args) {
-		groupname = args;
+		groupreq = args;
+		String []resp = groupreq.split("&");
+		groupname = resp[0];
 		//System.out.println("m*"+args);
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
@@ -128,7 +131,7 @@ public class groupGui {
 		JTextPane textPane_2 = new JTextPane();
 		textPane_2.setBounds(10, 11, 83, 21);
 		frame.getContentPane().add(textPane_2);
-		String []resp = groupname.split("&");
+		String []resp = groupreq.split("&");
 		textPane_2.setText(resp[0]);
 		
 		JList listactiveusersingroup = new JList();
