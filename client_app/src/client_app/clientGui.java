@@ -107,7 +107,7 @@ public class clientGui {
 	                		String []res = response.split(":");
 	                		System.out.println(res[1]);
 	                		groupGui newgroup = new groupGui();
-		                	newgroup.main(res[1]);
+		                	newgroup.main(res[1],client);
 	                	//	newgroup.main();
 	                	}
 	                	else

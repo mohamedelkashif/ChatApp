@@ -23,7 +23,7 @@ public class groupGui {
 	static JTextArea textAregroupmessg;
 	public static  String groupreq = "uu&users&nn,mm";
 	static String groupname ;
-	Socket group;
+	static Socket group;
 	DefaultListModel model = new DefaultListModel();
 	static JTextArea textAreaGroup;
 	 static JButton btnNewButton;
@@ -35,7 +35,7 @@ public class groupGui {
 		public void run() {
 		 try {
 	            //1.Create Client Socket and connect to the server
-	            group = new Socket("127.0.0.1", 1234);
+	           // group = new Socket("127.0.0.1", 1234);
 	            
 	            //2.if accepted create IO streams
 	            DataOutputStream dos = new DataOutputStream(group.getOutputStream());
@@ -55,19 +55,13 @@ public class groupGui {
 	              
 	                String response = "";
 	                //read the response from the server
-	                //dis.read
-	                //if(dis.readUTF() != null)
-	               // {
-	                
 	                if(dis.available() >0)
 	                {
-	                	//System.out.println(dis.available());
-	                	response = dis.readUTF();
-	                	
-	                		System.out.println(response);
+	                	System.out.println("ave"+dis.available());
+	                	response = dis.readUTF();       	
+	                	System.out.println("resfromGroup"+response);
 		                	textAregroupmessg.append(response+"\n");
-	                	
-	                	
+	        
 	                }
 	                //Print response
 	                
@@ -87,8 +81,9 @@ public class groupGui {
 	/**
 	 * Launch the application.
 	 */
-	public static void main(String args) {
+	public static void main(String args,Socket cli) {
 		groupreq = args;
+		group = cli;
 		String []resp = groupreq.split("&");
 		groupname = resp[0];
 		//System.out.println("m*"+args);

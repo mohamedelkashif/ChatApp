@@ -34,8 +34,8 @@ public class serverGui {
 	ArrayList<DataOutputStream> doses = new ArrayList<>();
 	ArrayList<String> usernames = new ArrayList<>();
 	ArrayList<String> groups = new ArrayList<>();
-	HashMap<String,ArrayList<DataOutputStream>> dosesofgroups = new HashMap<>();
-	ArrayList<DataOutputStream> dosesofAgroup = new ArrayList<>();
+	HashMap<String,ArrayList<DataOutputStream>> dosesofgroups = new HashMap<String,ArrayList<DataOutputStream>>();
+	ArrayList<DataOutputStream> dosesofAgroup = new ArrayList<DataOutputStream>();
 	JPanel list_panel;
 	DefaultListModel model = new DefaultListModel();
 	JList list;
@@ -89,6 +89,7 @@ public class serverGui {
 		            while (true) {
 		                String AN = dis.readUTF();
 		                System.out.println(AN);
+		                
 		                if(AN.contains("newClient"))
 		                {
 		                	doses.add(dos);
@@ -122,23 +123,33 @@ public class serverGui {
 		                }
 		                else if(AN.contains("CreateGroup")){
 		                	String []order = AN.split(":");
-		                	dosesofAgroup.add(dos);
-				            dosesofgroups.put(order[5], dosesofAgroup);
+		                	
+		                	
+				           
 		                	txtrServerLogs.append("\n new group added: name:" +order[5]+ " admin:"+ order[3]);
 		                	groups.add(order[5]);
 		                	String []sendees = order[1].split(",");
 		                	for(String se : sendees){
 		                		for(int i= 0; i < usernames.size() ; i++){
 		                			if(se.equals(usernames.get(i))){
+		                				dosesofAgroup.add(doses.get(i));
 		                				doses.get(i).writeUTF("OpenGroupGui:"+order[5]+"&users&"+order[1]);
 		                			}
 		                		}
 		                	}
-		      
+		                	 dosesofgroups.put(order[5], dosesofAgroup);
 		                }else if(AN.contains("FromGroup")){
 		                	String []groupOb = AN.split(":");
 		                	String groupname = groupOb[1];
-		                	
+		                	ArrayList<DataOutputStream> getdoses ;
+		                	getdoses = dosesofgroups.get(groupname);
+		                	//for(DataOutputStream data: dosesofgroups.get(groupname))
+		                	for (DataOutputStream data : getdoses)
+			                {
+		                		//System.out.println(groupOb[2]);
+			                	data.writeUTF("toGroup:"+groupname+":"+groupOb[2]);
+			                }
+			                txtrServerLogs.append("\n"+"Sent Stuff to group:"+groupname);
 		                }
 		                else
 		                {
@@ -241,14 +252,8 @@ public class serverGui {
 				try {
 					//Client Server Socket 	
 					sv = new ServerSocket(1234);
-					//servermain = new serverMain(sv);
-					//servermain.start();
-					//Group Server socket
-					gsv = new ServerSocket(1235);
 					servermain = new serverMain(sv);
 					servermain.start();
-					 groupservermain = new serverMain(gsv);
-					groupservermain.start();
 					//txtrServerLogs.setText(txtrServerLogs.getText()+"\n"+servermain.message);
 					btnNewButton_1.setEnabled(true);
 				} catch (IOException e1) {
