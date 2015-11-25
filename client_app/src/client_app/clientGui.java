@@ -41,6 +41,8 @@ public class clientGui {
 	private JButton btnNewButton_3;
 	private ArrayList<String> selectedActiveUsersToGroup = new ArrayList<String>();
 	private JTextField textField_1;
+	DataOutputStream dos;
+	DataInputStream dis;
 	public class clientMain extends Thread{
 		public clientMain() {
 	        
@@ -50,8 +52,8 @@ public class clientGui {
 	            //1.Create Client Socket and connect to the server
 	            client = new Socket("127.0.0.1", 1234);
 	            //2.if accepted create IO streams
-	            DataOutputStream dos = new DataOutputStream(client.getOutputStream());
-	            DataInputStream dis = new DataInputStream(client.getInputStream());
+	            dos = new DataOutputStream(client.getOutputStream());
+	            dis = new DataInputStream(client.getInputStream());
 	            //Scanner sc = new Scanner(System.in);
 	            dos.writeUTF("newClient:"+textField.getText());
 	            String userInput;
@@ -73,7 +75,7 @@ public class clientGui {
 	    			    	userInput += (String) list.getModel().getElementAt(selectedIx[i]) + ",";
 	    			    }
 	                	userInput += textField.getText() ;
-	                	dos.writeUTF(userInput + ":AdminOfGroup:"+textField.getText() +":GroupName:"+ textField_1.getText() );
+	                	dos.writeUTF("$From"+textField.getText()+"$"+userInput + ":AdminOfGroup:"+textField.getText() +":GroupName:"+ textField_1.getText() );
 	                	userInput = "";
 	                	
 	                	btnNewButton_3.setEnabled(true);
@@ -107,8 +109,17 @@ public class clientGui {
 	                		String []res = response.split(":");
 	                		System.out.println(res[1]);
 	                		groupGui newgroup = new groupGui();
+	                		newgroup.setdis(dis);
+	                		newgroup.setdos(dos);
+	                		newgroup.setUser(textField.getText());
+	                		groupMain groupThreadx = newgroup.new groupMain();
+	    					groupThreadx.start();
 		                	newgroup.main(res[1],client);
 	                	//	newgroup.main();
+	                	}
+	                	else if(response.contains("toGroup"))
+	                	{
+	                		
 	                	}
 	                	else
 	                	{
@@ -251,8 +262,12 @@ public class clientGui {
 				{
 					btnNewButton_3.setEnabled(false);
 					textField_1.setEnabled(false);
-					groupMain groupThread = new groupGui().new groupMain();
-					groupThread.start();
+					//groupGui group = new groupGui();
+					//group.setdos(dos);
+					//group.setdis(dis);
+					//groupMain groupThread = group.new groupMain();
+					//groupThread.start();
+					//group.main("wala 7aga",client);
 				}
 				else
 				{
@@ -273,5 +288,13 @@ public class clientGui {
 		
 		
 		
+	}
+	public DataOutputStream getDos()
+	{
+		return this.dos;
+	}
+	public DataInputStream getDis()
+	{
+		return this.dis;
 	}
 }

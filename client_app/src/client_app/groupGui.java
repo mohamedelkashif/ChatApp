@@ -28,6 +28,10 @@ public class groupGui {
 	static JTextArea textAreaGroup;
 	 static JButton btnNewButton;
 	 static String userInputingroup;
+	 DataOutputStream dos;
+	 DataInputStream dis;
+	 //clientGui client;
+	 String userx;
 	public class groupMain extends Thread{
 		public groupMain() {
 	        
@@ -38,9 +42,10 @@ public class groupGui {
 	           // group = new Socket("127.0.0.1", 1234);
 	            
 	            //2.if accepted create IO streams
-	            DataOutputStream dos = new DataOutputStream(group.getOutputStream());
-	            DataInputStream  dis = new DataInputStream(group.getInputStream());
-	            
+	            //DataOutputStream dos = new DataOutputStream(group.getOutputStream());
+			 	// DataOutputStream dos = client.getDos();
+	            //DataInputStream  dis = new DataInputStream(group.getInputStream());
+	            //DataInputStream dis = client
 	            
 	            while (true) {
 	                //read from the user
@@ -48,7 +53,7 @@ public class groupGui {
 	                if(!btnNewButton.isEnabled()){
 	                	userInputingroup = textAreaGroup.getText() ;
 	               // System.out.println("gr"+userInputingroup);
-	                dos.writeUTF("FromGroup:"+ groupname +":"+ userInputingroup);
+	                dos.writeUTF("$From"+userx+"$"+"FromGroup:"+ groupname +":"+ userInputingroup);
 	                	btnNewButton.setEnabled(true);
 	                }
 
@@ -57,8 +62,9 @@ public class groupGui {
 	                //read the response from the server
 	                if(dis.available() >0)
 	                {
-	                	System.out.println("ave"+dis.available());
-	                	response = dis.readUTF();       	
+	                	//System.out.println("reading inside one of the groups");
+	                	response = dis.readUTF();
+	                	System.out.println("reading inside one of the groups"+response);
 	                	System.out.println("resfromGroup"+response);
 		                	textAregroupmessg.append(response+"\n");
 	        
@@ -83,7 +89,7 @@ public class groupGui {
 	 */
 	public static void main(String args,Socket cli) {
 		groupreq = args;
-		group = cli;
+		//group = cli;
 		String []resp = groupreq.split("&");
 		groupname = resp[0];
 		//System.out.println("m*"+args);
@@ -155,5 +161,17 @@ public class groupGui {
 		});
 		btnNewButton.setBounds(158, 222, 89, 23);
 		frame.getContentPane().add(btnNewButton);
+	}
+	public void setdos(DataOutputStream dos)
+	{
+		this.dos = dos;
+	}
+	public void setdis(DataInputStream dis)
+	{
+		this.dis = dis;
+	}
+	public void setUser(String user)
+	{
+		this.userx = user;
 	}
 }

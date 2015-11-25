@@ -35,7 +35,6 @@ public class serverGui {
 	ArrayList<String> usernames = new ArrayList<>();
 	ArrayList<String> groups = new ArrayList<>();
 	HashMap<String,ArrayList<DataOutputStream>> dosesofgroups = new HashMap<String,ArrayList<DataOutputStream>>();
-	ArrayList<DataOutputStream> dosesofAgroup = new ArrayList<DataOutputStream>();
 	JPanel list_panel;
 	DefaultListModel model = new DefaultListModel();
 	JList list;
@@ -74,7 +73,7 @@ public class serverGui {
 	}
 	public class clientListener extends Thread{
 		 private Socket client;
-
+         private String userlistener;
 		    // constructor
 		    public clientListener(Socket client) {
 		        this.client = client;
@@ -88,14 +87,17 @@ public class serverGui {
 		            
 		            while (true) {
 		                String AN = dis.readUTF();
-		                System.out.println(AN);
+		                System.out.println("Listening to :" +userlistener+" Message is : "+AN );
+		                System.out.println("");
 		                
 		                if(AN.contains("newClient"))
 		                {
 		                	doses.add(dos);
 		                	String []user = AN.split(":");
-		                	System.out.println(user[1]);
+		                	//System.out.println(user[1]);
 		                	usernames.add(user[1]);
+		                	userlistener = user[1];
+		                	//System.out.println("created a new user :" + userlistener);
 		                	model.addElement(user[1]);
 		                	list.setModel(model);
 		                	txtrServerLogs.append("\n new user added:"+user[1]);
@@ -121,14 +123,18 @@ public class serverGui {
 		                	
 		                	
 		                }
-		                else if(AN.contains("CreateGroup")){
+		                else if(AN.contains("$From"+userlistener+"$"))
+		                {
+		                System.out.println(AN);
+		                if(AN.contains("CreateGroup")){
 		                	String []order = AN.split(":");
-		                	
+		                	//System.out.println(AN);
 		                	
 				           
 		                	txtrServerLogs.append("\n new group added: name:" +order[5]+ " admin:"+ order[3]);
 		                	groups.add(order[5]);
 		                	String []sendees = order[1].split(",");
+		                	ArrayList<DataOutputStream> dosesofAgroup = new ArrayList<DataOutputStream>();
 		                	for(String se : sendees){
 		                		for(int i= 0; i < usernames.size() ; i++){
 		                			if(se.equals(usernames.get(i))){
@@ -138,15 +144,17 @@ public class serverGui {
 		                		}
 		                	}
 		                	 dosesofgroups.put(order[5], dosesofAgroup);
+		                	 System.out.println("Groups Available:" +dosesofgroups.size());
 		                }else if(AN.contains("FromGroup")){
 		                	String []groupOb = AN.split(":");
 		                	String groupname = groupOb[1];
-		                	ArrayList<DataOutputStream> getdoses ;
+		                	ArrayList<DataOutputStream> getdoses = new ArrayList<>() ;
 		                	getdoses = dosesofgroups.get(groupname);
+		                	System.out.println("Sending to "+groupname+" which contains "+getdoses.size());
 		                	//for(DataOutputStream data: dosesofgroups.get(groupname))
 		                	for (DataOutputStream data : getdoses)
 			                {
-		                		//System.out.println(groupOb[2]);
+		                		System.out.println("writing to one of the clients in group"+groupname);
 			                	data.writeUTF("toGroup:"+groupname+":"+groupOb[2]);
 			                }
 			                txtrServerLogs.append("\n"+"Sent Stuff to group:"+groupname);
@@ -158,6 +166,7 @@ public class serverGui {
 			                	data.writeUTF(AN);
 			                }
 			                txtrServerLogs.append("\n"+"Sent Stuff to the clients");
+		                }
 		                }
 		            }
 		            //Close/release resources
