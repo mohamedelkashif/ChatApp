@@ -43,6 +43,8 @@ public class clientGui {
 	private JTextField textField_1;
 	DataOutputStream dos;
 	DataInputStream dis;
+	private JScrollPane scrollPane;
+	private JScrollPane scrollPane_1;
 	public class clientMain extends Thread{
 		public clientMain() {
 	        
@@ -226,9 +228,12 @@ public class clientGui {
 		btnNewButton_1.setBounds(234, 23, 106, 23);
 		frame.getContentPane().add(btnNewButton_1);
 		
+		scrollPane = new JScrollPane();
+		scrollPane.setBounds(135, 78, 289, 135);
+		frame.getContentPane().add(scrollPane);
+		
 		textArea = new JTextArea();
-		textArea.setBounds(135, 78, 289, 135);
-		frame.getContentPane().add(textArea);
+		scrollPane.setViewportView(textArea);
 		
 		JLabel lblAll = new JLabel("All");
 		lblAll.setBounds(145, 57, 46, 14);
@@ -247,11 +252,14 @@ public class clientGui {
 		textArea_1.setBounds(242, 229, 182, 15);
 		frame.getContentPane().add(textArea_1);
 		
+		scrollPane_1 = new JScrollPane();
+		scrollPane_1.setBounds(10, 78, 103, 159);
+		frame.getContentPane().add(scrollPane_1);
+		
 		
 		
 		list = new JList();
-		list.setBounds(10, 78, 103, 159);
-		frame.getContentPane().add(list);
+		scrollPane_1.setViewportView(list);
 		
 		lblActiveUsers = new JLabel("Active Users");
 		lblActiveUsers.setBounds(10, 55, 103, 14);

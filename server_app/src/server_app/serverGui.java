@@ -40,7 +40,6 @@ public class serverGui {
 		public serverMain(ServerSocket sv) {
 	        this.sv = sv;
 	    }
-
 		
 		
 		public void run() {
@@ -215,9 +214,12 @@ public class serverGui {
 		panel.add(list_panel);
 		list_panel.setLayout(null);
 		
+		JScrollPane scrollPane_1 = new JScrollPane();
+		scrollPane_1.setBounds(10, 35, 105, 205);
+		list_panel.add(scrollPane_1);
+		
 		list = new JList();
-		list.setBounds(10, 35, 105, 205);
-		list_panel.add(list);
+		scrollPane_1.setViewportView(list);
 		
 		JLabel lblActiveUsers = new JLabel("Active Users");
 		lblActiveUsers.setBounds(10, 11, 105, 14);
@@ -288,11 +290,14 @@ public class serverGui {
 		panel.add(log);
 		log.setLayout(null);
 		
+		JScrollPane scrollPane = new JScrollPane();
+		scrollPane.setBounds(43, 0, 222, 186);
+		log.add(scrollPane);
+		
 		txtrServerLogs = new JTextArea();
+		scrollPane.setViewportView(txtrServerLogs);
 		txtrServerLogs.setEditable(false);
-		txtrServerLogs.setBounds(43, 0, 222, 186);
 		txtrServerLogs.setText("Server Logs");
-		log.add(txtrServerLogs);
 		
 		JPanel contol_users_panel = new JPanel();
 		contol_users_panel.setBounds(126, 226, 298, 36);
