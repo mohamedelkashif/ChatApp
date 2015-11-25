@@ -34,7 +34,7 @@ public class groupGui {
 		public void run() {
 		 try {
 	            //1.Create Client Socket and connect to the server
-	            group = new Socket("127.0.0.1", 1235);
+	            group = new Socket("127.0.0.1", 1234);
 	            
 	            //2.if accepted create IO streams
 	            DataOutputStream dos = new DataOutputStream(group.getOutputStream());
