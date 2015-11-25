@@ -91,6 +91,7 @@ public class clientGui {
 	                {
 	                	//System.out.println(dis.available());
 	                	response = dis.readUTF();
+	                	System.out.println("i am "+textField.getText()+" message recieved: "+response);
 	                	if(response.contains("activeUsers"))
 	                	{
 	                		String[] users= response.split(",");
