@@ -39,6 +39,7 @@ public class groupGui {
 	 private JTextField textFieldMessage;
 	 ArrayList<String> activeUsersList = new ArrayList<>();
 	 JList listactiveusersingroup;
+	 JButton kick;
 	
 	/**
 	 * Launch the application.
@@ -116,9 +117,13 @@ public class groupGui {
 		frame.getContentPane().add(btnNewButton);
 		
 		textFieldMessage = new JTextField();
-		textFieldMessage.setBounds(7, 231, 86, 20);
+		textFieldMessage.setBounds(190, 242, 86, 20);
 		frame.getContentPane().add(textFieldMessage);
 		textFieldMessage.setColumns(10);
+		
+		kick = new JButton("Kick");
+		kick.setBounds(10, 221, 123, 23);
+		frame.getContentPane().add(kick);
 		textFieldMessage.getDocument().addDocumentListener(new DocumentListener() {
 
 	        @Override
@@ -140,7 +145,7 @@ public class groupGui {
 	        }
 	    });
 		textFieldMessage.setVisible(false);
-		
+		kick.setEnabled(false);
 	}
 
 	public void setUser(String user)
@@ -162,5 +167,7 @@ public class groupGui {
 				model.addElement(s);
 			listactiveusersingroup.setModel(model);
 		}
+		if(list[list.length-1].equals(userx))
+			kick.setEnabled(true);
 	}
 }
