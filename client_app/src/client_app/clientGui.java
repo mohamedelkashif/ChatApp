@@ -265,11 +265,10 @@ public class clientGui {
 				
 				if(!textField_1.getText().equals(""))
 				{
-					
-					textField_1.setEnabled(false);
 					String userInput = "CreateGroup:";
     				int[] selectedIx = list.getSelectedIndices();      
-
+                    if(selectedIx.length>=1)
+                    {
     			    for (int i = 0; i < selectedIx.length; i++) {
     			    	userInput += (String) list.getModel().getElementAt(selectedIx[i]) + ",";
     			    }
@@ -280,6 +279,14 @@ public class clientGui {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
+                    }
+                    else
+                    {
+                    	JOptionPane.showMessageDialog(frame,
+    						    "Sorry group must contain at least two persons",
+    						    "Connection error",
+    						    JOptionPane.ERROR_MESSAGE);
+                    }
                 	userInput = "";
 				}
 				else

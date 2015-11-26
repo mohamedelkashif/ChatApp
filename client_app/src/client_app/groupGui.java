@@ -168,6 +168,9 @@ public class groupGui {
 			listactiveusersingroup.setModel(model);
 		}
 		if(list[list.length-1].equals(userx))
+		{
 			kick.setEnabled(true);
+			textAregroupmessg.append("u are the Admin of this Group \n only you Can Kick people\n");
+		}
 	}
 }
