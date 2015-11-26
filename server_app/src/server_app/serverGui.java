@@ -15,6 +15,8 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Map;
+import java.util.Random;
 import java.awt.event.ActionEvent;
 import javax.swing.JTextArea;
 import javax.swing.ListModel;
@@ -35,6 +37,7 @@ public class serverGui {
 	JTextArea txtrServerLogs;
 	//ArrayList<DataOutputStream> doses = new ArrayList<>();
 	ArrayList<Socket> clients = new ArrayList<>();
+	ArrayList<Map<String,ArrayList<Socket>>> groups = new ArrayList<>();
 	ArrayList<String> usernames = new ArrayList<>();
 	JPanel list_panel;
 	DefaultListModel model = new DefaultListModel();
@@ -84,9 +87,8 @@ public class serverGui {
 		        try {
 		        	DataOutputStream dos = new DataOutputStream(client.getOutputStream());
 		            DataInputStream dis = new DataInputStream(client.getInputStream());
-		            //doses.add(dos);
-		            clients.add(client);
-		            while (true) {
+		            //doses.add(dos);		            	            
+		            while (true){
 		                String AN = dis.readUTF();
 		                System.out.println(AN);
 		                if(AN.contains("newClient"))
@@ -94,6 +96,11 @@ public class serverGui {
 		                	String []user = AN.split(":",2);
 		                	System.out.println(user[1]);
 		                	usernames.add(user[1]);
+		                	clients.add(client);
+				            ArrayList<Socket> groupClients = new ArrayList<>();
+				            groupClients.add(client);	
+				            Map<String,ArrayList<Socket>> group = null;
+				            group.put(user[1],groupClients);
 		                	model.addElement(user[1]);
 		                	list.setModel(model);
 		                	txtrServerLogs.append("\n new user added:"+user[1]);
@@ -135,7 +142,7 @@ public class serverGui {
 		                	{
 			                	System.out.println(usernames.get(i));
 			                	if(usernames.get(i).equals(att[0]) && !att[1].equals(""))
-			                	{
+			                	{			                		
 			                		DataOutputStream data = new DataOutputStream(clients.get(i)
 			                				.getOutputStream());
 			                		String Message = att[1];
@@ -249,6 +256,8 @@ public class serverGui {
 				try {
 					
 					sv = new ServerSocket(1234);
+					System.out.println();					
+					int i = Rand.nextInt();
 					servermain = new serverMain(sv);
 					servermain.start();
 					//txtrServerLogs.setText(txtrServerLogs.getText()+"\n"+servermain.message);
