@@ -4,6 +4,7 @@ import java.awt.Component;
 import java.awt.EventQueue;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.IOException;
 import java.net.Socket;
 
 import javax.swing.JFrame;
@@ -11,11 +12,15 @@ import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import javax.swing.JTextArea;
+import java.awt.event.InputMethodListener;
+import java.awt.event.InputMethodEvent;
 
 public class groupGui {
 
@@ -28,68 +33,16 @@ public class groupGui {
 	static JTextArea textAreaGroup;
 	 static JButton btnNewButton;
 	 static String userInputingroup;
-	 DataOutputStream dos;
-	 DataInputStream dis;
-	 //clientGui client;
+	 static clientGui client;
 	 String userx;
-	public class groupMain extends Thread{
-		public groupMain() {
-	        
-	    }
-		public void run() {
-		 try {
-	            //1.Create Client Socket and connect to the server
-	           // group = new Socket("127.0.0.1", 1234);
-	            
-	            //2.if accepted create IO streams
-	            //DataOutputStream dos = new DataOutputStream(group.getOutputStream());
-			 	// DataOutputStream dos = client.getDos();
-	            //DataInputStream  dis = new DataInputStream(group.getInputStream());
-	            //DataInputStream dis = client
-	            
-	            while (true) {
-	                //read from the user
-	            	//System.out.println("ts");
-	                if(!btnNewButton.isEnabled()){
-	                	userInputingroup = textAreaGroup.getText() ;
-	               // System.out.println("gr"+userInputingroup);
-	                dos.writeUTF("$From"+userx+"$"+"FromGroup:"+ groupname +":"+ userInputingroup);
-	                	btnNewButton.setEnabled(true);
-	                }
-
-	              
-	                String response = "";
-	                //read the response from the server
-	                if(dis.available() >0)
-	                {
-	                	//System.out.println("reading inside one of the groups");
-	                	response = dis.readUTF();
-	                	System.out.println("reading inside one of the groups"+response);
-	                	System.out.println("resfromGroup"+response);
-		                	textAregroupmessg.append(response+"\n");
-	        
-	                }
-	                //Print response
-	                
-	                //}
-	            }
-	            
-	            //dis.close();
-	            //dos.close();
-	            //client.close();
-
-	        } catch (Exception e) {
-	            System.out.println(e.getMessage());
-	        }
-		}
-		
-	}
+	 private JTextField textFieldMessage;
+	
 	/**
 	 * Launch the application.
 	 */
-	public static void main(String args,Socket cli) {
+	public static void main(String args,clientGui cli,groupGui group) {
 		groupreq = args;
-		//group = cli;
+		client = cli;
 		String []resp = groupreq.split("&");
 		groupname = resp[0];
 		//System.out.println("m*"+args);
@@ -97,8 +50,8 @@ public class groupGui {
 			public void run() {
 				try {
 					
-					groupGui window = new groupGui();
-					window.frame.setVisible(true);
+					//groupGui window = new groupGui();
+					group.frame.setVisible(true);
 					
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -156,22 +109,53 @@ public class groupGui {
 		btnNewButton = new JButton("Send To group");
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				btnNewButton.setEnabled(false);
+				userInputingroup = textAreaGroup.getText() ;
+	               // System.out.println("gr"+userInputingroup);
+				   //dos.writeUTF("$From"+userx+"$"+"FromGroup:"+ groupname +":"+ userInputingroup);
+				System.out.println("i am "+userx);
+				client.setMessage("$From"+userx+"$"+"FromGroup:"+ groupname +":"+ userInputingroup);
+					
 			}
 		});
 		btnNewButton.setBounds(158, 222, 89, 23);
 		frame.getContentPane().add(btnNewButton);
+		
+		textFieldMessage = new JTextField();
+		textFieldMessage.setBounds(7, 231, 86, 20);
+		frame.getContentPane().add(textFieldMessage);
+		textFieldMessage.setColumns(10);
+		textFieldMessage.getDocument().addDocumentListener(new DocumentListener() {
+
+	        @Override
+	        public void removeUpdate(DocumentEvent e) {
+
+	        }
+
+	        @Override
+	        public void insertUpdate(DocumentEvent e) {
+	        	textAregroupmessg.append(textFieldMessage.getText()+"\n");
+	        	System.out.println("something updated neehaaa"+textFieldMessage.getText()+"\n");
+	        	
+	        }
+
+	        @Override
+	        public void changedUpdate(DocumentEvent arg0) {
+	        	System.out.println("something changed neehaaa\n");
+	        	textAregroupmessg.append(textFieldMessage.getText()+"\n");
+	        }
+	    });
+		textFieldMessage.setVisible(false);
+		
 	}
-	public void setdos(DataOutputStream dos)
-	{
-		this.dos = dos;
-	}
-	public void setdis(DataInputStream dis)
-	{
-		this.dis = dis;
-	}
+
 	public void setUser(String user)
 	{
+		System.out.println("Setting the user to : "+user);
 		this.userx = user;
+	}
+	public void setMessage(String message)
+	{
+		System.out.println("message is being set neehaaa\n");
+		textFieldMessage.setText(message);
 	}
 }

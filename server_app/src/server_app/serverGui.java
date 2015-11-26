@@ -140,6 +140,7 @@ public class serverGui {
 		                			if(se.equals(usernames.get(i))){
 		                				dosesofAgroup.add(doses.get(i));
 		                				doses.get(i).writeUTF("OpenGroupGui:"+order[5]+"&users&"+order[1]);
+		                				doses.get(i).writeUTF("toGroup:"+order[5]);
 		                			}
 		                		}
 		                	}

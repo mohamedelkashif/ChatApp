@@ -6,9 +6,8 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import java.awt.BorderLayout;
 import javax.swing.JTextField;
-
-import client_app.groupGui.groupMain;
-
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import java.awt.event.ActionListener;
@@ -18,6 +17,7 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Scanner;
 import java.awt.event.ActionEvent;
 import javax.swing.JList;
@@ -41,8 +41,11 @@ public class clientGui {
 	private JButton btnNewButton_3;
 	private ArrayList<String> selectedActiveUsersToGroup = new ArrayList<String>();
 	private JTextField textField_1;
+	HashMap<String,groupGui> usergroups = new HashMap<String,groupGui>();
 	DataOutputStream dos;
 	DataInputStream dis;
+	static clientGui window;
+	private JTextField messageFromGroup;
 	public class clientMain extends Thread{
 		public clientMain() {
 	        
@@ -68,15 +71,7 @@ public class clientGui {
 	                btnNewButton_2.setEnabled(true);
 	                }
 	                if(!btnNewButton_3.isEnabled()){
-	                	userInput = "CreateGroup:";
-	    				int[] selectedIx = list.getSelectedIndices();      
-
-	    			    for (int i = 0; i < selectedIx.length; i++) {
-	    			    	userInput += (String) list.getModel().getElementAt(selectedIx[i]) + ",";
-	    			    }
-	                	userInput += textField.getText() ;
-	                	dos.writeUTF("$From"+textField.getText()+"$"+userInput + ":AdminOfGroup:"+textField.getText() +":GroupName:"+ textField_1.getText() );
-	                	userInput = "";
+	                	
 	                	
 	                	btnNewButton_3.setEnabled(true);
 	                }
@@ -110,16 +105,20 @@ public class clientGui {
 	                		String []res = response.split(":");
 	                		System.out.println(res[1]);
 	                		groupGui newgroup = new groupGui();
-	                		newgroup.setdis(dis);
-	                		newgroup.setdos(dos);
+	                		String createdgroupName = res[1].split("&")[0];
 	                		newgroup.setUser(textField.getText());
-	                		groupMain groupThreadx = newgroup.new groupMain();
-	    					groupThreadx.start();
-		                	newgroup.main(res[1],client);
+	                		//groupMain groupThreadx = newgroup.new groupMain();
+	    					//groupThreadx.start();
+		                	newgroup.main(res[1],window,newgroup);
+		                	usergroups.put(createdgroupName, newgroup);
 	                	//	newgroup.main();
 	                	}
 	                	else if(response.contains("toGroup"))
 	                	{
+	                		String createdgroupName =response.split(":")[1];
+	                		System.out.println("sending to group:"+createdgroupName);
+	                		groupGui sendingto  = usergroups.get(createdgroupName);
+	                		sendingto.setMessage(response);
 	                		
 	                	}
 	                	else
@@ -154,7 +153,7 @@ public class clientGui {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					clientGui window = new clientGui();
+					window = new clientGui();
 					window.frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -263,12 +262,20 @@ public class clientGui {
 				{
 					btnNewButton_3.setEnabled(false);
 					textField_1.setEnabled(false);
-					//groupGui group = new groupGui();
-					//group.setdos(dos);
-					//group.setdis(dis);
-					//groupMain groupThread = group.new groupMain();
-					//groupThread.start();
-					//group.main("wala 7aga",client);
+					String userInput = "CreateGroup:";
+    				int[] selectedIx = list.getSelectedIndices();      
+
+    			    for (int i = 0; i < selectedIx.length; i++) {
+    			    	userInput += (String) list.getModel().getElementAt(selectedIx[i]) + ",";
+    			    }
+                	userInput += textField.getText() ;
+                	try {
+						dos.writeUTF("$From"+textField.getText()+"$"+userInput + ":AdminOfGroup:"+textField.getText() +":GroupName:"+ textField_1.getText() );
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+                	userInput = "";
 				}
 				else
 				{
@@ -287,6 +294,36 @@ public class clientGui {
 		frame.getContentPane().add(textField_1);
 		textField_1.setColumns(10);
 		
+		messageFromGroup = new JTextField();
+		messageFromGroup.setBounds(234, 249, 86, 20);
+		frame.getContentPane().add(messageFromGroup);
+		messageFromGroup.setColumns(10);
+		messageFromGroup.getDocument().addDocumentListener(new DocumentListener() {
+
+	        @Override
+	        public void removeUpdate(DocumentEvent e) {
+
+	        }
+
+	        @Override
+	        public void insertUpdate(DocumentEvent e) {
+	        	System.out.println("something updated neehaaa"+messageFromGroup.getText()+"\n");
+	        	try {
+					dos.writeUTF(messageFromGroup.getText());
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+	        }
+
+	        @Override
+	        public void changedUpdate(DocumentEvent arg0) {
+	        	System.out.println("something changed neehaaa\n");
+	        	
+	        }
+	    });
+		messageFromGroup.setVisible(false);
+		
 		
 		
 	}
@@ -297,5 +334,9 @@ public class clientGui {
 	public DataInputStream getDis()
 	{
 		return this.dis;
+	}
+	public void setMessage(String message)
+	{
+		this.messageFromGroup.setText(message);
 	}
 }
