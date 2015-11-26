@@ -264,7 +264,7 @@ public class clientGui {
 				
 				if(!textField_1.getText().equals(""))
 				{
-					btnNewButton_3.setEnabled(false);
+					
 					textField_1.setEnabled(false);
 					String userInput = "CreateGroup:";
     				int[] selectedIx = list.getSelectedIndices();      
