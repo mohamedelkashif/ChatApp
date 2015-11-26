@@ -35,9 +35,11 @@ public class serverGui {
 	JList list;
 	DataInputStream dis ;
 	DataOutputStream dos;
+	Socket c;
 	//DefaultListModel<String> model = new DefaultListModel<>();
 	public class serverMain extends Thread{
 		ServerSocket sv;
+		Socket c;
 		public JTextArea jx ;
 		public serverMain(ServerSocket sv) {
 	        this.sv = sv;
@@ -51,7 +53,7 @@ public class serverGui {
 					while (true) {
 	            	
 	                //2.Listen for Clients
-	                Socket c;
+	                
 	                c = sv.accept();
 	                //txtrServerLogs.append("\n New Client Arrived");
 	                clientListener ch = new clientListener(c);
@@ -82,6 +84,7 @@ public class serverGui {
 		            doses.add(dos);
 		            while (true) {
 		                String AN = dis.readUTF();
+		                System.out.println(AN);
 		                if(AN.contains("newClient"))
 		                {
 		                	String []user = AN.split(":");
@@ -125,6 +128,11 @@ public class serverGui {
 		                		}
 		                	}
 		      
+		                }
+		                else if(AN.contains("Ban"))
+		                {
+		                	model.removeElement(AN.split(":")[1]);
+		                	list.setModel(model);
 		                }
 		                else if(AN.contains("Disconnect"))
 		                {
@@ -313,8 +321,7 @@ public class serverGui {
 			public void actionPerformed(ActionEvent arg0) {
 				try {
 					dos.writeUTF("Ban:"+list.getSelectedValue().toString());
-					//String x = list.getSelectedValue().toString();
-					//System.out.println(x);
+					
 					txtrServerLogs.setText("Client deleted");
 				} catch (IOException e) {
 					// TODO Auto-generated catch block

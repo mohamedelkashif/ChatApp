@@ -58,11 +58,12 @@ public class clientGui {
 	            //2.if accepted create IO streams
 	             dos = new DataOutputStream(client.getOutputStream());
 	             dis = new DataInputStream(client.getInputStream());
+	             doses.add(dos);
 	            //Scanner sc = new Scanner(System.in);
 	            
 	            dos.writeUTF("newClient:"+textField.getText());
 	            String userInput;
-	           doses.add(dos);
+	           
 	            	while (true) {
 	            		
 	       //System.out.print(selectedActiveUsersToGroup);
@@ -98,7 +99,6 @@ public class clientGui {
             		
 	                if(dis.available() >0)
 	                {
-	                	//System.out.println(dis.available());
 	                	response = dis.readUTF();
 	                	System.out.println(response);
 	                	if(response.contains("activeUsers"))
@@ -122,27 +122,20 @@ public class clientGui {
 	                		list.setModel(model);
 	                		textArea.setText(response.split(":")[1] +" "+"Removed");
 	                	}
-	                	/*else if(response.contains("Ban"))
-	                	{
-	                		//for()
-	                		model.removeElement(response.split(":")[1]);
-	                		//list.remove(list);
-	                		list.setModel(model);
-	                		textArea.setText(response.split(":")[1] +" "+"Removed");
-	                	}*/
+	                	
 	                	else if(response.contains("Ban"))
 	            		{
-	            			String []user = response.split(":");
-		                	System.out.println(user[1]);
+	            			//String []user = response.split(":");
+		                	//System.out.println(user[1]);
 		                	//usernames.remove(user[1]);
-		                	model.removeElement(user[1]);
+		                	model.removeElement(response.split(":")[1]);
 		                	list.setModel(model);
-		                	textArea.append("\n user removed:"+user[1]);
+		                	textArea.append("\n user removed:"+response.split(":")[1]);
 		                	dos.writeUTF("connection lost!");
 		                	for (int i=0; i<usernames.size();i++)
 		                	{
 		                		System.out.println("username:"+usernames.get(i));
-		                		if(usernames.get(i).equals(user[1]))
+		                		if(usernames.get(i).equals(response.split(":")[1]))
 		                		{
 		                			System.out.println(doses.size());
 		                			
@@ -156,8 +149,9 @@ public class clientGui {
 		                	}
 		                	for(DataOutputStream data : doses){
 			                	//System.out.println(doses.size());
-			                	data.writeUTF("Disconnect:"+user[1]);
+			                	data.writeUTF("Ban:"+response.split(":")[1]);
 			                	}
+		                	client.close();
 	            		}
 
 	                	
@@ -264,7 +258,8 @@ public class clientGui {
 				try {
 					dos.writeUTF("Disconnect:"+textField.getText());
 					
-					client.close();
+					//client.close();
+					//dos.close();
 					textArea.setText("Connection lost !");
 				} catch (IOException e1) {
 					// TODO Auto-generated catch block
