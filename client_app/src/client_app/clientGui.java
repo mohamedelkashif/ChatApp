@@ -96,6 +96,7 @@ public class clientGui {
 	                		groupGui newgroup = new groupGui();
 	                		String createdgroupName = res[1].split("&")[0];
 	                		newgroup.setUser(textField.getText());
+	                		newgroup.setActiveUsersList(res[1].split("&")[2].split(","));
 	                		//groupMain groupThreadx = newgroup.new groupMain();
 	    					//groupThreadx.start();
 		                	newgroup.main(res[1],window,newgroup);

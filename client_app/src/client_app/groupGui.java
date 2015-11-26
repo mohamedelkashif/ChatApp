@@ -6,6 +6,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.util.ArrayList;
 
 import javax.swing.JFrame;
 import javax.swing.DefaultListModel;
@@ -36,12 +37,14 @@ public class groupGui {
 	 static clientGui client;
 	 static String userx;
 	 private JTextField textFieldMessage;
+	 ArrayList<String> activeUsersList = new ArrayList<>();
+	 JList listactiveusersingroup;
 	
 	/**
 	 * Launch the application.
 	 */
 	public static void main(String args,clientGui cli,groupGui group) {
-		groupreq = args;
+		String groupreq = args;
 		client = cli;
 		String []resp = groupreq.split("&");
 		groupname = resp[0];
@@ -81,31 +84,21 @@ public class groupGui {
 		frame.getContentPane().setLayout(null);
 		
 		JLabel lblActiveGroups = new JLabel("Active User in Group");
-		lblActiveGroups.setBounds(10, 43, 103, 14);
+		lblActiveGroups.setBounds(10, 16, 123, 14);
 		frame.getContentPane().add(lblActiveGroups);
-		
-		JTextPane textPane_2 = new JTextPane();
-		textPane_2.setBounds(10, 11, 83, 21);
-		frame.getContentPane().add(textPane_2);
 		String []resp = groupreq.split("&");
-		textPane_2.setText(resp[0]);
 		
-		JList listactiveusersingroup = new JList();
-		listactiveusersingroup.setBounds(10, 68, 103, 159);
+		listactiveusersingroup = new JList();
+		listactiveusersingroup.setBounds(10, 41, 123, 169);
 		frame.getContentPane().add(listactiveusersingroup);
-		String []actusers = resp[2].split(",");
-		for(int i = 0 ; i < actusers.length ; i++){
-			model.addElement(actusers[i]);
-			
-		}
-		listactiveusersingroup.setModel(model);
 		
-		 textAregroupmessg = new JTextArea();
+		
+		textAregroupmessg = new JTextArea();
 		textAregroupmessg.setBounds(158, 17, 273, 193);
 		frame.getContentPane().add(textAregroupmessg);
 		
 		textAreaGroup = new JTextArea();
-		textAreaGroup.setBounds(257, 221, 167, 21);
+		textAreaGroup.setBounds(158, 221, 153, 21);
 		frame.getContentPane().add(textAreaGroup);
 		
 		btnNewButton = new JButton("Send To group");
@@ -119,7 +112,7 @@ public class groupGui {
 					
 			}
 		});
-		btnNewButton.setBounds(158, 222, 89, 23);
+		btnNewButton.setBounds(321, 221, 110, 23);
 		frame.getContentPane().add(btnNewButton);
 		
 		textFieldMessage = new JTextField();
@@ -159,5 +152,15 @@ public class groupGui {
 	{
 		System.out.println("message is being set neehaaa\n");
 		textFieldMessage.setText(message);
+	}
+	public void setActiveUsersList(String[] list)
+	{
+		for(String s : list)
+		{
+			activeUsersList.add(s);
+			if(!s.equals(userx))
+				model.addElement(s);
+			listactiveusersingroup.setModel(model);
+		}
 	}
 }
