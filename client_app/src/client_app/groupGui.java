@@ -24,7 +24,7 @@ import java.awt.event.InputMethodEvent;
 
 public class groupGui {
 
-	private  JFrame frame;
+	private static  JFrame frame;
 	static JTextArea textAregroupmessg;
 	public static  String groupreq = "uu&users&nn,mm";
 	static String groupname ;
@@ -34,7 +34,7 @@ public class groupGui {
 	 static JButton btnNewButton;
 	 static String userInputingroup;
 	 static clientGui client;
-	 String userx;
+	 static String userx;
 	 private JTextField textFieldMessage;
 	
 	/**
@@ -45,6 +45,7 @@ public class groupGui {
 		client = cli;
 		String []resp = groupreq.split("&");
 		groupname = resp[0];
+		frame.setTitle("client "+userx+" chat with group "+groupname);
 		//System.out.println("m*"+args);
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
@@ -74,6 +75,7 @@ public class groupGui {
 	 */
 	private void initialize() {
 		frame = new JFrame();
+		
 		frame.setBounds(100, 100, 450, 300);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(null);
