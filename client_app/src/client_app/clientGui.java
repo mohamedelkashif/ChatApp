@@ -65,17 +65,6 @@ public class clientGui {
 	                //System.out.print(selectedActiveUsersToGroup);
 	                //read from the user
 	            	//System.out.println("sent status"+btnNewButton_2.isEnabled());
-	                if(!btnNewButton_2.isEnabled()){
-	                userInput = textArea_1.getText() ;
-	                dos.writeUTF("$From"+textField.getText()+"$:"+userInput);
-	                btnNewButton_2.setEnabled(true);
-	                }
-	                if(!btnNewButton_3.isEnabled()){
-	                	
-	                	
-	                	btnNewButton_3.setEnabled(true);
-	                }
-	              
 	                String response = "";
 	                //read the response from the server
 	                //dis.read
@@ -197,6 +186,11 @@ public class clientGui {
 					clientThread.start();
 					textField.setEnabled(false);
 					frame.setTitle("Client "+textField.getText()+" chat");
+					btnNewButton_2.setEnabled(true);
+					btnNewButton_3.setEnabled(true);
+					textArea_1.setEditable(true);
+					textField_1.setEditable(true);
+					btnNewButton_1.setEnabled(true);
 				}
 				else
 				{
@@ -237,14 +231,20 @@ public class clientGui {
 		btnNewButton_2 = new JButton("Send");
 		btnNewButton_2.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				btnNewButton_2.setEnabled(false);
+				String userInput = textArea_1.getText() ;
+                try {
+					dos.writeUTF("$From"+textField.getText()+"$:"+userInput);
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
 			}
 		});
-		btnNewButton_2.setBounds(135, 224, 89, 23);
+		btnNewButton_2.setBounds(329, 218, 89, 23);
 		frame.getContentPane().add(btnNewButton_2);
 		
 		textArea_1 = new JTextArea();
-		textArea_1.setBounds(242, 229, 182, 15);
+		textArea_1.setBounds(135, 223, 184, 15);
 		frame.getContentPane().add(textArea_1);
 		
 		
@@ -258,6 +258,7 @@ public class clientGui {
 		frame.getContentPane().add(lblActiveUsers);
 		
 		btnNewButton_3 = new JButton("Create A Group");
+		btnNewButton_3.setToolTipText("Please select multiple users first");
 		btnNewButton_3.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				
@@ -289,16 +290,17 @@ public class clientGui {
 				}
 			}
 		});
-		btnNewButton_3.setBounds(10, 248, 117, 23);
+		btnNewButton_3.setBounds(10, 249, 133, 23);
 		frame.getContentPane().add(btnNewButton_3);
 		
 		textField_1 = new JTextField();
-		textField_1.setBounds(135, 249, 86, 20);
+		textField_1.setToolTipText("Enter group name here");
+		textField_1.setBounds(158, 250, 133, 20);
 		frame.getContentPane().add(textField_1);
 		textField_1.setColumns(10);
 		
 		messageFromGroup = new JTextField();
-		messageFromGroup.setBounds(234, 249, 86, 20);
+		messageFromGroup.setBounds(338, 249, 86, 20);
 		frame.getContentPane().add(messageFromGroup);
 		messageFromGroup.setColumns(10);
 		messageFromGroup.getDocument().addDocumentListener(new DocumentListener() {
@@ -326,7 +328,12 @@ public class clientGui {
 	        }
 	    });
 		messageFromGroup.setVisible(false);
-		
+		btnNewButton_2.setEnabled(false);
+		btnNewButton_3.setEnabled(false);
+		textArea_1.setEditable(false);
+		textField_1.setEditable(false);
+		btnNewButton_1.setEnabled(false);
+		textArea.setEditable(false);
 		
 		
 	}
