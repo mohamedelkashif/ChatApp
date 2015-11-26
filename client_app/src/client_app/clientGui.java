@@ -14,6 +14,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.UnknownHostException;
 import java.util.Scanner;
 import java.awt.event.ActionEvent;
 import javax.swing.JList;
@@ -60,7 +61,7 @@ public class clientGui {
 	                
 	                //read from the user
 	            	//System.out.println("sent status"+btnNewButton_2.isEnabled());
-	                if(!btnNewButton_2.isEnabled())
+	                /*if(!btnNewButton_2.isEnabled())
 	                {
 		                userInput = textArea_1.getText();
 		                //userInput = "create"
@@ -73,17 +74,17 @@ public class clientGui {
 		                {
 		                	dos.writeUTF(textField.getText()+"sendto"+list.getSelectedValue()
 		                	.toString()+","+textField.getText()+": "+userInput);
-		                }*/
+		                }
 		                if(!userInput.equals(""))
 		                {
 		                	//dos.writeUTF(textField.getText()+"sendto"+lblAll.getText()
-		                	//.toString()+","+textField.getText()+": "+userInput);*/
+		                	//.toString()+","+textField.getText()+": "+userInput);
 		                dos.writeUTF(textField.getText()+"sendto"+lblAll.getText()
 	                	.toString().split(": ")[1]+","+textField.getText()+": "+userInput);
 		                }
 		                btnNewButton_2.setEnabled(true);
 		                
-	                }
+	                }*/
 	                String response = "";
 	                //read the response from the server
 	                //dis.read
@@ -96,7 +97,7 @@ public class clientGui {
 	                	response = dis.readUTF();
 	                	if(response.contains("activeUsers"))
 	                	{
-	                		String[] users= response.split(",",2);
+	                		String[] users= response.split(",");
 	                		for(int i= 1 ;i<users.length;i++)
 	                		{
 	                			model.addElement(users[i]);
@@ -105,7 +106,7 @@ public class clientGui {
 	                	}
 	                	else if(response.contains("updateUsers"))
 	                	{
-	                		model.addElement(response.split(":",2)[1]);
+	                		model.addElement(response.split(":")[1]);
 	                		list.setModel(model);
 	                	}
 	                	else if (response.contains(":"))
@@ -225,6 +226,26 @@ public class clientGui {
 		btnNewButton_2.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				btnNewButton_2.setEnabled(false);
+				try {
+					client = new Socket("127.0.0.1", 1234);
+					DataOutputStream dos = new DataOutputStream(client.getOutputStream());
+		            String userInput;
+					userInput = textArea_1.getText();
+	                if(!userInput.equals(""))
+	                {
+	                	//dos.writeUTF(textField.getText()+"sendto"+lblAll.getText()
+	                	//.toString()+","+textField.getText()+": "+userInput);*/
+	                dos.writeUTF(textField.getText()+"sendto"+lblAll.getText()
+	            	.toString().split(": ")[1]+","+textField.getText()+": "+userInput);
+	                }
+				} catch (UnknownHostException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}				
+                btnNewButton_2.setEnabled(true);
 			}
 		});
 		btnNewButton_2.setBounds(135, 224, 89, 23);
