@@ -33,7 +33,7 @@ public class clientGui {
 	JButton btnNewButton_1;
 	Socket client;
 	JTextArea textArea;
-	private JFrame frame;
+	private static JFrame frame;
 	private JTextField textField;
 	private JList list;
 	DefaultListModel model = new DefaultListModel();
@@ -150,9 +150,11 @@ public class clientGui {
 	 * Launch the application.
 	 */
 	public static void main(String[] args) {
+		
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
+					
 					window = new clientGui();
 					window.frame.setVisible(true);
 				} catch (Exception e) {
@@ -194,6 +196,7 @@ public class clientGui {
 					clientMain clientThread = new  clientMain();
 					clientThread.start();
 					textField.setEnabled(false);
+					frame.setTitle("Client "+textField.getText()+" chat");
 				}
 				else
 				{
