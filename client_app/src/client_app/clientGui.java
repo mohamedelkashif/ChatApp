@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.Random;
 import java.util.Scanner;
 import java.awt.event.ActionEvent;
 import javax.swing.JList;
@@ -182,6 +183,15 @@ public class clientGui {
 				{
 					btnNewButton.setEnabled(false);
 					btnNewButton_1.setEnabled(true);
+					Random rand = new Random();
+					int i = rand.nextInt((1500 - 1000) + 1) + 1000;
+					System.out.println(i);
+					try {
+						ServerSocket cs = new ServerSocket(i);
+					} catch (IOException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
 					clientMain clientThread = new  clientMain();
 					clientThread.start();
 					textField.setEnabled(false);

@@ -97,10 +97,10 @@ public class serverGui {
 		                	System.out.println(user[1]);
 		                	usernames.add(user[1]);
 		                	clients.add(client);
-				            ArrayList<Socket> groupClients = new ArrayList<>();
-				            groupClients.add(client);	
-				            Map<String,ArrayList<Socket>> group = null;
-				            group.put(user[1],groupClients);
+				            //ArrayList<Socket> groupClients = new ArrayList<>();
+				            //groupClients.add(client);	
+				            //Map<String,ArrayList<Socket>> group = null;
+				            //group.put(user[1],groupClients);
 		                	model.addElement(user[1]);
 		                	list.setModel(model);
 		                	txtrServerLogs.append("\n new user added:"+user[1]);
