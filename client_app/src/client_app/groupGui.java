@@ -42,6 +42,7 @@ public class groupGui {
 	 ArrayList<String> activeUsersList = new ArrayList<>();
 	 JList listactiveusersingroup;
 	 JButton kick;
+	 String choice;
 	
 	/**
 	 * Launch the application.
@@ -92,6 +93,13 @@ public class groupGui {
 		String []resp = groupreq.split("&");
 		
 		listactiveusersingroup = new JList();
+		listactiveusersingroup.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				choice = listactiveusersingroup.getSelectedValue().toString();
+				System.out.println(choice);
+			}
+		});
 		listactiveusersingroup.setBounds(10, 41, 123, 169);
 		frame.getContentPane().add(listactiveusersingroup);
 		
@@ -126,7 +134,20 @@ public class groupGui {
 		kick = new JButton("Kick");
 		kick.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				
+				System.out.println(client.usergroups.keySet());
+				groupGui gui = client.usergroups.get(groupname);
+				if(gui != null)
+					try {
+						client.client = new Socket("127.0.0.1", 1234);
+						DataOutputStream dos = new DataOutputStream(client.client.getOutputStream());
+						dos.writeUTF(groupname+"kickOff"+choice);
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				else 
+					System.out.println("ERROR");
+				client.usergroups.remove(choice);
 			}
 		});
 		kick.setBounds(10, 221, 123, 23);

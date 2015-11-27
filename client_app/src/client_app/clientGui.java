@@ -214,6 +214,7 @@ public class clientGui {
 	                		//groupMain groupThreadx = newgroup.new groupMain();
 	    					//groupThreadx.start();
 		                	newgroup.main(res[1],window,newgroup);
+		                	System.out.println(createdgroupName);
 		                	usergroups.put(createdgroupName, newgroup);
 	                	//	newgroup.main();
 	                	}
