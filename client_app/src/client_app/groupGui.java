@@ -173,4 +173,17 @@ public class groupGui {
 			textAregroupmessg.append("u are the Admin of this Group \n only you Can Kick people\n");
 		}
 	}
+	public void UpdateActiveUsersList(String[] list)
+	{
+		model.removeAllElements();
+		ArrayList<String> activeusersingroupnow = activeUsersList;
+		activeUsersList.clear();
+		for(String s : list)
+		{
+			if(activeusersingroupnow.contains(s))
+				activeUsersList.add(s);
+			listactiveusersingroup.setModel(model);
+		}
+		
+	}
 }

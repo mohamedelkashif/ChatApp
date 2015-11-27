@@ -219,8 +219,16 @@ public class serverGui {
 		                	}
 		                	for(Socket c : clients){
 		                	//System.out.println(doses.size());
-		                		DataOutputStream data = new DataOutputStream(c.getOutputStream());		                				
-		                	data.writeUTF("Disconnect:"+user[1]);
+		                		DataOutputStream data = new DataOutputStream(c.getOutputStream());
+		                		String groupnamesinarr = "nullGroup";
+		                		for(String group : groups){
+		                			groupnamesinarr += ","+group ;
+		                		}
+		                		String usernamesinarr = "nullName";
+		                		for(String username : usernames){
+		                			usernamesinarr += ","+username ;
+		                		}
+		                	data.writeUTF("Disconnect:"+user[1]+":activeusers:"+usernamesinarr +":toGrouup:"+groupnamesinarr);
 		                	}
 		                }
 		                else

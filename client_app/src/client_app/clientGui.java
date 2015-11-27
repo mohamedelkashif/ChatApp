@@ -225,6 +225,22 @@ public class clientGui {
 	                		sendingto.setMessage(response);
 	                		
 	                	}
+	                	else if(response.contains("toGrouup"))
+	                	{
+	                		String groupnamestosend =response.split(":")[5];
+	                		String[] useractive =response.split(":")[3].split(",");
+	                		String[] acttivs = null ;
+	                		for(int i = 1 ; i < useractive.length ;i++){
+	                				acttivs[i-1] = useractive[i];
+	                		}
+	                			
+	                		for(String grupnme : groupnamestosend.split(",")){
+	                			if(!grupnme.equals("nullGroup")){
+			                		groupGui sendingtto  = usergroups.get(grupnme);
+			                		sendingtto.UpdateActiveUsersList(acttivs);
+			                		}
+	                		}
+	                	}
 	                	else if (response.contains(":"))
 	                	{
 	                		String[] s = response.split(":",2);
