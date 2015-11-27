@@ -22,6 +22,8 @@ import java.awt.event.ActionEvent;
 import javax.swing.JTextArea;
 import java.awt.event.InputMethodListener;
 import java.awt.event.InputMethodEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 public class groupGui {
 
@@ -122,6 +124,14 @@ public class groupGui {
 		textFieldMessage.setColumns(10);
 		
 		kick = new JButton("Kick");
+		kick.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				
+			}
+		});
+			}
+				
+			}
 		kick.setBounds(10, 221, 123, 23);
 		frame.getContentPane().add(kick);
 		textFieldMessage.getDocument().addDocumentListener(new DocumentListener() {
