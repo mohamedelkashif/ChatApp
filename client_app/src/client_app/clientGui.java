@@ -240,6 +240,11 @@ public class clientGui {
 			                		sendingtto.UpdateActiveUsersList(acttivs);
 			                		}
 	                		}
+	                	}else if(response.contains("ChangingGroupAdmin")){
+	                		String groupnamestosend =response.split(":")[1];
+	                		String newadmin =response.split(":")[3];
+	                		groupGui sendingtto  = usergroups.get(groupnamestosend);
+	                		sendingtto.UpdateAdmin(newadmin);
 	                	}
 	                	else if (response.contains(":"))
 	                	{

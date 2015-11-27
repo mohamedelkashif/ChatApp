@@ -156,7 +156,9 @@ public class groupGui {
                 if(selectedIx.length==1)
                 {
 			    	adminofgroup = (String) listactiveusersingroup.getModel().getElementAt(selectedIx[0]);
+			    	client.setMessage("ChangeGroupAdmin:"+groupname+":to:"+adminofgroup);
 			    	btnNewButton_1.setEnabled(false);
+			    	kick.setEnabled(false);
 			    }
 			}
 		});
@@ -209,5 +211,14 @@ public class groupGui {
 			listactiveusersingroup.setModel(model);
 		}
 		
+	}
+	public void UpdateAdmin(String newadmin)
+	{
+		adminofgroup = newadmin;
+		if(userx.equals(newadmin)){
+			btnNewButton_1.setEnabled(true);
+			kick.setEnabled(true);
+			textAregroupmessg.append("u are the Admin of this Group \n only you Can Kick people\n");
+		}
 	}
 }

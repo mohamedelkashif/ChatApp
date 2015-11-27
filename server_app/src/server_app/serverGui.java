@@ -42,7 +42,7 @@ public class serverGui {
 	ArrayList<Socket> clients = new ArrayList<>();
 	ArrayList<Map<String,ArrayList<Socket>>> groupsList = new ArrayList<>();
 	ArrayList<String> usernames = new ArrayList<>();
-	ArrayList<String> groups = new ArrayList<>();
+	HashMap<String,String> groups = new HashMap<>();
 	HashMap<String,ArrayList<DataOutputStream>> dosesofgroups = new HashMap<String,ArrayList<DataOutputStream>>();
 	JPanel list_panel;
 	DefaultListModel model = new DefaultListModel();
@@ -157,7 +157,7 @@ public class serverGui {
 		                	
 				           
 		                	txtrServerLogs.append("\n new group added: name:" +order[5]+ " admin:"+ order[3]);
-		                	groups.add(order[5]);
+		                	groups.put(order[5], order[3]);
 		                	String []sendees = order[1].split(",");
 		                	ArrayList<DataOutputStream> dosesofAgroup = new ArrayList<DataOutputStream>();
 		                	for(String se : sendees){
@@ -221,7 +221,7 @@ public class serverGui {
 		                	//System.out.println(doses.size());
 		                		DataOutputStream data = new DataOutputStream(c.getOutputStream());
 		                		String groupnamesinarr = "nullGroup";
-		                		for(String group : groups){
+		                		for(String group : groups.keySet()){
 		                			groupnamesinarr += ","+group ;
 		                		}
 		                		String usernamesinarr = "nullName";
@@ -243,6 +243,19 @@ public class serverGui {
 		                }
 
 		            }
+		                	else if(AN.contains("ChangeGroupAdmin")){
+		                	
+			                	groups.put(AN.split(":")[1],AN.split(":")[3]);
+			                	String groupname = AN.split(":")[1];
+			                	ArrayList<DataOutputStream> getdoses = new ArrayList<>() ;
+			                	getdoses = dosesofgroups.get(groupname);
+			                	System.out.println("ChangingGroupAdmin:"+AN.split(":")[1]+":to:"+ AN.split(":")[3]);
+			                	for (DataOutputStream data : getdoses)
+				                {
+			                		data.writeUTF("ChangingGroupAdmin:"+AN.split(":")[1]+":to:"+ AN.split(":")[3]);
+				                }
+			                	
+			                }
 		                else if (AN.contains("sendto"))
 		                {
 		                	String[] message = AN.split("sendto",2);
