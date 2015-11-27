@@ -18,6 +18,8 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.net.UnknownHostException;
+import java.util.Random;
 import java.util.Scanner;
 import java.awt.event.ActionEvent;
 import javax.swing.JList;
@@ -25,6 +27,11 @@ import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.AbstractListModel;
 
 public class clientGui {
 	
@@ -34,6 +41,7 @@ public class clientGui {
 	Socket client;
 	JTextArea textArea;
 	private static JFrame frame;
+	JLabel lblAll;
 	private JTextField textField;
 	private JList list;
 	DefaultListModel model = new DefaultListModel();
@@ -72,6 +80,30 @@ public class clientGui {
 	                //read from the user
 	            	//System.out.println("sent status"+btnNewButton_2.isEnabled());
 
+	                /*if(!btnNewButton_2.isEnabled())
+	                {
+		                userInput = textArea_1.getText();
+		                //userInput = "create"
+		                /*if(lblAll.getText().equals("All") && !!userInput.equals(""))
+		                {
+		                	dos.writeUTF(textField.getText()+"sendto"+"All:"+userInput );
+		                }
+		                else if(lblAll.getText().equals(list.getSelectedValue().toString()) && 
+		                		!userInput.equals(""))
+		                {
+		                	dos.writeUTF(textField.getText()+"sendto"+list.getSelectedValue()
+		                	.toString()+","+textField.getText()+": "+userInput);
+		                }
+		                if(!userInput.equals(""))
+		                {
+		                	//dos.writeUTF(textField.getText()+"sendto"+lblAll.getText()
+		                	//.toString()+","+textField.getText()+": "+userInput);
+		                dos.writeUTF(textField.getText()+"sendto"+lblAll.getText()
+	                	.toString().split(": ")[1]+","+textField.getText()+": "+userInput);
+		                }
+		                btnNewButton_2.setEnabled(true);
+		                
+	                }*/
 	                String response = "";
 	                //read the response from the server
 	                //dis.read
@@ -193,11 +225,14 @@ public class clientGui {
 	                		sendingto.setMessage(response);
 	                		
 	                	}
-	                	else
+	                	else if (response.contains(":"))
 	                	{
+	                		String[] s = response.split(":",2);
+	                		lblAll.setText("Chat with : "+s[0]);
 	                		//System.out.println(response);
 		                	textArea.append(response+"\n");
 	                	}
+	                	else;
 	                	
 	                }
 	                
@@ -267,6 +302,15 @@ public class clientGui {
 				{
 					btnNewButton.setEnabled(false);
 					btnNewButton_1.setEnabled(true);
+					Random rand = new Random();
+					int i = rand.nextInt((1500 - 1000) + 1) + 1000;
+					System.out.println(i);
+					try {
+						ServerSocket cs = new ServerSocket(i);
+					} catch (IOException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
 					clientMain clientThread = new  clientMain();
 					clientThread.start();
 					textField.setEnabled(false);
@@ -318,20 +362,36 @@ public class clientGui {
 		textArea = new JTextArea();
 		scrollPane.setViewportView(textArea);
 		
-		JLabel lblAll = new JLabel("All");
-		lblAll.setBounds(145, 57, 46, 14);
+		lblAll = new JLabel("Chat with : None");
+		lblAll.setBounds(135, 58, 188, 14);
 		frame.getContentPane().add(lblAll);
 		
 		btnNewButton_2 = new JButton("Send");
 		btnNewButton_2.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				String userInput = textArea_1.getText() ;
-                try {
-					dos.writeUTF("$From"+textField.getText()+"$:"+userInput);
+
+				String userInput = textArea_1.getText() ;                
+				btnNewButton_2.setEnabled(false);
+				try {
+					client = new Socket("127.0.0.1", 1234);
+					DataOutputStream dos = new DataOutputStream(client.getOutputStream());
+		            String userInput;
+					userInput = textArea_1.getText();
+	                if(!userInput.equals(""))
+	                {
+	                	//dos.writeUTF(textField.getText()+"sendto"+lblAll.getText()
+	                	//.toString()+","+textField.getText()+": "+userInput);*/
+	                dos.writeUTF(textField.getText()+"sendto"+lblAll.getText()
+	            	.toString().split(": ")[1]+","+textField.getText()+": "+userInput);
+	                }
+				} catch (UnknownHostException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
 				} catch (IOException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
-				}
+				}				
+                btnNewButton_2.setEnabled(true);
 			}
 		});
 		btnNewButton_2.setBounds(329, 218, 89, 23);
@@ -348,7 +408,33 @@ public class clientGui {
 		
 		
 		list = new JList();
+
 		scrollPane_1.setViewportView(list);
+
+		list.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				lblAll.setText("Chat with : "+list.getSelectedValue().toString());
+			}
+		});
+		list.setModel(new AbstractListModel() {
+			String[] values = new String[] {};
+			public int getSize() {
+				return values.length;
+			}
+			public Object getElementAt(int index) {
+				return values[index];
+			}
+		});
+		list.addListSelectionListener(new ListSelectionListener() {
+			public void valueChanged(ListSelectionEvent e) {
+				String selection = list.getSelectedValue().toString();
+				
+			}
+		});
+		list.setBounds(10, 78, 103, 159);
+		
+		frame.getContentPane().add(list);
 		
 		lblActiveUsers = new JLabel("Active Users");
 		lblActiveUsers.setBounds(10, 55, 103, 14);

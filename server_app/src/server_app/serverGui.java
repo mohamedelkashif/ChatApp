@@ -16,12 +16,19 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
+import java.util.Random;
 import java.awt.event.ActionEvent;
 import javax.swing.JTextArea;
 import javax.swing.ListModel;
 import javax.swing.ListSelectionModel;
 import javax.swing.JScrollPane;
 import javax.swing.JLabel;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.AbstractListModel;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 public class serverGui {
 	ServerSocket sv;
@@ -31,7 +38,9 @@ public class serverGui {
 	private JFrame frame;
 	JButton btnNewButton_1;
 	JTextArea txtrServerLogs;
-	ArrayList<DataOutputStream> doses = new ArrayList<>();
+	//ArrayList<DataOutputStream> doses = new ArrayList<>();
+	ArrayList<Socket> clients = new ArrayList<>();
+	ArrayList<Map<String,ArrayList<Socket>>> groups = new ArrayList<>();
 	ArrayList<String> usernames = new ArrayList<>();
 	ArrayList<String> groups = new ArrayList<>();
 	HashMap<String,ArrayList<DataOutputStream>> dosesofgroups = new HashMap<String,ArrayList<DataOutputStream>>();
@@ -83,6 +92,7 @@ public class serverGui {
 
 		    public void run() {
 		        try {
+
 		        	DataInputStream dis ;
 			DataOutputStream dos;
 		        	 dos = new DataOutputStream(client.getOutputStream());
@@ -95,12 +105,22 @@ public class serverGui {
 
 		                if(AN.contains("newClient"))
 		                {
-		                	doses.add(dos);
+		                	//doses.add(dos);
 		                	String []user = AN.split(":");
 		                	//System.out.println(user[1]);
 		                	usernames.add(user[1]);
 		                	userlistener = user[1];
 		                	//System.out.println("created a new user :" + userlistener);
+
+		            //doses.add(dos);        	            
+		           
+		                	
+		                	System.out.println(user[1]);		              
+		                	clients.add(client);
+				            //ArrayList<Socket> groupClients = new ArrayList<>();
+				            //groupClients.add(client);	
+				            //Map<String,ArrayList<Socket>> group = null;
+				            //group.put(user[1],groupClients);
 		                	model.addElement(user[1]);
 		                	list.setModel(model);
 		                	txtrServerLogs.append("\n new user added:"+user[1]);
@@ -116,11 +136,12 @@ public class serverGui {
 		                		dos.writeUTF("activeUsers"+active);
 		                		System.out.println(active);
 		                	}
-		                	
-		                	for(DataOutputStream data :doses)
+		                	for(Socket c :clients)
+
 		                	{
-		                		if(data != dos)
+		                		if(c != client)
 		                		{
+		                			DataOutputStream data = new DataOutputStream(c.getOutputStream());
 		                			data.writeUTF("updateUsers:"+user[1]);
 		                		}
 		                	}
@@ -210,6 +231,32 @@ public class serverGui {
 		                }
 
 		            }
+		                else if (AN.contains("sendto"))
+		                {
+		                	String[] message = AN.split("sendto",2);
+		                	String[] att = message[1].split(",",2);
+		                	System.out.println(att[0]);
+			                /*for (DataOutputStream data : doses)
+			                {
+			                	System.out.println(data.toString());
+			                	if(data.equals(att[0]))
+			                		data.writeUTF(att[1]);
+			                }*/
+		                	for (int i =0;i<usernames.size();i++)
+		                	{
+			                	System.out.println(usernames.get(i));
+			                	if(usernames.get(i).equals(att[0]) && !att[1].equals(""))
+			                	{			                		
+			                		DataOutputStream data = new DataOutputStream(clients.get(i)
+			                				.getOutputStream());
+			                		String Message = att[1];
+		                			data.writeUTF(Message);
+		                			Message = "";
+			                	}
+			                }
+			                txtrServerLogs.append("\n"+"Sent Stuff to the clients");
+		                }
+		                else;
 		            }
 		            
 		            //Close/release resources
@@ -219,6 +266,7 @@ public class serverGui {
 		        } catch (Exception e) {
 		            System.out.println(e.getMessage());
 		        }
+		        
 		    }
 
 	}
@@ -271,6 +319,17 @@ public class serverGui {
 		
 		list = new JList();
 		scrollPane_1.setViewportView(list);
+		list.setModel(new AbstractListModel() {
+			String[] values = new String[] {};
+			public int getSize() {
+				return values.length;
+			}
+			public Object getElementAt(int index) {
+				return values[index];
+			}
+		});
+		list.setBounds(10, 35, 105, 205);
+		list_panel.add(list);
 		
 		JLabel lblActiveUsers = new JLabel("Active Users");
 		lblActiveUsers.setBounds(10, 11, 105, 14);
@@ -305,8 +364,13 @@ public class serverGui {
 				btnNewButton.setEnabled(false);
 				
 				try {
-					//Client Server Socket 	
-					sv = new ServerSocket(1234);
+
+					
+					sv = new ServerSocket(1234);					
+					Random rand = new Random();
+					int i = rand.nextInt((1500 - 1000) + 1) + 1000;
+					System.out.println(i);
+
 					servermain = new serverMain(sv);
 					servermain.start();
 					//txtrServerLogs.setText(txtrServerLogs.getText()+"\n"+servermain.message);
