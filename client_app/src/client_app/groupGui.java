@@ -156,16 +156,17 @@ public class groupGui {
                 if(selectedIx.length==1)
                 {
 			    	adminofgroup = (String) listactiveusersingroup.getModel().getElementAt(selectedIx[0]);
+			    	btnNewButton_1.setEnabled(false);
 			    }
 			}
 		});
 		btnNewButton_1.setBounds(10, 255, 123, 23);
 		frame.getContentPane().add(btnNewButton_1);
 		btnNewButton_1.setEnabled(false);
-		if(userx.equals(adminofgroup)){
-			btnNewButton_1.setEnabled(true);
-			kick.setEnabled(true);
-		}
+//		if(userx.equals(adminofgroup)){
+//			btnNewButton_1.setEnabled(true);
+//			kick.setEnabled(true);
+//		}
 	}
 
 	public void setUser(String user)
