@@ -142,7 +142,8 @@ public class serverGui {
 		                	model.removeElement(user[1]);
 		                	list.setModel(model);
 		                	txtrServerLogs.append("\n user removed:"+user[1]);
-		                	dos.writeUTF("connection lost!");
+		                	//dos.writeUTF("connection lost!");
+		                	//textArea.append("Connection lost\n");
 		                	for (int i=0; i<usernames.size();i++)
 		                	{
 		                		System.out.println("username:"+usernames.get(i));
@@ -320,7 +321,21 @@ public class serverGui {
 		btnDeleteUser.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				try {
-					dos.writeUTF("Ban:"+list.getSelectedValue().toString());
+					for(DataOutputStream data :doses)
+					{
+						data.writeUTF("Ban:"+list.getSelectedValue().toString());
+					}
+					for(int i = 0 ;i <usernames.size();i++)
+					{
+						if(usernames.get(i).equals(list.getSelectedValue().toString()))
+						{
+							usernames.remove(i);
+							doses.remove(i);
+							model.removeElementAt(i);
+							list.setModel(model);
+
+						}
+					}
 					
 					txtrServerLogs.setText("Client deleted");
 				} catch (IOException e) {

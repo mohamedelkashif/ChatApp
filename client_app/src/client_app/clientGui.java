@@ -36,8 +36,6 @@ public class clientGui {
 	private JFrame frame;
 	private JTextField textField;
 	private JList list;
-	ArrayList<DataOutputStream> doses = new ArrayList<>();
-	ArrayList<String> usernames = new ArrayList<>();
 	DefaultListModel model = new DefaultListModel();
 	private JLabel lblActiveUsers;
 	private JButton btnNewButton_3;
@@ -47,6 +45,7 @@ public class clientGui {
 	DataInputStream dis;
 	private JScrollPane scrollPane;
 	private JScrollPane scrollPane_1;
+	JButton btnNewButton;
 	public class clientMain extends Thread{
 		public clientMain() {
 	        
@@ -58,9 +57,7 @@ public class clientGui {
 	            //2.if accepted create IO streams
 	             dos = new DataOutputStream(client.getOutputStream());
 	             dis = new DataInputStream(client.getInputStream());
-	             doses.add(dos);
-	            //Scanner sc = new Scanner(System.in);
-	            
+	            //Scanner sc = new Scanner(System.in); 
 	            dos.writeUTF("newClient:"+textField.getText());
 	            String userInput;
 	           
@@ -125,10 +122,43 @@ public class clientGui {
 	                	
 	                	else if(response.contains("Ban"))
 	            		{
+	                		System.out.println(response+" i am "+textField.getText());
+	                		if(response.split(":")[1].equals(textField.getText()))
+	                		{
+	                			model.removeAllElements();
+	                			list.setModel(model);
+	                			dis.close();
+	                			dos.close();
+	                			client.close();
+	                			btnNewButton.setEnabled(true);
+	                			btnNewButton_1.setEnabled(false);
+	                			btnNewButton_2.setEnabled(false);
+	                			btnNewButton_3.setEnabled(false);
+	                			textArea_1.setEnabled(false);
+	                			textField_1.setEnabled(false);
+	                			textField.setEnabled(true);
+	                			textArea.append("Connection lost\n");
+	                			
+	                		}
+	                		else
+	                		{
+	                			for(int i = 0; i<model.getSize();i++)
+	                			{
+	                				if(model.get(i).toString().equals(response.split(":")[1]))
+	                				{
+	                					System.out.println("removing something");
+	                					model.remove(i);
+	                					textArea.append("\n user removed:"+response.split(":")[1]+"\n");
+	                				}
+	                				list.setModel(model);
+	                			}
+	                			
+	                		}
+	                		}
 	            			//String []user = response.split(":");
 		                	//System.out.println(user[1]);
 		                	//usernames.remove(user[1]);
-		                	model.removeElement(response.split(":")[1]);
+		                	/*model.removeElement(response.split(":")[1]);
 		                	list.setModel(model);
 		                	textArea.append("\n user removed:"+response.split(":")[1]);
 		                	dos.writeUTF("connection lost!");
@@ -152,7 +182,7 @@ public class clientGui {
 			                	data.writeUTF("Ban:"+response.split(":")[1]);
 			                	}
 		                	client.close();
-	            		}
+	            		}*/
 
 	                	
 	                	else if(response.contains("OpenGroupGui")){
@@ -227,7 +257,7 @@ public class clientGui {
 		frame.getContentPane().add(textField);
 		textField.setColumns(10);
 		
-		JButton btnNewButton = new JButton("Connect");
+		btnNewButton = new JButton("Connect");
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if(!textField.getText().equals(""))
@@ -257,8 +287,8 @@ public class clientGui {
 				btnNewButton_1.setEnabled(false);
 				try {
 					dos.writeUTF("Disconnect:"+textField.getText());
-					
-					//client.close();
+					textArea.append("Connection lost\n");
+					client.close();
 					//dos.close();
 					textArea.setText("Connection lost !");
 				} catch (IOException e1) {
