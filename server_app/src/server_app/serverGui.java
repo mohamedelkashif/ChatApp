@@ -255,9 +255,10 @@ public class serverGui {
 				
 				try {
 					
-					sv = new ServerSocket(1234);
-					System.out.println();					
-					int i = Rand.nextInt();
+					sv = new ServerSocket(1234);					
+					Random rand = new Random();
+					int i = rand.nextInt((1500 - 1000) + 1) + 1000;
+					System.out.println(i);
 					servermain = new serverMain(sv);
 					servermain.start();
 					//txtrServerLogs.setText(txtrServerLogs.getText()+"\n"+servermain.message);
