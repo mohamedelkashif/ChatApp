@@ -40,6 +40,8 @@ public class groupGui {
 	 ArrayList<String> activeUsersList = new ArrayList<>();
 	 JList listactiveusersingroup;
 	 JButton kick;
+	 static String adminofgroup;
+	 static JButton btnNewButton_1;
 	
 	/**
 	 * Launch the application.
@@ -80,7 +82,7 @@ public class groupGui {
 	private void initialize() {
 		frame = new JFrame();
 		
-		frame.setBounds(100, 100, 450, 300);
+		frame.setBounds(100, 100, 450, 322);
 		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		frame.getContentPane().setLayout(null);
 		
@@ -146,6 +148,24 @@ public class groupGui {
 	    });
 		textFieldMessage.setVisible(false);
 		kick.setEnabled(false);
+		
+		 btnNewButton_1 = new JButton("Reset Admin");
+		btnNewButton_1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				int[] selectedIx = listactiveusersingroup.getSelectedIndices();      
+                if(selectedIx.length==1)
+                {
+			    	adminofgroup = (String) listactiveusersingroup.getModel().getElementAt(selectedIx[0]);
+			    }
+			}
+		});
+		btnNewButton_1.setBounds(10, 255, 123, 23);
+		frame.getContentPane().add(btnNewButton_1);
+		btnNewButton_1.setEnabled(false);
+		if(userx.equals(adminofgroup)){
+			btnNewButton_1.setEnabled(true);
+			kick.setEnabled(true);
+		}
 	}
 
 	public void setUser(String user)
@@ -169,7 +189,10 @@ public class groupGui {
 		}
 		if(list[list.length-1].equals(userx))
 		{
+			adminofgroup = userx; 
 			kick.setEnabled(true);
+			
+			btnNewButton_1.setEnabled(true);
 			textAregroupmessg.append("u are the Admin of this Group \n only you Can Kick people\n");
 		}
 	}
