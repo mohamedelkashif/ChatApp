@@ -46,6 +46,10 @@ public class clientGui {
 	DataInputStream dis;
 	static clientGui window;
 	private JTextField messageFromGroup;
+	private JScrollPane scrollPane;
+	private JScrollPane scrollPane_1;
+	JButton btnNewButton;
+
 	public class clientMain extends Thread{
 		public clientMain() {
 	        
@@ -58,24 +62,29 @@ public class clientGui {
 	            dos = new DataOutputStream(client.getOutputStream());
 	            dis = new DataInputStream(client.getInputStream());
 	            //Scanner sc = new Scanner(System.in);
+
 	            dos.writeUTF("newClient:"+textField.getText());
 	            String userInput;
-	            
-	            while (true) {
-	                //System.out.print(selectedActiveUsersToGroup);
+	           
+	            	while (true) {
+	            		
+	       //System.out.print(selectedActiveUsersToGroup);
 	                //read from the user
 	            	//System.out.println("sent status"+btnNewButton_2.isEnabled());
+
 	                String response = "";
 	                //read the response from the server
 	                //dis.read
 	                //if(dis.readUTF() != null)
 	               // {
-	                
+	                //String server = dis.readUTF();
+            		//System.out.println(server);
+            		
 	                if(dis.available() >0)
 	                {
-	                	//System.out.println(dis.available());
 	                	response = dis.readUTF();
 	                	System.out.println("i am "+textField.getText()+" message recieved: "+response);
+
 	                	if(response.contains("activeUsers"))
 	                	{
 	                		String[] users= response.split(",");
@@ -90,6 +99,79 @@ public class clientGui {
 	                		model.addElement(response.split(":")[1]);
 	                		list.setModel(model);
 	                	}
+	                	else if(response.contains("Disconnect"))
+	                	{
+	                		//for()
+	                		model.removeElement(response.split(":")[1]);
+	                		list.setModel(model);
+	                		textArea.setText(response.split(":")[1] +" "+"Removed");
+	                	}
+	                	
+	                	else if(response.contains("Ban"))
+	            		{
+	                		System.out.println(response+" i am "+textField.getText());
+	                		if(response.split(":")[1].equals(textField.getText()))
+	                		{
+	                			model.removeAllElements();
+	                			list.setModel(model);
+	                			dis.close();
+	                			dos.close();
+	                			client.close();
+	                			btnNewButton.setEnabled(true);
+	                			btnNewButton_1.setEnabled(false);
+	                			btnNewButton_2.setEnabled(false);
+	                			btnNewButton_3.setEnabled(false);
+	                			textArea_1.setEnabled(false);
+	                			textField_1.setEnabled(false);
+	                			textField.setEnabled(true);
+	                			textArea.append("Connection lost\n");
+	                			
+	                		}
+	                		else
+	                		{
+	                			for(int i = 0; i<model.getSize();i++)
+	                			{
+	                				if(model.get(i).toString().equals(response.split(":")[1]))
+	                				{
+	                					System.out.println("removing something");
+	                					model.remove(i);
+	                					textArea.append("\n user removed:"+response.split(":")[1]+"\n");
+	                				}
+	                				list.setModel(model);
+	                			}
+	                			
+	                		}
+	                		}
+	            			//String []user = response.split(":");
+		                	//System.out.println(user[1]);
+		                	//usernames.remove(user[1]);
+		                	/*model.removeElement(response.split(":")[1]);
+		                	list.setModel(model);
+		                	textArea.append("\n user removed:"+response.split(":")[1]);
+		                	dos.writeUTF("connection lost!");
+		                	for (int i=0; i<usernames.size();i++)
+		                	{
+		                		System.out.println("username:"+usernames.get(i));
+		                		if(usernames.get(i).equals(response.split(":")[1]))
+		                		{
+		                			System.out.println(doses.size());
+		                			
+		                			doses.remove(i);
+		                			usernames.remove(i);
+		                			System.out.println(",ndvnk");
+		                			
+		                			System.out.println(doses.size());
+		                		
+		                		}
+		                	}
+		                	for(DataOutputStream data : doses){
+			                	//System.out.println(doses.size());
+			                	data.writeUTF("Ban:"+response.split(":")[1]);
+			                	}
+		                	client.close();
+	            		}*/
+
+	                	
 	                	else if(response.contains("OpenGroupGui")){
 	                		String []res = response.split(":");
 	                		System.out.println(res[1]);
@@ -118,9 +200,11 @@ public class clientGui {
 	                	}
 	                	
 	                }
+	                
 	                //Print response
 	                
 	                //}
+	                
 	            }
 	            
 	            //dis.close();
@@ -176,7 +260,7 @@ public class clientGui {
 		frame.getContentPane().add(textField);
 		textField.setColumns(10);
 		
-		JButton btnNewButton = new JButton("Connect");
+		btnNewButton = new JButton("Connect");
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if(!textField.getText().equals(""))
@@ -211,19 +295,28 @@ public class clientGui {
 				btnNewButton.setEnabled(true);
 				btnNewButton_1.setEnabled(false);
 				try {
+					dos.writeUTF("Disconnect:"+textField.getText());
+					textArea.append("Connection lost\n");
 					client.close();
+					//dos.close();
+					textArea.setText("Connection lost !");
 				} catch (IOException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
+				btnNewButton.setEnabled(true);
+				btnNewButton_1.setEnabled(false);
 			}
 		});
 		btnNewButton_1.setBounds(234, 23, 106, 23);
 		frame.getContentPane().add(btnNewButton_1);
 		
+		scrollPane = new JScrollPane();
+		scrollPane.setBounds(135, 78, 289, 135);
+		frame.getContentPane().add(scrollPane);
+		
 		textArea = new JTextArea();
-		textArea.setBounds(135, 78, 289, 135);
-		frame.getContentPane().add(textArea);
+		scrollPane.setViewportView(textArea);
 		
 		JLabel lblAll = new JLabel("All");
 		lblAll.setBounds(145, 57, 46, 14);
@@ -248,11 +341,14 @@ public class clientGui {
 		textArea_1.setBounds(135, 223, 184, 15);
 		frame.getContentPane().add(textArea_1);
 		
+		scrollPane_1 = new JScrollPane();
+		scrollPane_1.setBounds(10, 78, 103, 159);
+		frame.getContentPane().add(scrollPane_1);
+		
 		
 		
 		list = new JList();
-		list.setBounds(10, 78, 103, 159);
-		frame.getContentPane().add(list);
+		scrollPane_1.setViewportView(list);
 		
 		lblActiveUsers = new JLabel("Active Users");
 		lblActiveUsers.setBounds(10, 55, 103, 14);

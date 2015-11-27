@@ -38,14 +38,15 @@ public class serverGui {
 	JPanel list_panel;
 	DefaultListModel model = new DefaultListModel();
 	JList list;
+	
 	//DefaultListModel<String> model = new DefaultListModel<>();
 	public class serverMain extends Thread{
 		ServerSocket sv;
+		Socket c;
 		public JTextArea jx ;
 		public serverMain(ServerSocket sv) {
 	        this.sv = sv;
 	    }
-
 		
 		
 		public void run() {
@@ -55,8 +56,9 @@ public class serverGui {
 					while (true) {
 	            	
 	                //2.Listen for Clients
+
 	                Socket c;
-	                c = sv.accept();	             
+	                c = sv.accept();
 	                //txtrServerLogs.append("\n New Client Arrived");
 	                clientListener ch = new clientListener(c);
 	                ch.start();
@@ -81,15 +83,16 @@ public class serverGui {
 
 		    public void run() {
 		        try {
-		        	DataOutputStream dos = new DataOutputStream(client.getOutputStream());
-		            DataInputStream dis = new DataInputStream(client.getInputStream());
+		        	DataInputStream dis ;
+			DataOutputStream dos;
+		        	 dos = new DataOutputStream(client.getOutputStream());
+		             dis = new DataInputStream(client.getInputStream());
 		            
 		            
 		            while (true) {
 		                String AN = dis.readUTF();
 		                System.out.println("Listening to :" +userlistener+" Message is : "+AN );
-		                System.out.println("");
-		                
+
 		                if(AN.contains("newClient"))
 		                {
 		                	doses.add(dos);
@@ -113,6 +116,7 @@ public class serverGui {
 		                		dos.writeUTF("activeUsers"+active);
 		                		System.out.println(active);
 		                	}
+		                	
 		                	for(DataOutputStream data :doses)
 		                	{
 		                		if(data != dos)
@@ -160,6 +164,41 @@ public class serverGui {
 			                }
 			                txtrServerLogs.append("\n"+"Sent Stuff to group:"+groupname);
 		                }
+		                else if(AN.contains("Ban"))
+		                {
+		                	model.removeElement(AN.split(":")[1]);
+		                	list.setModel(model);
+		                }
+		                else if(AN.contains("Disconnect"))
+		                {
+		                	String []user = AN.split(":");
+		                	System.out.println(user[1]);
+		                	//usernames.remove(user[1]);
+		                	model.removeElement(user[1]);
+		                	list.setModel(model);
+		                	txtrServerLogs.append("\n user removed:"+user[1]);
+		                	//dos.writeUTF("connection lost!");
+		                	//textArea.append("Connection lost\n");
+		                	for (int i=0; i<usernames.size();i++)
+		                	{
+		                		System.out.println("username:"+usernames.get(i));
+		                		if(usernames.get(i).equals(user[1]))
+		                		{
+		                			System.out.println(doses.size());
+		                			
+		                			doses.remove(i);
+		                			usernames.remove(i);
+		                			System.out.println(",ndvnk");
+		                			
+		                			System.out.println(doses.size());
+		                		
+		                		}
+		                	}
+		                	for(DataOutputStream data : doses){
+		                	//System.out.println(doses.size());
+		                	data.writeUTF("Disconnect:"+user[1]);
+		                	}
+		                }
 		                else
 		                {
 		                	
@@ -169,8 +208,9 @@ public class serverGui {
 			                }
 			                txtrServerLogs.append("\n"+"Sent Stuff to the clients");
 		                }
-		                }
+
 		            }
+		            
 		            //Close/release resources
 		            //dis.close();
 		           // dos.close();
@@ -224,9 +264,12 @@ public class serverGui {
 		panel.add(list_panel);
 		list_panel.setLayout(null);
 		
+		JScrollPane scrollPane_1 = new JScrollPane();
+		scrollPane_1.setBounds(10, 35, 105, 205);
+		list_panel.add(scrollPane_1);
+		
 		list = new JList();
-		list.setBounds(10, 35, 105, 205);
-		list_panel.add(list);
+		scrollPane_1.setViewportView(list);
 		
 		JLabel lblActiveUsers = new JLabel("Active Users");
 		lblActiveUsers.setBounds(10, 11, 105, 14);
@@ -297,17 +340,46 @@ public class serverGui {
 		panel.add(log);
 		log.setLayout(null);
 		
+		JScrollPane scrollPane = new JScrollPane();
+		scrollPane.setBounds(43, 0, 222, 186);
+		log.add(scrollPane);
+		
 		txtrServerLogs = new JTextArea();
+		scrollPane.setViewportView(txtrServerLogs);
 		txtrServerLogs.setEditable(false);
-		txtrServerLogs.setBounds(43, 0, 222, 186);
 		txtrServerLogs.setText("Server Logs");
-		log.add(txtrServerLogs);
 		
 		JPanel contol_users_panel = new JPanel();
 		contol_users_panel.setBounds(126, 226, 298, 36);
 		panel.add(contol_users_panel);
 		
 		JButton btnDeleteUser = new JButton("Delete User");
+		btnDeleteUser.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				try {
+					for(DataOutputStream data :doses)
+					{
+						data.writeUTF("Ban:"+list.getSelectedValue().toString());
+					}
+					for(int i = 0 ;i <usernames.size();i++)
+					{
+						if(usernames.get(i).equals(list.getSelectedValue().toString()))
+						{
+							usernames.remove(i);
+							doses.remove(i);
+							model.removeElementAt(i);
+							list.setModel(model);
+
+						}
+					}
+					
+					txtrServerLogs.setText("Client deleted");
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		});
 		contol_users_panel.add(btnDeleteUser);
 	}
 }
