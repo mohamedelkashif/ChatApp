@@ -129,9 +129,6 @@ public class groupGui {
 				
 			}
 		});
-			}
-				
-			}
 		kick.setBounds(10, 221, 123, 23);
 		frame.getContentPane().add(kick);
 		textFieldMessage.getDocument().addDocumentListener(new DocumentListener() {
