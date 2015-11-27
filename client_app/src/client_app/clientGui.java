@@ -369,8 +369,7 @@ public class clientGui {
 		btnNewButton_2 = new JButton("Send");
 		btnNewButton_2.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-
-				String userInput = textArea_1.getText() ;                
+                
 				btnNewButton_2.setEnabled(false);
 				try {
 					client = new Socket("127.0.0.1", 1234);
@@ -434,7 +433,7 @@ public class clientGui {
 		});
 		list.setBounds(10, 78, 103, 159);
 		
-		frame.getContentPane().add(list);
+		//frame.getContentPane().add(list);
 		
 		lblActiveUsers = new JLabel("Active Users");
 		lblActiveUsers.setBounds(10, 55, 103, 14);

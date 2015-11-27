@@ -40,7 +40,7 @@ public class serverGui {
 	JTextArea txtrServerLogs;
 	//ArrayList<DataOutputStream> doses = new ArrayList<>();
 	ArrayList<Socket> clients = new ArrayList<>();
-	ArrayList<Map<String,ArrayList<Socket>>> groups = new ArrayList<>();
+	ArrayList<Map<String,ArrayList<Socket>>> groupsList = new ArrayList<>();
 	ArrayList<String> usernames = new ArrayList<>();
 	ArrayList<String> groups = new ArrayList<>();
 	HashMap<String,ArrayList<DataOutputStream>> dosesofgroups = new HashMap<String,ArrayList<DataOutputStream>>();
@@ -163,9 +163,11 @@ public class serverGui {
 		                	for(String se : sendees){
 		                		for(int i= 0; i < usernames.size() ; i++){
 		                			if(se.equals(usernames.get(i))){
-		                				dosesofAgroup.add(doses.get(i));
-		                				doses.get(i).writeUTF("OpenGroupGui:"+order[5]+"&users&"+order[1]);
-		                				doses.get(i).writeUTF("toGroup:"+order[5]);
+		                				DataOutputStream data = new DataOutputStream(clients.get(i)
+				                				.getOutputStream());
+		                				dosesofAgroup.add(data);
+		                				data.writeUTF("OpenGroupGui:"+order[5]+"&users&"+order[1]);
+		                				data.writeUTF("toGroup:"+order[5]);
 		                			}
 		                		}
 		                	}
@@ -205,26 +207,28 @@ public class serverGui {
 		                		System.out.println("username:"+usernames.get(i));
 		                		if(usernames.get(i).equals(user[1]))
 		                		{
-		                			System.out.println(doses.size());
+		                			System.out.println(usernames.size());
 		                			
-		                			doses.remove(i);
+		                			clients.remove(i);
 		                			usernames.remove(i);
 		                			System.out.println(",ndvnk");
 		                			
-		                			System.out.println(doses.size());
+		                			System.out.println(usernames.size());
 		                		
 		                		}
 		                	}
-		                	for(DataOutputStream data : doses){
+		                	for(Socket c : clients){
 		                	//System.out.println(doses.size());
+		                		DataOutputStream data = new DataOutputStream(c.getOutputStream());		                				
 		                	data.writeUTF("Disconnect:"+user[1]);
 		                	}
 		                }
 		                else
 		                {
 		                	
-			                for (DataOutputStream data : doses)
+			                for (Socket c : clients)
 			                {
+			                	DataOutputStream data = new DataOutputStream(c.getOutputStream());		
 			                	data.writeUTF(AN.split(":")[1]);
 			                }
 			                txtrServerLogs.append("\n"+"Sent Stuff to the clients");
@@ -329,7 +333,7 @@ public class serverGui {
 			}
 		});
 		list.setBounds(10, 35, 105, 205);
-		list_panel.add(list);
+		//list_panel.add(list);
 		
 		JLabel lblActiveUsers = new JLabel("Active Users");
 		lblActiveUsers.setBounds(10, 11, 105, 14);
@@ -422,8 +426,9 @@ public class serverGui {
 		btnDeleteUser.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				try {
-					for(DataOutputStream data :doses)
+					for(Socket c :clients)
 					{
+						DataOutputStream data = new DataOutputStream(c.getOutputStream());		
 						data.writeUTF("Ban:"+list.getSelectedValue().toString());
 					}
 					for(int i = 0 ;i <usernames.size();i++)
@@ -431,7 +436,7 @@ public class serverGui {
 						if(usernames.get(i).equals(list.getSelectedValue().toString()))
 						{
 							usernames.remove(i);
-							doses.remove(i);
+							clients.remove(i);
 							model.removeElementAt(i);
 							list.setModel(model);
 
