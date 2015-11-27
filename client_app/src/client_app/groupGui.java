@@ -25,7 +25,7 @@ import java.awt.event.InputMethodEvent;
 
 public class groupGui {
 
-	private static  JFrame frame;
+	public static  JFrame frame;
 	static JTextArea textAregroupmessg;
 	public static  String groupreq = "uu&users&nn,mm";
 	static String groupname ;

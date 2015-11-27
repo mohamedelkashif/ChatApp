@@ -32,6 +32,8 @@ import java.awt.event.MouseEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.AbstractListModel;
+import javax.swing.JComboBox;
+import javax.swing.DefaultComboBoxModel;
 
 public class clientGui {
 	
@@ -45,7 +47,7 @@ public class clientGui {
 	private JTextField textField;
 	private JList list;
 	DefaultListModel model = new DefaultListModel();
-	private JLabel lblActiveUsers;
+	DefaultListModel groupmodel = new DefaultListModel();
 	private JButton btnNewButton_3;
 	private ArrayList<String> selectedActiveUsersToGroup = new ArrayList<String>();
 	private JTextField textField_1;
@@ -57,6 +59,7 @@ public class clientGui {
 	private JScrollPane scrollPane;
 	private JScrollPane scrollPane_1;
 	JButton btnNewButton;
+	JComboBox comboBox;
 
 	public class clientMain extends Thread{
 		public clientMain() {
@@ -124,18 +127,27 @@ public class clientGui {
 	                		{
 	                			model.addElement(users[i]);
 	                		}
-	                		list.setModel(model);
+	                		 if(comboBox.getSelectedItem().toString().equals("active users"))
+	         				{
+	         					list.setModel(model);
+	         				}
 	                	}
 	                	else if(response.contains("updateUsers"))
 	                	{
 	                		model.addElement(response.split(":")[1]);
-	                		list.setModel(model);
+	                		 if(comboBox.getSelectedItem().toString().equals("active users"))
+	         				{
+	         					list.setModel(model);
+	         				}
 	                	}
 	                	else if(response.contains("Disconnect"))
 	                	{
 	                		//for()
 	                		model.removeElement(response.split(":")[1]);
-	                		list.setModel(model);
+	                		 if(comboBox.getSelectedItem().toString().equals("active users"))
+	         				{
+	         					list.setModel(model);
+	         				}
 	                		textArea.setText(response.split(":")[1] +" "+"Removed");
 	                	}
 	                	
@@ -169,7 +181,10 @@ public class clientGui {
 	                					model.remove(i);
 	                					textArea.append("\n user removed:"+response.split(":")[1]+"\n");
 	                				}
-	                				list.setModel(model);
+	                				 if(comboBox.getSelectedItem().toString().equals("active users"))
+	                					{
+	                						list.setModel(model);
+	                					}
 	                			}
 	                			
 	                		}
@@ -215,6 +230,11 @@ public class clientGui {
 	    					//groupThreadx.start();
 		                	newgroup.main(res[1],window,newgroup);
 		                	usergroups.put(createdgroupName, newgroup);
+		                	groupmodel.addElement(createdgroupName);
+		                	if(comboBox.getSelectedItem().toString().equals("your groups"))
+		    				{
+		    					list.setModel(groupmodel);
+		    				} 
 	                	//	newgroup.main();
 	                	}
 	                	else if(response.contains("toGroup"))
@@ -222,7 +242,16 @@ public class clientGui {
 	                		String createdgroupName =response.split(":")[1];
 	                		System.out.println("sending to group:"+createdgroupName);
 	                		groupGui sendingto  = usergroups.get(createdgroupName);
-	                		sendingto.setMessage(response);
+	                		String [] mess = response.split(":");
+	                		String message = "";
+	                		for(int i = 2;i<mess.length;i++)
+	                		{
+	                			if(i == 2)
+	                			message += mess[i]+":";
+	                			else message += mess[i];
+	                		}
+	                		sendingto.setMessage(message);
+	                		sendingto.frame.setVisible(true);
 	                		
 	                	}
 	                	else if (response.contains(":"))
@@ -413,7 +442,18 @@ public class clientGui {
 		list.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				lblAll.setText("Chat with : "+list.getSelectedValue().toString());
+				
+				if(comboBox.getSelectedItem().toString().equals("active users"))
+				{
+					lblAll.setText("Chat with : "+list.getSelectedValue().toString());
+				}
+				else if(comboBox.getSelectedItem().toString().equals("your groups"))
+				{
+					groupGui openSelected = usergroups.get(list.getSelectedValue().toString());
+					openSelected.frame.setVisible(true);
+				}
+
+				
 			}
 		});
 		list.setModel(new AbstractListModel() {
@@ -425,19 +465,8 @@ public class clientGui {
 				return values[index];
 			}
 		});
-		list.addListSelectionListener(new ListSelectionListener() {
-			public void valueChanged(ListSelectionEvent e) {
-				String selection = list.getSelectedValue().toString();
-				
-			}
-		});
+		
 		list.setBounds(10, 78, 103, 159);
-		
-		//frame.getContentPane().add(list);
-		
-		lblActiveUsers = new JLabel("Active Users");
-		lblActiveUsers.setBounds(10, 55, 103, 14);
-		frame.getContentPane().add(lblActiveUsers);
 		
 		btnNewButton_3 = new JButton("Create A Group");
 		btnNewButton_3.setToolTipText("Please select multiple users first");
@@ -523,6 +552,24 @@ public class clientGui {
 		textField_1.setEditable(false);
 		btnNewButton_1.setEnabled(false);
 		textArea.setEditable(false);
+		
+		comboBox = new JComboBox();
+		comboBox.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				if(comboBox.getSelectedItem().toString().equals("your groups"))
+				{
+					list.setModel(groupmodel);
+				}
+				else if(comboBox.getSelectedItem().toString().equals("active users"))
+				{
+					list.setModel(model);
+				}
+			}
+		});
+		comboBox.setModel(new DefaultComboBoxModel(new String[] {"active users", "your groups"}));
+		comboBox.setEditable(true);
+		comboBox.setBounds(10, 55, 106, 20);
+		frame.getContentPane().add(comboBox);
 		
 		
 	}

@@ -183,7 +183,7 @@ public class serverGui {
 		                	for (DataOutputStream data : getdoses)
 			                {
 		                		System.out.println("writing to one of the clients in group"+groupname);
-			                	data.writeUTF("toGroup:"+groupname+":"+groupOb[2]);
+			                	data.writeUTF("toGroup:"+groupname+":"+userlistener+":"+groupOb[2]);
 			                }
 			                txtrServerLogs.append("\n"+"Sent Stuff to group:"+groupname);
 		                }
