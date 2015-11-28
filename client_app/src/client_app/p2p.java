@@ -3,6 +3,8 @@ package client_app;
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.net.Socket;
 
 import javax.swing.JFrame;
@@ -77,13 +79,27 @@ public class p2p {
 		JButton btnSend = new JButton("Send");
 		btnSend.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				String message = "client sendTo"+txtMessage.getText();
 				if(type.equals("server"))
 				{
-					
+					try {
+						DataOutputStream dos = new DataOutputStream(client.getOutputStream());
+						dos.writeUTF(message);
+					} catch (IOException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
 				}
 				else if(type.equals("client"))
 				{
-					
+					try {
+						Socket c = new Socket("127.0.0.1",portip);
+						DataOutputStream dos = new DataOutputStream(client.getOutputStream());
+						dos.writeUTF(message);
+					} catch (IOException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
 				}
 			}
 		});
@@ -97,14 +113,29 @@ public class p2p {
 		JButton btnClose = new JButton("Close");
 		btnClose.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				String message = "BYEBYE";
 				if(type.equals("server"))
 				{
-					
+					try {
+						DataOutputStream dos = new DataOutputStream(client.getOutputStream());
+						dos.writeUTF(message);
+					} catch (IOException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
 				}
 				else if(type.equals("client"))
 				{
-					
+					try {
+						Socket c = new Socket("127.0.0.1",portip);
+						DataOutputStream dos = new DataOutputStream(client.getOutputStream());
+						dos.writeUTF(message);
+					} catch (IOException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
 				}
+				frame.setVisible(false);
 			}
 		});
 		btnClose.setBounds(158, 235, 117, 25);

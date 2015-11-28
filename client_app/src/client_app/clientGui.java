@@ -79,6 +79,7 @@ public class clientGui {
 		public void run() {
 			try {
 					DataInputStream dis = new DataInputStream(p2pclient.getInputStream());
+					DataOutputStream dos = new DataOutputStream(p2pclient.getOutputStream());
 					peers.getFrame().setTitle("Client "+sender);
 					peers.lblChatWithNone.setText("Chat with: "+reciever);
 					while(true)
@@ -88,6 +89,11 @@ public class clientGui {
 						{
 							String[] att = input.split("sendTo");
 							peers.textArea.append(att[1]);
+						}
+						else if(input.contains("BYEBYE"))
+						{
+							dos.writeUTF("BYEBYE");
+							break;
 						}
 					}
 
@@ -111,6 +117,7 @@ public class clientGui {
 			try {
 				Socket c = new Socket("127.0.0.1", port);
 				DataInputStream dis = new DataInputStream(c.getInputStream());
+				DataOutputStream dos = new DataOutputStream(c.getOutputStream());
 				peers.getFrame().setTitle("Client "+sender);
 				peers.lblChatWithNone.setText("Chat with: "+reciever);
 				while(true)
@@ -120,6 +127,11 @@ public class clientGui {
 					{
 						String[] att = input.split("sendTo");
 						peers.textArea.append(att[1]);
+					}
+					else if(input.contains("BYEBYE"))
+					{
+						dos.writeUTF("BYEBYE");
+						break;
 					}
 				}
 
