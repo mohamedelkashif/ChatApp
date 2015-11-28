@@ -181,13 +181,15 @@ public class groupGui {
 		System.out.println("message is being set neehaaa\n");
 		textFieldMessage.setText(message);
 	}
-	public void setActiveUsersList(String[] list)
+	public void setActiveUsersList(String[] list,String admin)
 	{
 		for(String s : list)
 		{
 			activeUsersList.add(s);
 			if(!s.equals(userx))
 				model.addElement(s);
+			if(s.equals(admin))
+				model.addElement(s + "(Admin)");
 			listactiveusersingroup.setModel(model);
 		}
 		if(list[list.length-1].equals(userx))
@@ -202,13 +204,22 @@ public class groupGui {
 	public void UpdateActiveUsersList(String[] list)
 	{
 		model.removeAllElements();
-		ArrayList<String> activeusersingroupnow = activeUsersList;
+		ArrayList<String> activeusersingroupnow = new ArrayList<>();
+		for(String user: activeUsersList){
+			activeusersingroupnow.add(user);
+		}
 		activeUsersList.clear();
 		for(String s : list)
 		{
-			if(activeusersingroupnow.contains(s))
+			
+			if(activeusersingroupnow.contains(s)){
 				activeUsersList.add(s);
-			listactiveusersingroup.setModel(model);
+				if(s.equals(adminofgroup))
+					model.addElement(s + "(Admin)");
+				else
+					model.addElement(s);
+				listactiveusersingroup.setModel(model);
+				}
 		}
 		
 	}
@@ -219,6 +230,19 @@ public class groupGui {
 			btnNewButton_1.setEnabled(true);
 			kick.setEnabled(true);
 			textAregroupmessg.append("u are the Admin of this Group \n only you Can Kick people\n");
+		}
+		model.removeAllElements();
+		for(String s : activeUsersList){
+			if(s.equals(adminofgroup))
+				model.addElement(s + "(Admin)");
+			else
+				model.addElement(s);
+			listactiveusersingroup.setModel(model);
+		}
+	}
+	public void disconnect(String name){
+		if(userx.equals(name)){
+			frame.setVisible(false);
 		}
 	}
 }

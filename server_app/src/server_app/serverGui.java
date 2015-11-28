@@ -47,7 +47,7 @@ public class serverGui {
 	JPanel list_panel;
 	DefaultListModel model = new DefaultListModel();
 	JList list;
-	
+	ArrayList<Socket> clientsbeforedelete;
 	//DefaultListModel<String> model = new DefaultListModel<>();
 	public class serverMain extends Thread{
 		ServerSocket sv;
@@ -166,7 +166,7 @@ public class serverGui {
 		                				DataOutputStream data = new DataOutputStream(clients.get(i)
 				                				.getOutputStream());
 		                				dosesofAgroup.add(data);
-		                				data.writeUTF("OpenGroupGui:"+order[5]+"&users&"+order[1]);
+		                				data.writeUTF("OpenGroupGui:"+order[5]+"&users&"+order[1]+"&admin&"+ order[3]);
 		                				data.writeUTF("toGroup:"+order[5]);
 		                			}
 		                		}
@@ -208,27 +208,32 @@ public class serverGui {
 		                		if(usernames.get(i).equals(user[1]))
 		                		{
 		                			System.out.println(usernames.size());
+		                			clientsbeforedelete = clients;
 		                			
-		                			clients.remove(i);
 		                			usernames.remove(i);
 		                			System.out.println(",ndvnk");
-		                			
+		                			for(Socket c : clients){
+		    		                	//System.out.println(doses.size());
+		    		                		DataOutputStream data = new DataOutputStream(c.getOutputStream());
+		    		                		String groupnamesinarr = "nullGroup";
+		    		                		for(String group : groups.keySet()){
+		    		                			groupnamesinarr += ","+group ;
+		    		                		}
+		    		                		String usernamesinarr = "nullName";
+		    		                		for(String username : usernames){
+		    		                			usernamesinarr += ","+username ;
+		    		                		}
+		    		                		data.writeUTF("DisconnUser:"+user[1]+":actusers:"+usernamesinarr +":toGrouup:"+groupnamesinarr);
+		    		                	}
 		                			System.out.println(usernames.size());
-		                		
+		                			clients.remove(i);
 		                		}
 		                	}
 		                	for(Socket c : clients){
 		                	//System.out.println(doses.size());
 		                		DataOutputStream data = new DataOutputStream(c.getOutputStream());
-		                		String groupnamesinarr = "nullGroup";
-		                		for(String group : groups.keySet()){
-		                			groupnamesinarr += ","+group ;
-		                		}
-		                		String usernamesinarr = "nullName";
-		                		for(String username : usernames){
-		                			usernamesinarr += ","+username ;
-		                		}
-		                	data.writeUTF("Disconnect:"+user[1]+":activeusers:"+usernamesinarr +":toGrouup:"+groupnamesinarr);
+		                	
+		                		data.writeUTF("Disconnect:"+user[1]);
 		                	}
 		                }
 		                else
