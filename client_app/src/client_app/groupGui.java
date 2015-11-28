@@ -42,7 +42,7 @@ public class groupGui {
 	 ArrayList<String> activeUsersList = new ArrayList<>();
 	 JList listactiveusersingroup;
 	 JButton kick;
-	 static String adminofgroup;
+	 static String adminofgroup = "";
 	 static JButton btnNewButton_1;
 	 String choice;
 	

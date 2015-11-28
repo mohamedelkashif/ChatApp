@@ -61,6 +61,7 @@ public class clientGui {
 	private JScrollPane scrollPane_1;
 	JButton btnNewButton;
 	JComboBox comboBox;
+	JButton btnLeaveGroup;
 
 	public class clientMain extends Thread{
 		public clientMain() {
@@ -306,6 +307,19 @@ public class clientGui {
 	                		groupGui sendingto  = usergroups.get(resAtt[1]);
 	                		sendingto.setMessage(response);
 	                	}
+	                	else if(response.contains("Remove"))
+	                	{
+	                		String [] orders = response.split(":");
+	                		String removedClient = orders[1];
+	                		String inGroup = orders[3];
+	                		if(groupmodel.contains(inGroup))
+	                		{
+	                			groupGui reworked = usergroups.get(inGroup);
+	                			reworked.activeUsersList.remove(removedClient);
+	                			reworked.model.removeElement(removedClient);
+	                			reworked.listactiveusersingroup.setModel(reworked.model);
+	                		}
+	                	}
 	                	else if (response.contains(":"))
 	                	{
 	                		String[] s = response.split(":",2);
@@ -401,6 +415,7 @@ public class clientGui {
 					textArea_1.setEditable(true);
 					textField_1.setEditable(true);
 					btnNewButton_1.setEnabled(true);
+					btnLeaveGroup.setEnabled(true);
 				}
 				else
 				{
@@ -575,7 +590,7 @@ public class clientGui {
 		textField_1.setColumns(10);
 		
 		messageFromGroup = new JTextField();
-		messageFromGroup.setBounds(338, 249, 86, 20);
+		messageFromGroup.setBounds(10, 282, 86, 20);
 		frame.getContentPane().add(messageFromGroup);
 		messageFromGroup.setColumns(10);
 		messageFromGroup.getDocument().addDocumentListener(new DocumentListener() {
@@ -602,6 +617,58 @@ public class clientGui {
 	        	
 	        }
 	    });
+		btnLeaveGroup = new JButton("Leave group");
+		btnLeaveGroup.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				if(comboBox.getSelectedItem().toString().equals("your groups"))
+				{
+					if(list.isSelectionEmpty())
+					{
+						JOptionPane.showMessageDialog(frame,
+							    "please select a group first from your groups to leave it.",
+							    "Connection error",
+							    JOptionPane.ERROR_MESSAGE);
+					}
+					else
+					{
+						String group_name = list.getSelectedValue().toString();
+						 groupGui selected_group = usergroups.get(group_name);
+						 selected_group.frame.setVisible(false);
+						 if(selected_group.adminofgroup.equals(textField.getText()) && selected_group.adminofgroup!= null)
+						 {
+							 JOptionPane.showMessageDialog(frame,
+									    "you are the admin of this group , assign a new admin to be able to leave group.",
+									    "Connection error",
+									    JOptionPane.ERROR_MESSAGE);
+						 }
+						 else
+						 {
+							 groupmodel.removeElement(group_name);
+							 othergroupsmodel.addElement(group_name);
+							 usergroups.remove(group_name);
+							 try {
+								dos.writeUTF("Remove:"+textField.getText()+":From:"+group_name);
+							} catch (IOException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+						 }
+						 
+					}
+					 
+				}
+				else
+				{
+					JOptionPane.showMessageDialog(frame,
+						    "please select a group first from your groups to leave it.",
+						    "Connection error",
+						    JOptionPane.ERROR_MESSAGE);
+				}
+			}
+		});
+		btnLeaveGroup.setBounds(301, 249, 123, 23);
+		frame.getContentPane().add(btnLeaveGroup);
+		
 		messageFromGroup.setVisible(false);
 		btnNewButton_2.setEnabled(false);
 		btnNewButton_3.setEnabled(false);
@@ -609,7 +676,7 @@ public class clientGui {
 		textField_1.setEditable(false);
 		btnNewButton_1.setEnabled(false);
 		textArea.setEditable(false);
-		
+		btnLeaveGroup.setEnabled(false);
 		comboBox = new JComboBox();
 		comboBox.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -629,9 +696,10 @@ public class clientGui {
 			}
 		});
 		comboBox.setModel(new DefaultComboBoxModel(new String[] {"active users", "your groups", "other groups"}));
-		comboBox.setEditable(true);
 		comboBox.setBounds(10, 55, 106, 20);
 		frame.getContentPane().add(comboBox);
+		
+		
 		
 		
 	}

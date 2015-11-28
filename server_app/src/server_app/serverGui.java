@@ -261,6 +261,7 @@ public class serverGui {
 		                		data.writeUTF("Disconnect:"+user[1]);
 		                	}
 		                }
+		                
 		                else
 		                {
 		                	
@@ -273,6 +274,41 @@ public class serverGui {
 		                }
 
 		            }
+		                else if(AN.contains("Remove"))
+		                {
+		                	String [] orders = AN.split(":");
+		                	String removeClient = orders[1];
+		                	String fromGroup = orders[3];
+		                	ArrayList<DataOutputStream> datas = new ArrayList<DataOutputStream>();
+		                	datas = dosesofgroups.get(fromGroup);
+		                	dosesofgroups.remove(fromGroup);
+		                	DataOutputStream clientDos  = null;
+		                	for(int i = 0 ;i<usernames.size();i++)
+		                	{
+		                		if(removeClient.equals(usernames.get(i)))
+		                		{
+		                			System.out.println("Found who i should remove");
+		                			clientDos = new DataOutputStream(clients.get(i).getOutputStream());
+		                			clientDos.writeUTF("u are being removed");
+		                		}
+		                		
+		                	}
+		                	for(int i = 0 ;i<datas.size();i++)
+		                	{
+		                		datas.get(i).writeUTF("u are being removed");
+		                		if(datas.get(i) == clientDos)
+		                		{
+		                			System.out.println("a group dos got removed"+datas.size());
+		                			datas.remove(i);
+		                			System.out.println("a group dos got removed"+datas.size());
+		                		}
+		                	}
+		                	dosesofgroups.put(fromGroup,datas);
+		                	for(int i = 0 ;i<datas.size();i++)
+		                	{
+		                		datas.get(i).writeUTF("Remove:"+removeClient+":From:"+fromGroup);
+		                	}
+		                }
 		                	else if(AN.contains("ChangeGroupAdmin")){
 		                	
 			                	groups.put(AN.split(":")[1],AN.split(":")[3]);
