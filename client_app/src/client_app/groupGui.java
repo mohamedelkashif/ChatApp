@@ -180,7 +180,8 @@ public class groupGui {
 	        				client.usergroups.get(resAtt[1]).model.clear();
 	        				for(String active:client.usergroups.get(resAtt[1]).activeUsersList)
 	        				{
-	        					client.usergroups.get(resAtt[1]).model.addElement(active);
+	        					if(!active.equals(userx))
+	        						client.usergroups.get(resAtt[1]).model.addElement(active);
 	        				}
 	        				client.usergroups.get(resAtt[1]).listactiveusersingroup
 	        					.setModel(client.usergroups.get(resAtt[1]).model);
