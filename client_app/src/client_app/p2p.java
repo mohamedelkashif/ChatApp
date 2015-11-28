@@ -88,7 +88,8 @@ public class p2p {
 		JButton btnSend = new JButton("Send");
 		btnSend.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				String message = "client sendTo"+txtMessage.getText();
+				btnSend.setEnabled(false);
+				String message = "client sendTo"+sender+": "+txtMessage.getText();
 				if(type.equals("server"))
 				{
 					try {
@@ -102,8 +103,6 @@ public class p2p {
 				else if(type.equals("client"))
 				{
 					try {
-						Socket c = new Socket("127.0.0.1",portip);
-						System.out.println(portip);
 						DataOutputStream dos = new DataOutputStream(client.getOutputStream());
 						dos.writeUTF(message);
 					} catch (IOException e1) {
@@ -111,6 +110,8 @@ public class p2p {
 						e1.printStackTrace();
 					}
 				}
+				textArea.append(sender+": "+txtMessage.getText()+"\n");
+				btnSend.setEnabled(true);
 			}
 		});
 		btnSend.setBounds(321, 206, 117, 25);
@@ -138,7 +139,6 @@ public class p2p {
 				else if(type.equals("client"))
 				{
 					try {
-						Socket c = new Socket("127.0.0.1",portip);
 						DataOutputStream dos = new DataOutputStream(client.getOutputStream());
 						dos.writeUTF(message);
 					} catch (IOException e1) {
@@ -146,7 +146,7 @@ public class p2p {
 						e1.printStackTrace();
 					}
 				}
-				frame.setVisible(false);
+				//frame.setVisible(false);
 			}
 		});
 		btnClose.setBounds(158, 235, 117, 25);

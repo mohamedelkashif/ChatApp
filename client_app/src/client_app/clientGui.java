@@ -87,11 +87,12 @@ public class clientGui {
 						if(input.contains("sendTo"))
 						{
 							String[] att = input.split("sendTo");
-							peers.textArea.append(att[1]);
+							peers.textArea.append(att[1]+"\n");
 						}
 						else if(input.contains("BYEBYE"))
 						{
 							dos.writeUTF("BYEBYE");
+							peers.getFrame().setVisible(false);
 							break;
 						}
 					}
@@ -103,18 +104,17 @@ public class clientGui {
 	}
 	public class p2pClient extends Thread{
 		private p2p peers;
-		private int port;
+		private Socket c;
 		private String sender;
 		private String reciever;
-		public p2pClient(int port,p2p newp2p,String sender,String reciever) {
+		public p2pClient(Socket c,p2p newp2p,String sender,String reciever) {
 			this.peers = newp2p;
-			this.port = port;
+			this.c = c;
 			this.sender = sender;
 	        this.reciever = reciever;
 	    }		
 		public void run() {
-			try {
-				Socket c = new Socket("127.0.0.1", port);
+			try {				
 				DataInputStream dis = new DataInputStream(c.getInputStream());
 				DataOutputStream dos = new DataOutputStream(c.getOutputStream());
 				while(true)
@@ -124,11 +124,12 @@ public class clientGui {
 					if(input.contains("sendTo"))
 					{
 						String[] att = input.split("sendTo");
-						peers.textArea.append(att[1]);
+						peers.textArea.append(att[1]+"\n");
 					}
 					else if(input.contains("BYEBYE"))
 					{
 						dos.writeUTF("BYEBYE");
+						peers.getFrame().setVisible(false);
 						break;
 					}
 				}
@@ -353,10 +354,11 @@ public class clientGui {
 	                		String[] att = response.split("sendIP");	                		
 	                		try {
 								int port = Integer.parseInt(att[1]);
-								p2p newp2p = new p2p(port,"client",textField.getText(),att[0]);
+								Socket c = new Socket("127.0.0.1", port);
+								p2p newp2p = new p2p(c,"client",textField.getText(),att[0]);
 								newp2p.getFrame().setVisible(true);
-								System.out.println("OPEN P2P CLIENT");
-								p2pClient ch = new p2pClient(port,newp2p,textField.getText(),att[0]);
+								System.out.println("OPEN P2P CLIENT::"+port);								
+								p2pClient ch = new p2pClient(c,newp2p,textField.getText(),att[0]);
 								ch.start();
 							} catch (Exception e) {
 								// TODO Auto-generated catch block
