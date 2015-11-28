@@ -286,6 +286,14 @@ public class serverGui {
 		                			data.writeUTF(Message);
 		                			Message = "";
 			                	}
+			                	if(usernames.get(i).equals(message[0]) && !att[1].equals(""))
+			                	{			                		
+			                		DataOutputStream data = new DataOutputStream(clients.get(i)
+			                				.getOutputStream());
+			                		String Message = att[1];
+		                			data.writeUTF(Message);
+		                			Message = "";
+			                	}
 			                }
 			                txtrServerLogs.append("\n"+"Sent Stuff to the clients");
 		                }
@@ -298,6 +306,11 @@ public class serverGui {
 		                		if(usernames.get(i).equals(att[1]))
 		                		{
 		                			port = ports.get(i);
+		                			DataOutputStream data = new DataOutputStream(clients.get(i)
+			                				.getOutputStream());
+			                		String Message = "openP2P:"+att[0];
+		                			data.writeUTF(Message);
+		                			Message = "";
 		                			break;
 		                		}
 		                	}
@@ -458,9 +471,9 @@ public class serverGui {
 
 					
 					sv = new ServerSocket(1234);					
-					Random rand = new Random();
-					int i = rand.nextInt((1500 - 1000) + 1) + 1000;
-					System.out.println(i);
+					//Random rand = new Random();
+					//int i = rand.nextInt((1500 - 1000) + 1) + 1000;
+					//System.out.println(i);
 
 					servermain = new serverMain(sv);
 					servermain.start();

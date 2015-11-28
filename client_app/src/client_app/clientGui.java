@@ -30,6 +30,9 @@ import javax.swing.JScrollPane;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import javax.swing.event.ListSelectionListener;
+
+import server_app.serverGui.clientListener;
+
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.AbstractListModel;
 import javax.swing.JComboBox;
@@ -41,6 +44,7 @@ public class clientGui {
 	JTextArea textArea_1; 
 	JButton btnNewButton_1;
 	Socket client;
+	ServerSocket cs;
 	JTextArea textArea;
 	private static JFrame frame;
 	JLabel lblAll;
@@ -61,7 +65,31 @@ public class clientGui {
 	JButton btnNewButton;
 	JComboBox comboBox;
 	JButton btnChatDirectly;
+	
+	public class p2pServer extends Thread{
+		public p2pServer(Socket p2pclient,p2p newp2p,String sender,String reviever) {
+	        //this.sv = sv;
+	    }		
+		public void run() {
+			try {
 
+	        } catch (Exception e1) {
+	            System.out.println(e1.getMessage());
+	        }
+		}
+	}
+	public class p2pClient extends Thread{
+		public p2pClient(ServerSocket sv,p2p newp2p,String sender,String revievr) {
+	        //this.sv = sv;
+	    }		
+		public void run() {
+			try {
+
+	        } catch (Exception e1) {
+	            System.out.println(e1.getMessage());
+	        }
+		}
+	}
 	public class clientMain extends Thread{
 		private ServerSocket cs;
 		public clientMain(ServerSocket cs) {
@@ -141,7 +169,7 @@ public class clientGui {
 	         				{
 	         					list.setModel(model);
 	         				}
-	                	}
+	                	}	                	
 	                	else if(response.contains("Disconnect"))
 	                	{
 	                		//for()
@@ -261,6 +289,18 @@ public class clientGui {
 		    				} 
 	                	//	newgroup.main();
 	                	}
+	                	else if(response.contains("openP2P"))
+	                	{
+	                		p2p newp2p = new p2p();
+	                		Socket c;
+	    	                c = cs.accept();
+	    	                p2pServer ch = new p2pServer(c,newp2p);
+	    	                ch.start();
+	                	}
+	                	else if(response.contains("sendIP"))
+	                	{
+	                		String att = response.split(regex)
+	                	}
 	                	else if(response.contains("toGroup"))
 	                	{
 	                		String createdgroupName =response.split(":")[1];
@@ -377,7 +417,7 @@ public class clientGui {
 					Random rand = new Random();
 					int i = (2*rand.nextInt((1500 - 1000) + 1)) + 1000;					
 					try {
-						ServerSocket cs = new ServerSocket(i);
+						cs = new ServerSocket(i);
 						System.out.println(cs.getLocalPort());
 						clientMain clientThread = new  clientMain(cs);
 						clientThread.start();
