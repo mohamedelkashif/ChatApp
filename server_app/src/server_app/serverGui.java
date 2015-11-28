@@ -106,7 +106,8 @@ public class serverGui {
 		                if(AN.contains("newClient"))
 		                {
 		                	//doses.add(dos);
-		                	String []user = AN.split(":");
+		                	String[] att = AN.split(":");
+		                	String []user = att[1].split("&");
 		                	//System.out.println(user[1]);
 		                	usernames.add(user[1]);
 		                	userlistener = user[1];

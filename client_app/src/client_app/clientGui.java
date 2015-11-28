@@ -60,10 +60,12 @@ public class clientGui {
 	private JScrollPane scrollPane_1;
 	JButton btnNewButton;
 	JComboBox comboBox;
+	JButton btnChatDirectly;
 
 	public class clientMain extends Thread{
-		public clientMain() {
-	        
+		private ServerSocket cs;
+		public clientMain(ServerSocket cs) {
+	        this.cs = cs;
 	    }
 		public void run() {
 		 try {
@@ -74,7 +76,7 @@ public class clientGui {
 	            dis = new DataInputStream(client.getInputStream());
 	            //Scanner sc = new Scanner(System.in);
 
-	            dos.writeUTF("newClient:"+textField.getText());
+	            dos.writeUTF("newClient:"+cs.getLocalPort()+"&"+textField.getText());
 	            String userInput;
 	           
 	            	while (true) {
@@ -373,16 +375,16 @@ public class clientGui {
 					btnNewButton.setEnabled(false);
 					btnNewButton_1.setEnabled(true);
 					Random rand = new Random();
-					int i = rand.nextInt((1500 - 1000) + 1) + 1000;
-					System.out.println(i);
+					int i = (2*rand.nextInt((1500 - 1000) + 1)) + 1000;					
 					try {
 						ServerSocket cs = new ServerSocket(i);
+						System.out.println(cs.getLocalPort());
+						clientMain clientThread = new  clientMain(cs);
+						clientThread.start();
 					} catch (IOException e1) {
 						// TODO Auto-generated catch block
 						e1.printStackTrace();
-					}
-					clientMain clientThread = new  clientMain();
-					clientThread.start();
+					}					
 					textField.setEnabled(false);
 					frame.setTitle("Client "+textField.getText()+" chat");
 					btnNewButton_2.setEnabled(true);
@@ -486,6 +488,7 @@ public class clientGui {
 				
 				if(comboBox.getSelectedItem().toString().equals("active users"))
 				{
+					btnChatDirectly.setVisible(true);
 					lblAll.setText("Chat with : "+list.getSelectedValue().toString());
 				}
 				else if(comboBox.getSelectedItem().toString().equals("your groups"))
@@ -549,12 +552,13 @@ public class clientGui {
 				}
 			}
 		});
-		btnNewButton_3.setBounds(10, 249, 133, 23);
+		btnNewButton_3.setBounds(158, 250, 133, 20);
 		frame.getContentPane().add(btnNewButton_3);
 		
 		textField_1 = new JTextField();
 		textField_1.setToolTipText("Enter group name here");
-		textField_1.setBounds(158, 250, 133, 20);
+		textField_1.setBounds(10, 249, 133, 23);
+		
 		frame.getContentPane().add(textField_1);
 		textField_1.setColumns(10);
 		
@@ -611,6 +615,27 @@ public class clientGui {
 		comboBox.setEditable(true);
 		comboBox.setBounds(10, 55, 106, 20);
 		frame.getContentPane().add(comboBox);
+		
+		btnChatDirectly = new JButton("Chat directly");
+		btnChatDirectly.setBounds(307, 53, 117, 25);
+		btnChatDirectly.setVisible(false);
+		btnChatDirectly.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				try {
+					client = new Socket("127.0.0.1", 1234);
+					DataOutputStream dosClient = new DataOutputStream(client.getOutputStream());
+					dosClient.writeUTF(textField.getText()+"getIP"+lblAll.getText());
+				} catch (UnknownHostException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}	            
+	            
+			}
+		});			
+		frame.getContentPane().add(btnChatDirectly);
 		
 		
 	}
