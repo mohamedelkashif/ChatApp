@@ -95,7 +95,7 @@ public class serverGui {
 		        try {
 
 		        	DataInputStream dis ;
-			DataOutputStream dos;
+		        	DataOutputStream dos;
 		        	 dos = new DataOutputStream(client.getOutputStream());
 		             dis = new DataInputStream(client.getInputStream());
 		            

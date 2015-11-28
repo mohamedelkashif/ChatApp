@@ -31,7 +31,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import javax.swing.event.ListSelectionListener;
 
-import server_app.serverGui.clientListener;
 
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.AbstractListModel;
@@ -56,8 +55,8 @@ public class clientGui {
 	private ArrayList<String> selectedActiveUsersToGroup = new ArrayList<String>();
 	private JTextField textField_1;
 	HashMap<String,groupGui> usergroups = new HashMap<String,groupGui>();
-	DataOutputStream dos;
-	DataInputStream dis;
+	//DataOutputStream dos;
+	//DataInputStream dis;
 	static clientGui window;
 	private JTextField messageFromGroup;
 	private JScrollPane scrollPane;
@@ -67,11 +66,30 @@ public class clientGui {
 	JButton btnChatDirectly;
 	
 	public class p2pServer extends Thread{
-		public p2pServer(Socket p2pclient,p2p newp2p,String sender,String reviever) {
-	        //this.sv = sv;
+		private p2p peers;
+		private Socket p2pclient;
+		private String sender;
+		private String reciever;
+		public p2pServer(Socket p2pclient,p2p newp2p,String sender,String reciever) {
+	        this.peers = newp2p;
+	        this.p2pclient = p2pclient;
+	        this.sender = sender;
+	        this.reciever = reciever;
 	    }		
 		public void run() {
 			try {
+					DataInputStream dis = new DataInputStream(p2pclient.getInputStream());
+					peers.getFrame().setTitle("Client "+sender);
+					peers.lblChatWithNone.setText("Chat with: "+reciever);
+					while(true)
+					{
+						String input = dis.readUTF();
+						if(input.contains("sendTo"))
+						{
+							String[] att = input.split("sendTo");
+							peers.textArea.append(att[1]);
+						}
+					}
 
 	        } catch (Exception e1) {
 	            System.out.println(e1.getMessage());
@@ -79,11 +97,31 @@ public class clientGui {
 		}
 	}
 	public class p2pClient extends Thread{
-		public p2pClient(ServerSocket sv,p2p newp2p,String sender,String revievr) {
-	        //this.sv = sv;
+		private p2p peers;
+		private int port;
+		private String sender;
+		private String reciever;
+		public p2pClient(int port,p2p newp2p,String sender,String reciever) {
+			this.peers = newp2p;
+			this.port = port;
+			this.sender = sender;
+	        this.reciever = reciever;
 	    }		
 		public void run() {
 			try {
+				Socket c = new Socket("127.0.0.1", port);
+				DataInputStream dis = new DataInputStream(c.getInputStream());
+				peers.getFrame().setTitle("Client "+sender);
+				peers.lblChatWithNone.setText("Chat with: "+reciever);
+				while(true)
+				{
+					String input = dis.readUTF();
+					if(input.contains("sendTo"))
+					{
+						String[] att = input.split("sendTo");
+						peers.textArea.append(att[1]);
+					}
+				}
 
 	        } catch (Exception e1) {
 	            System.out.println(e1.getMessage());
@@ -100,8 +138,8 @@ public class clientGui {
 	            //1.Create Client Socket and connect to the server
 	            client = new Socket("127.0.0.1", 1234);
 	            //2.if accepted create IO streams
-	            dos = new DataOutputStream(client.getOutputStream());
-	            dis = new DataInputStream(client.getInputStream());
+	            DataOutputStream dos = new DataOutputStream(client.getOutputStream());
+	            DataInputStream dis = new DataInputStream(client.getInputStream());
 	            //Scanner sc = new Scanner(System.in);
 
 	            dos.writeUTF("newClient:"+cs.getLocalPort()+"&"+textField.getText());
@@ -289,17 +327,27 @@ public class clientGui {
 		    				} 
 	                	//	newgroup.main();
 	                	}
-	                	else if(response.contains("openP2P"))
+	                	else if(response.contains("openP2P:"))
 	                	{
-	                		p2p newp2p = new p2p();
+	                		String[] att = response.split(":");	                		
 	                		Socket c;
-	    	                c = cs.accept();
-	    	                p2pServer ch = new p2pServer(c,newp2p);
+	    	                c = cs.accept();	    	                
+	    	                p2p newp2p = new p2p(c,"server");
+	    	                p2pServer ch = new p2pServer(c,newp2p,textField.getText(),att[1]);
 	    	                ch.start();
 	                	}
 	                	else if(response.contains("sendIP"))
 	                	{
-	                		String att = response.split(regex)
+	                		String[] att = response.split("sendIP");	                		
+	                		try {
+								int port = Integer.parseInt(att[1]);
+								p2p newp2p = new p2p(port,"client");
+								p2pClient ch = new p2pClient(port,newp2p,textField.getText(),att[0]);
+								ch.start();
+							} catch (Exception e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}	                		
 	                	}
 	                	else if(response.contains("toGroup"))
 	                	{
@@ -451,6 +499,7 @@ public class clientGui {
 				btnNewButton.setEnabled(true);
 				btnNewButton_1.setEnabled(false);
 				try {
+					DataOutputStream dos = new DataOutputStream(client.getOutputStream());
 					dos.writeUTF("$From"+textField.getText()+"$"+"Disconnect:"+textField.getText());
 					textArea.append("Connection lost\n");
 					client.close();
@@ -568,6 +617,7 @@ public class clientGui {
     			    }
                 	userInput += textField.getText() ;
                 	try {
+                		DataOutputStream dos = new DataOutputStream(client.getOutputStream());
 						dos.writeUTF("$From"+textField.getText()+"$"+userInput + ":AdminOfGroup:"+textField.getText() +":GroupName:"+ textField_1.getText() );
 					} catch (IOException e) {
 						// TODO Auto-generated catch block
@@ -617,6 +667,7 @@ public class clientGui {
 	        public void insertUpdate(DocumentEvent e) {
 	        	System.out.println("something updated neehaaa"+messageFromGroup.getText()+"\n");
 	        	try {
+	        		DataOutputStream dos = new DataOutputStream(client.getOutputStream());
 					dos.writeUTF(messageFromGroup.getText());
 				} catch (IOException e1) {
 					// TODO Auto-generated catch block
@@ -679,13 +730,14 @@ public class clientGui {
 		
 		
 	}
-	public DataOutputStream getDos()
+	public DataOutputStream getDos() throws IOException
 	{
-		return this.dos;
+		DataOutputStream dos = new DataOutputStream(client.getOutputStream());
+		return dos;
 	}
-	public DataInputStream getDis()
+	public DataInputStream getDis() throws IOException
 	{
-		return this.dis;
+		return new DataInputStream(client.getInputStream());
 	}
 	public void setMessage(String message)
 	{
