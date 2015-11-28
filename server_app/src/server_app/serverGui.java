@@ -286,6 +286,37 @@ public class serverGui {
 			                }
 			                txtrServerLogs.append("\n"+"Sent Stuff to the clients");
 		                }
+		                else if(AN.contains("kickOff"))
+		                {
+		                	String[] data = AN.split("kickOff");
+		                	/*for(String group:groups)
+		                	{
+		                		if(group.equals(data[0]))
+		                		{
+		                			groups.remove(group);
+		                		}		                			
+		                	}*/
+		                	for(int i =0;i<usernames.size();i++)
+		                	{
+		                		if(usernames.get(i).equals(data[1]))
+		                		{
+		                			DataOutputStream clientdos = new DataOutputStream(clients.get(i)
+			                				.getOutputStream());
+			                		String Message = "youKickedOff"+data[0];
+			                		clientdos.writeUTF(Message);
+		                			Message = "";
+		                		}
+		                		else
+		                		{
+		                			DataOutputStream clientdos = new DataOutputStream(clients.get(i)
+			                				.getOutputStream());
+			                		String Message = data[1]+"out"+data[0];
+			                		clientdos.writeUTF(Message);
+		                			Message = "";
+		                		}
+		                		
+		                	}
+		                }
 		                else;
 		            }
 		            

@@ -22,6 +22,8 @@ import java.awt.event.ActionEvent;
 import javax.swing.JTextArea;
 import java.awt.event.InputMethodListener;
 import java.awt.event.InputMethodEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 public class groupGui {
 
@@ -42,6 +44,7 @@ public class groupGui {
 	 JButton kick;
 	 static String adminofgroup;
 	 static JButton btnNewButton_1;
+	 String choice;
 	
 	/**
 	 * Launch the application.
@@ -92,6 +95,13 @@ public class groupGui {
 		String []resp = groupreq.split("&");
 		
 		listactiveusersingroup = new JList();
+		listactiveusersingroup.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				choice = listactiveusersingroup.getSelectedValue().toString();
+				System.out.println(choice);
+			}
+		});
 		listactiveusersingroup.setBounds(10, 41, 123, 169);
 		frame.getContentPane().add(listactiveusersingroup);
 		
@@ -124,6 +134,24 @@ public class groupGui {
 		textFieldMessage.setColumns(10);
 		
 		kick = new JButton("Kick");
+		kick.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				System.out.println(client.usergroups.keySet());
+				groupGui gui = client.usergroups.get(groupname);
+				if(gui != null)
+					try {
+						client.client = new Socket("127.0.0.1", 1234);
+						DataOutputStream dos = new DataOutputStream(client.client.getOutputStream());
+						dos.writeUTF(groupname+"kickOff"+choice);
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				else 
+					System.out.println("ERROR");
+				client.usergroups.remove(choice);
+			}
+		});
 		kick.setBounds(10, 221, 123, 23);
 		frame.getContentPane().add(kick);
 		textFieldMessage.getDocument().addDocumentListener(new DocumentListener() {
@@ -135,9 +163,38 @@ public class groupGui {
 
 	        @Override
 	        public void insertUpdate(DocumentEvent e) {
-	        	textAregroupmessg.append(textFieldMessage.getText()+"\n");
-	        	System.out.println("something updated neehaaa"+textFieldMessage.getText()+"\n");
-	        	
+	        	if(textFieldMessage.getText().contains("youKickedOff"))
+	        	{
+	        		String[] resAtt = textFieldMessage.getText().split("KickedOff");
+	        		if(client.usergroups.get(resAtt[1]) != null)
+	        		{
+	        			client.usergroups.get(resAtt[1]).frame.setVisible(false);
+	        			client.usergroups.remove(resAtt[1]);
+	        		}
+	        	}
+	        	if(textFieldMessage.getText().contains("out"))
+	        	{
+	        		String[] resAtt = textFieldMessage.getText().split("out");
+	        		if(client.usergroups.get(resAtt[1]) != null)
+	        		{
+	        			if(client.usergroups.get(resAtt[1]).activeUsersList.remove(resAtt[0]))
+	        			{
+	        				client.usergroups.get(resAtt[1]).model.clear();
+	        				for(String active:client.usergroups.get(resAtt[1]).activeUsersList)
+	        				{
+	        					if(!active.equals(userx))
+	        						client.usergroups.get(resAtt[1]).model.addElement(active);
+	        				}
+	        				client.usergroups.get(resAtt[1]).listactiveusersingroup
+	        					.setModel(client.usergroups.get(resAtt[1]).model);
+	        			}
+	        		}
+	        	}
+	        	else
+	        	{
+		        	textAregroupmessg.append(textFieldMessage.getText()+"\n");
+		        	System.out.println("something updated neehaaa"+textFieldMessage.getText()+"\n");
+	        	}
 	        }
 
 	        @Override

@@ -250,6 +250,7 @@ public class clientGui {
 	                		//groupMain groupThreadx = newgroup.new groupMain();
 	    					//groupThreadx.start();
 		                	newgroup.main(res[1],window,newgroup);
+		                	System.out.println(createdgroupName);
 		                	usergroups.put(createdgroupName, newgroup);
 		                	groupmodel.addElement(createdgroupName);
 		                	if(comboBox.getSelectedItem().toString().equals("your groups"))
@@ -275,11 +276,24 @@ public class clientGui {
 	                		sendingto.frame.setVisible(true);
 	                		
 	                	}
+
 	                	else if(response.contains("ChangingGroupAdmin")){
 	                		String groupnamestosend =response.split(":")[1];
 	                		String newadmin =response.split(":")[3];
 	                		groupGui sendingtto  = usergroups.get(groupnamestosend);
-	                		sendingtto.UpdateAdmin(newadmin);
+	                		sendingtto.UpdateAdmin(newadmin);}
+
+	                	else if(response.contains("youKickedOff"))
+	                	{
+	                		String[] resAtt = response.split("KickedOff");
+	                		groupGui sendingto  = usergroups.get(resAtt[1]);
+	                		sendingto.setMessage(response);
+	                	}
+	                	else if(response.contains("out"))
+	                	{
+	                		String[] resAtt = response.split("out");
+	                		groupGui sendingto  = usergroups.get(resAtt[1]);
+	                		sendingto.setMessage(response);
 	                	}
 	                	else if (response.contains(":"))
 	                	{
