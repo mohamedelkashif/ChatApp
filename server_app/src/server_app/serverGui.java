@@ -42,6 +42,7 @@ public class serverGui {
 	ArrayList<Socket> clients = new ArrayList<>();
 	ArrayList<Map<String,ArrayList<Socket>>> groupsList = new ArrayList<>();
 	ArrayList<String> usernames = new ArrayList<>();
+	ArrayList<String> ports = new ArrayList<>();
 	HashMap<String,String> groups = new HashMap<>();
 	HashMap<String,ArrayList<DataOutputStream>> dosesofgroups = new HashMap<String,ArrayList<DataOutputStream>>();
 	JPanel list_panel;
@@ -108,6 +109,7 @@ public class serverGui {
 		                	//doses.add(dos);
 		                	String[] att = AN.split(":");
 		                	String []user = att[1].split("&");
+		                	ports.add(user[0]);
 		                	//System.out.println(user[1]);
 		                	usernames.add(user[1]);
 		                	userlistener = user[1];
@@ -286,6 +288,33 @@ public class serverGui {
 			                	}
 			                }
 			                txtrServerLogs.append("\n"+"Sent Stuff to the clients");
+		                }
+		                else if(AN.contains("getIP"))
+		                {
+		                	String[] att = AN.split("getIP");
+		                	String port = "";
+		                	for(int i=0;i<usernames.size();i++)
+		                	{
+		                		if(usernames.get(i).equals(att[1]))
+		                		{
+		                			port = ports.get(i);
+		                			break;
+		                		}
+		                	}
+		                	if(!port.equals(""))
+		                	{
+		                		for(int i=0;i<usernames.size();i++)
+		                		{
+		                			if(usernames.get(i).equals(att[0]))
+			                		{
+			                			DataOutputStream data = new DataOutputStream(clients.get(i)
+				                				.getOutputStream());
+				                		String Message = att[1]+"sendIP"+port;
+			                			data.writeUTF(Message);
+			                			Message = "";
+			                		}
+		                		}
+		                	}
 		                }
 		                else if(AN.contains("kickOff"))
 		                {
