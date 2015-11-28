@@ -494,7 +494,7 @@ public class clientGui {
 		});
 		
 		list.setBounds(10, 78, 103, 159);
-		
+		//list
 		btnNewButton_3 = new JButton("Create A Group");
 		btnNewButton_3.setToolTipText("Please select multiple users first");
 		btnNewButton_3.addActionListener(new ActionListener() {
