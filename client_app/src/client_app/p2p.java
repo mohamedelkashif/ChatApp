@@ -23,6 +23,8 @@ public class p2p {
 	 private String type;
 	 private Socket client;
 	 private int portip;
+	 private String sender;
+	 private String reciever;
 
 	/**
 	 * Launch the application.
@@ -48,14 +50,20 @@ public class p2p {
 	}
 
 
-	public p2p(Socket c, String string) {
+	public p2p(Socket c, String string, String text, String string2) {
 		type = string;
 		client = c;
+		sender = text;
+		reciever = string2;
+		initialize();
 	}
 
-	public p2p(int port, String string) {
+	public p2p(int port, String string, String text, String string2) {
 		type = string;
 		portip = port; 
+		sender = text;
+		reciever = string2;
+		initialize();
 	}
 
 	/**
@@ -66,6 +74,7 @@ public class p2p {
 		getFrame().setBounds(100, 100, 450, 300);
 		getFrame().setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		getFrame().getContentPane().setLayout(null);
+		getFrame().setTitle("Client: "+sender);
 		
 		textArea = new JTextArea();
 		textArea.setBounds(50, 38, 365, 130);
@@ -94,6 +103,7 @@ public class p2p {
 				{
 					try {
 						Socket c = new Socket("127.0.0.1",portip);
+						System.out.println(portip);
 						DataOutputStream dos = new DataOutputStream(client.getOutputStream());
 						dos.writeUTF(message);
 					} catch (IOException e1) {
@@ -107,6 +117,7 @@ public class p2p {
 		getFrame().getContentPane().add(btnSend);
 		
 		lblChatWithNone = new JLabel("Chat with: None");
+		lblChatWithNone.setText("Chat With: "+reciever);
 		lblChatWithNone.setBounds(50, 12, 225, 14);
 		getFrame().getContentPane().add(lblChatWithNone);
 		

@@ -310,8 +310,8 @@ public class serverGui {
 			                				.getOutputStream());
 			                		String Message = "openP2P:"+att[0];
 		                			data.writeUTF(Message);
+		                			System.out.println(Message);
 		                			Message = "";
-		                			break;
 		                		}
 		                	}
 		                	if(!port.equals(""))
@@ -324,6 +324,7 @@ public class serverGui {
 				                				.getOutputStream());
 				                		String Message = att[1]+"sendIP"+port;
 			                			data.writeUTF(Message);
+			                			System.out.println(Message);
 			                			Message = "";
 			                		}
 		                		}

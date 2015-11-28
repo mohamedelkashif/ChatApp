@@ -80,10 +80,9 @@ public class clientGui {
 			try {
 					DataInputStream dis = new DataInputStream(p2pclient.getInputStream());
 					DataOutputStream dos = new DataOutputStream(p2pclient.getOutputStream());
-					peers.getFrame().setTitle("Client "+sender);
-					peers.lblChatWithNone.setText("Chat with: "+reciever);
 					while(true)
 					{
+						System.out.println("RUNNING 1111");
 						String input = dis.readUTF();
 						if(input.contains("sendTo"))
 						{
@@ -118,10 +117,9 @@ public class clientGui {
 				Socket c = new Socket("127.0.0.1", port);
 				DataInputStream dis = new DataInputStream(c.getInputStream());
 				DataOutputStream dos = new DataOutputStream(c.getOutputStream());
-				peers.getFrame().setTitle("Client "+sender);
-				peers.lblChatWithNone.setText("Chat with: "+reciever);
 				while(true)
 				{
+					System.out.println("RUNNING 2222");
 					String input = dis.readUTF();
 					if(input.contains("sendTo"))
 					{
@@ -344,7 +342,9 @@ public class clientGui {
 	                		String[] att = response.split(":");	                		
 	                		Socket c;
 	    	                c = cs.accept();	    	                
-	    	                p2p newp2p = new p2p(c,"server");
+	    	                p2p newp2p = new p2p(c,"server",textField.getText(),att[1]);
+	    	                newp2p.getFrame().setVisible(true);
+	    	                System.out.println("OPEN P2P SERVER");
 	    	                p2pServer ch = new p2pServer(c,newp2p,textField.getText(),att[1]);
 	    	                ch.start();
 	                	}
@@ -353,7 +353,9 @@ public class clientGui {
 	                		String[] att = response.split("sendIP");	                		
 	                		try {
 								int port = Integer.parseInt(att[1]);
-								p2p newp2p = new p2p(port,"client");
+								p2p newp2p = new p2p(port,"client",textField.getText(),att[0]);
+								newp2p.getFrame().setVisible(true);
+								System.out.println("OPEN P2P CLIENT");
 								p2pClient ch = new p2pClient(port,newp2p,textField.getText(),att[0]);
 								ch.start();
 							} catch (Exception e) {
@@ -727,7 +729,8 @@ public class clientGui {
 				try {
 					client = new Socket("127.0.0.1", 1234);
 					DataOutputStream dosClient = new DataOutputStream(client.getOutputStream());
-					dosClient.writeUTF(textField.getText()+"getIP"+lblAll.getText());
+					dosClient.writeUTF(textField.getText()+"getIP"+lblAll.getText()
+	            	.toString().split(": ")[1]);
 				} catch (UnknownHostException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
