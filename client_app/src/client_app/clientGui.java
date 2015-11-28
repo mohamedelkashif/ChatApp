@@ -149,8 +149,29 @@ public class clientGui {
 	         					list.setModel(model);
 	         				}
 	                		textArea.setText(response.split(":")[1] +" "+"Removed");
+	                		
 	                	}
-	                	
+	                	else if(response.contains("DisconnUser"))
+	                	{
+	                		System.out.println("henna cli we"+response.split(":")[1]);
+	                		String groupnamestosend =response.split(":")[5];
+	                		String[] useractive =response.split(":")[3].split(",");
+//	                		String[] acttivs = null ;
+//	                		for(int i = 1 ; i < useractive.length ;i++){
+//	                				acttivs[i-1] = useractive[i];
+//	                				System.out.println(acttivs[i-1]);
+//	                		}
+	                		
+	                			
+	                		for(String grupnme : groupnamestosend.split(",")){
+	                			if(!grupnme.equals("nullGroup")){
+			                		groupGui sendingtto  = usergroups.get(grupnme);
+			                		sendingtto.UpdateActiveUsersList(useractive);
+			                		sendingtto.disconnect(response.split(":")[1]);
+			                		System.out.println("henna cli we"+response.split(":")[1]);
+			                		}
+	                		}
+	                	}
 	                	else if(response.contains("Ban"))
 	            		{
 	                		System.out.println(response+" i am "+textField.getText());
@@ -225,7 +246,7 @@ public class clientGui {
 	                		groupGui newgroup = new groupGui();
 	                		String createdgroupName = res[1].split("&")[0];
 	                		newgroup.setUser(textField.getText());
-	                		newgroup.setActiveUsersList(res[1].split("&")[2].split(","));
+	                		newgroup.setActiveUsersList(res[1].split("&")[2].split(","),res[1].split("&")[4]);
 	                		//groupMain groupThreadx = newgroup.new groupMain();
 	    					//groupThreadx.start();
 		                	newgroup.main(res[1],window,newgroup);
@@ -253,6 +274,12 @@ public class clientGui {
 	                		sendingto.setMessage(message);
 	                		sendingto.frame.setVisible(true);
 	                		
+	                	}
+	                	else if(response.contains("ChangingGroupAdmin")){
+	                		String groupnamestosend =response.split(":")[1];
+	                		String newadmin =response.split(":")[3];
+	                		groupGui sendingtto  = usergroups.get(groupnamestosend);
+	                		sendingtto.UpdateAdmin(newadmin);
 	                	}
 	                	else if (response.contains(":"))
 	                	{

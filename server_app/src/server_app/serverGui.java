@@ -42,12 +42,12 @@ public class serverGui {
 	ArrayList<Socket> clients = new ArrayList<>();
 	ArrayList<Map<String,ArrayList<Socket>>> groupsList = new ArrayList<>();
 	ArrayList<String> usernames = new ArrayList<>();
-	ArrayList<String> groups = new ArrayList<>();
+	HashMap<String,String> groups = new HashMap<>();
 	HashMap<String,ArrayList<DataOutputStream>> dosesofgroups = new HashMap<String,ArrayList<DataOutputStream>>();
 	JPanel list_panel;
 	DefaultListModel model = new DefaultListModel();
 	JList list;
-	
+	ArrayList<Socket> clientsbeforedelete;
 	//DefaultListModel<String> model = new DefaultListModel<>();
 	public class serverMain extends Thread{
 		ServerSocket sv;
@@ -157,7 +157,7 @@ public class serverGui {
 		                	
 				           
 		                	txtrServerLogs.append("\n new group added: name:" +order[5]+ " admin:"+ order[3]);
-		                	groups.add(order[5]);
+		                	groups.put(order[5], order[3]);
 		                	String []sendees = order[1].split(",");
 		                	ArrayList<DataOutputStream> dosesofAgroup = new ArrayList<DataOutputStream>();
 		                	for(String se : sendees){
@@ -166,7 +166,7 @@ public class serverGui {
 		                				DataOutputStream data = new DataOutputStream(clients.get(i)
 				                				.getOutputStream());
 		                				dosesofAgroup.add(data);
-		                				data.writeUTF("OpenGroupGui:"+order[5]+"&users&"+order[1]);
+		                				data.writeUTF("OpenGroupGui:"+order[5]+"&users&"+order[1]+"&admin&"+ order[3]);
 		                				data.writeUTF("toGroup:"+order[5]);
 		                			}
 		                		}
@@ -208,19 +208,32 @@ public class serverGui {
 		                		if(usernames.get(i).equals(user[1]))
 		                		{
 		                			System.out.println(usernames.size());
+		                			clientsbeforedelete = clients;
 		                			
-		                			clients.remove(i);
 		                			usernames.remove(i);
 		                			System.out.println(",ndvnk");
-		                			
+		                			for(Socket c : clients){
+		    		                	//System.out.println(doses.size());
+		    		                		DataOutputStream data = new DataOutputStream(c.getOutputStream());
+		    		                		String groupnamesinarr = "nullGroup";
+		    		                		for(String group : groups.keySet()){
+		    		                			groupnamesinarr += ","+group ;
+		    		                		}
+		    		                		String usernamesinarr = "nullName";
+		    		                		for(String username : usernames){
+		    		                			usernamesinarr += ","+username ;
+		    		                		}
+		    		                		data.writeUTF("DisconnUser:"+user[1]+":actusers:"+usernamesinarr +":toGrouup:"+groupnamesinarr);
+		    		                	}
 		                			System.out.println(usernames.size());
-		                		
+		                			clients.remove(i);
 		                		}
 		                	}
 		                	for(Socket c : clients){
 		                	//System.out.println(doses.size());
-		                		DataOutputStream data = new DataOutputStream(c.getOutputStream());		                				
-		                	data.writeUTF("Disconnect:"+user[1]);
+		                		DataOutputStream data = new DataOutputStream(c.getOutputStream());
+		                	
+		                		data.writeUTF("Disconnect:"+user[1]);
 		                	}
 		                }
 		                else
@@ -235,6 +248,19 @@ public class serverGui {
 		                }
 
 		            }
+		                	else if(AN.contains("ChangeGroupAdmin")){
+		                	
+			                	groups.put(AN.split(":")[1],AN.split(":")[3]);
+			                	String groupname = AN.split(":")[1];
+			                	ArrayList<DataOutputStream> getdoses = new ArrayList<>() ;
+			                	getdoses = dosesofgroups.get(groupname);
+			                	System.out.println("ChangingGroupAdmin:"+AN.split(":")[1]+":to:"+ AN.split(":")[3]);
+			                	for (DataOutputStream data : getdoses)
+				                {
+			                		data.writeUTF("ChangingGroupAdmin:"+AN.split(":")[1]+":to:"+ AN.split(":")[3]);
+				                }
+			                	
+			                }
 		                else if (AN.contains("sendto"))
 		                {
 		                	String[] message = AN.split("sendto",2);

@@ -40,6 +40,8 @@ public class groupGui {
 	 ArrayList<String> activeUsersList = new ArrayList<>();
 	 JList listactiveusersingroup;
 	 JButton kick;
+	 static String adminofgroup;
+	 static JButton btnNewButton_1;
 	
 	/**
 	 * Launch the application.
@@ -80,7 +82,7 @@ public class groupGui {
 	private void initialize() {
 		frame = new JFrame();
 		
-		frame.setBounds(100, 100, 450, 300);
+		frame.setBounds(100, 100, 450, 322);
 		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		frame.getContentPane().setLayout(null);
 		
@@ -146,6 +148,27 @@ public class groupGui {
 	    });
 		textFieldMessage.setVisible(false);
 		kick.setEnabled(false);
+		
+		 btnNewButton_1 = new JButton("Reset Admin");
+		btnNewButton_1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				int[] selectedIx = listactiveusersingroup.getSelectedIndices();      
+                if(selectedIx.length==1)
+                {
+			    	adminofgroup = (String) listactiveusersingroup.getModel().getElementAt(selectedIx[0]);
+			    	client.setMessage("ChangeGroupAdmin:"+groupname+":to:"+adminofgroup);
+			    	btnNewButton_1.setEnabled(false);
+			    	kick.setEnabled(false);
+			    }
+			}
+		});
+		btnNewButton_1.setBounds(10, 255, 123, 23);
+		frame.getContentPane().add(btnNewButton_1);
+		btnNewButton_1.setEnabled(false);
+//		if(userx.equals(adminofgroup)){
+//			btnNewButton_1.setEnabled(true);
+//			kick.setEnabled(true);
+//		}
 	}
 
 	public void setUser(String user)
@@ -158,19 +181,68 @@ public class groupGui {
 		System.out.println("message is being set neehaaa\n");
 		textFieldMessage.setText(message);
 	}
-	public void setActiveUsersList(String[] list)
+	public void setActiveUsersList(String[] list,String admin)
 	{
 		for(String s : list)
 		{
 			activeUsersList.add(s);
 			if(!s.equals(userx))
 				model.addElement(s);
+			if(s.equals(admin))
+				model.addElement(s + "(Admin)");
 			listactiveusersingroup.setModel(model);
 		}
 		if(list[list.length-1].equals(userx))
 		{
+			adminofgroup = userx; 
+			kick.setEnabled(true);
+			
+			btnNewButton_1.setEnabled(true);
+			textAregroupmessg.append("u are the Admin of this Group \n only you Can Kick people\n");
+		}
+	}
+	public void UpdateActiveUsersList(String[] list)
+	{
+		model.removeAllElements();
+		ArrayList<String> activeusersingroupnow = new ArrayList<>();
+		for(String user: activeUsersList){
+			activeusersingroupnow.add(user);
+		}
+		activeUsersList.clear();
+		for(String s : list)
+		{
+			
+			if(activeusersingroupnow.contains(s)){
+				activeUsersList.add(s);
+				if(s.equals(adminofgroup))
+					model.addElement(s + "(Admin)");
+				else
+					model.addElement(s);
+				listactiveusersingroup.setModel(model);
+				}
+		}
+		
+	}
+	public void UpdateAdmin(String newadmin)
+	{
+		adminofgroup = newadmin;
+		if(userx.equals(newadmin)){
+			btnNewButton_1.setEnabled(true);
 			kick.setEnabled(true);
 			textAregroupmessg.append("u are the Admin of this Group \n only you Can Kick people\n");
+		}
+		model.removeAllElements();
+		for(String s : activeUsersList){
+			if(s.equals(adminofgroup))
+				model.addElement(s + "(Admin)");
+			else
+				model.addElement(s);
+			listactiveusersingroup.setModel(model);
+		}
+	}
+	public void disconnect(String name){
+		if(userx.equals(name)){
+			frame.setVisible(false);
 		}
 	}
 }
