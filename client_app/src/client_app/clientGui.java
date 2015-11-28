@@ -226,6 +226,18 @@ public class clientGui {
 	                		sendingto.setMessage(response);
 	                		
 	                	}
+	                	else if(response.contains("youKickedOff"))
+	                	{
+	                		String[] resAtt = response.split("KickedOff");
+	                		groupGui sendingto  = usergroups.get(resAtt[1]);
+	                		sendingto.setMessage(response);
+	                	}
+	                	else if(response.contains("out"))
+	                	{
+	                		String[] resAtt = response.split("out");
+	                		groupGui sendingto  = usergroups.get(resAtt[1]);
+	                		sendingto.setMessage(response);
+	                	}
 	                	else if (response.contains(":"))
 	                	{
 	                		String[] s = response.split(":",2);

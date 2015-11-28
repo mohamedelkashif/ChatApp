@@ -161,9 +161,19 @@ public class groupGui {
 
 	        @Override
 	        public void insertUpdate(DocumentEvent e) {
-	        	textAregroupmessg.append(textFieldMessage.getText()+"\n");
-	        	System.out.println("something updated neehaaa"+textFieldMessage.getText()+"\n");
-	        	
+	        	if(textFieldMessage.getText().contains("youKickedOff"))
+	        	{
+	        		String[] resAtt = textFieldMessage.getText().split("KickedOff");
+	        	}
+	        	if(textFieldMessage.getText().contains("out"))
+	        	{
+	        		String[] resAtt = textFieldMessage.getText().split("out");
+	        	}
+	        	else
+	        	{
+		        	textAregroupmessg.append(textFieldMessage.getText()+"\n");
+		        	System.out.println("something updated neehaaa"+textFieldMessage.getText()+"\n");
+	        	}
 	        }
 
 	        @Override

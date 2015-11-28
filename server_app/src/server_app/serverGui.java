@@ -276,7 +276,7 @@ public class serverGui {
 		                		{
 		                			DataOutputStream clientdos = new DataOutputStream(clients.get(i)
 			                				.getOutputStream());
-			                		String Message = "you are out:"+data[0];
+			                		String Message = "youKickedOff"+data[0];
 			                		clientdos.writeUTF(Message);
 		                			Message = "";
 		                		}
