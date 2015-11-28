@@ -164,10 +164,28 @@ public class groupGui {
 	        	if(textFieldMessage.getText().contains("youKickedOff"))
 	        	{
 	        		String[] resAtt = textFieldMessage.getText().split("KickedOff");
+	        		if(client.usergroups.get(resAtt[1]) != null)
+	        		{
+	        			client.usergroups.get(resAtt[1]).frame.setVisible(false);
+	        			client.usergroups.remove(resAtt[1]);
+	        		}
 	        	}
 	        	if(textFieldMessage.getText().contains("out"))
 	        	{
 	        		String[] resAtt = textFieldMessage.getText().split("out");
+	        		if(client.usergroups.get(resAtt[1]) != null)
+	        		{
+	        			if(client.usergroups.get(resAtt[1]).activeUsersList.remove(resAtt[0]))
+	        			{
+	        				client.usergroups.get(resAtt[1]).model.clear();
+	        				for(String active:client.usergroups.get(resAtt[1]).activeUsersList)
+	        				{
+	        					client.usergroups.get(resAtt[1]).model.addElement(active);
+	        				}
+	        				client.usergroups.get(resAtt[1]).listactiveusersingroup
+	        					.setModel(client.usergroups.get(resAtt[1]).model);
+	        			}
+	        		}
 	        	}
 	        	else
 	        	{
