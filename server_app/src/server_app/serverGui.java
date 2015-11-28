@@ -171,6 +171,31 @@ public class serverGui {
 		                			}
 		                		}
 		                	}
+		                	ArrayList<String> usersNotInGroup = new ArrayList<String>();
+		                	ArrayList<Socket> socketsOfUsersNotInGroup = new ArrayList<Socket>();
+		                	for(int i = 0; i<usernames.size();i++)
+		                	{
+		                		usersNotInGroup.add(usernames.get(i));
+		                		socketsOfUsersNotInGroup.add(clients.get(i));
+		                	}
+		                	for(String se:sendees)
+		                	{
+		                		for(int i = 0 ;i<usersNotInGroup.size();i++)
+		                		{
+		                			if(se.equals(usersNotInGroup.get(i)))
+		                			{
+		                				usersNotInGroup.remove(i);
+		                				socketsOfUsersNotInGroup.remove(i);
+		                				i--;
+		                			}
+		                		}
+		                	}
+		                	for(int i = 0 ;i<usersNotInGroup.size();i++)
+	                		{
+		                		DataOutputStream data = new DataOutputStream(socketsOfUsersNotInGroup.get(i)
+		                				.getOutputStream());
+		                		data.writeUTF("NotInGroup:"+order[5]+"&users&"+order[1]+"&admin&"+ order[3]);
+	                		}
 		                	 dosesofgroups.put(order[5], dosesofAgroup);
 		                	 System.out.println("Groups Available:" +dosesofgroups.size());
 		                }else if(AN.contains("FromGroup")){

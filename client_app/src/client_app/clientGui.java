@@ -48,6 +48,7 @@ public class clientGui {
 	private JList list;
 	DefaultListModel model = new DefaultListModel();
 	DefaultListModel groupmodel = new DefaultListModel();
+	DefaultListModel othergroupsmodel = new DefaultListModel();
 	private JButton btnNewButton_3;
 	private ArrayList<String> selectedActiveUsersToGroup = new ArrayList<String>();
 	private JTextField textField_1;
@@ -192,6 +193,7 @@ public class clientGui {
 	                			textArea.append("Connection lost\n");
 	                			
 	                		}
+	                		
 	                		else
 	                		{
 	                			for(int i = 0; i<model.getSize();i++)
@@ -258,6 +260,15 @@ public class clientGui {
 		    					list.setModel(groupmodel);
 		    				} 
 	                	//	newgroup.main();
+	                	}
+	                	else if(response.contains("NotInGroup"))
+	                	{
+	                		String groupname = response.split(":")[1].split("&")[0];
+	                		othergroupsmodel.addElement(groupname);
+	                		if(comboBox.getSelectedItem().toString().equals("other groups"))
+        					{
+        						list.setModel(othergroupsmodel);
+        					}
 	                	}
 	                	else if(response.contains("toGroup"))
 	                	{
@@ -493,6 +504,11 @@ public class clientGui {
 					groupGui openSelected = usergroups.get(list.getSelectedValue().toString());
 					openSelected.frame.setVisible(true);
 				}
+				else if(comboBox.getSelectedItem().toString().equals("other groups"))
+				{
+					/////// lesa hashoof ha3mel 2ah fe el beta3 dah
+					
+				}
 
 				
 			}
@@ -605,9 +621,14 @@ public class clientGui {
 				{
 					list.setModel(model);
 				}
+				else if(comboBox.getSelectedItem().toString().equals("other groups"))
+				{
+					list.setModel(othergroupsmodel);
+				}
+				
 			}
 		});
-		comboBox.setModel(new DefaultComboBoxModel(new String[] {"active users", "your groups"}));
+		comboBox.setModel(new DefaultComboBoxModel(new String[] {"active users", "your groups", "other groups"}));
 		comboBox.setEditable(true);
 		comboBox.setBounds(10, 55, 106, 20);
 		frame.getContentPane().add(comboBox);
