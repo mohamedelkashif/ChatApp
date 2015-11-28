@@ -413,6 +413,12 @@ public class clientGui {
 					textArea.append("Connection lost\n");
 					client.close();
 					//dos.close();
+					textField.setEnabled(true);
+					btnNewButton.setEnabled(true);
+					btnNewButton_3.setEnabled(false);
+					textField_1.setEnabled(false);
+					textArea_1.setEnabled(false);
+					btnNewButton_2.setEnabled(false);
 					textArea.setText("Connection lost !");
 				} catch (IOException e1) {
 					// TODO Auto-generated catch block
