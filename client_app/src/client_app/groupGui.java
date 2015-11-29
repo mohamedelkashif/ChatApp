@@ -240,6 +240,7 @@ public class groupGui {
 	}
 	public void setActiveUsersList(String[] list,String admin)
 	{
+		model.clear();
 		for(String s : list)
 		{
 			System.out.println(s);

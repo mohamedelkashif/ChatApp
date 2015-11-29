@@ -706,6 +706,9 @@ public class clientGui {
 						 }
 						 else
 						 {
+							 ArrayList<String> usersingroup = selected_group.activeUsersList;
+							 usersingroup.remove(textField.getText());
+							 unJoinedGroupsInfo.put(group_name, usersingroup);
 							 groupmodel.removeElement(group_name);
 							 othergroupsmodel.addElement(group_name);
 							 usergroups.remove(group_name);
