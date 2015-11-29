@@ -29,6 +29,9 @@ import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.AbstractListModel;
@@ -617,7 +620,34 @@ public class clientGui {
 		comboBox.setEditable(true);
 		comboBox.setBounds(10, 55, 106, 20);
 		frame.getContentPane().add(comboBox);
-		
+		 frame.addWindowListener(new WindowAdapter()
+	        {
+	            @Override
+	            public void windowClosing(WindowEvent e)
+	            {
+	            	btnNewButton.setEnabled(true);
+					btnNewButton_1.setEnabled(false);
+					try {
+						dos.writeUTF("$From"+textField.getText()+"$"+"Disconnect:"+textField.getText());
+						textArea.append("Connection lost\n");
+						client.close();
+						//dos.close();
+						textField.setEnabled(true);
+						btnNewButton.setEnabled(true);
+						btnNewButton_3.setEnabled(false);
+						textField_1.setEnabled(false);
+						textArea_1.setEnabled(false);
+						btnNewButton_2.setEnabled(false);
+						textArea.setText("Connection lost !");
+					} catch (IOException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+					btnNewButton.setEnabled(true);
+					btnNewButton_1.setEnabled(false);
+	                e.getWindow().dispose();
+	            }
+	        });
 		
 	}
 	public DataOutputStream getDos()
