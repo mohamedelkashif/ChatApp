@@ -54,8 +54,10 @@ public class clientGui {
 	private JList list;
 	DefaultListModel model = new DefaultListModel();
 	DefaultListModel groupmodel = new DefaultListModel();
+	DefaultListModel othergroupsmodel = new DefaultListModel();
 	private JButton btnNewButton_3;
 	private ArrayList<String> selectedActiveUsersToGroup = new ArrayList<String>();
+	HashMap<String,ArrayList<String>> unJoinedGroupsInfo = new HashMap<String,ArrayList<String>>();
 	private JTextField textField_1;
 	HashMap<String,groupGui> usergroups = new HashMap<String,groupGui>();
 	//DataOutputStream dos;
@@ -67,7 +69,7 @@ public class clientGui {
 	JButton btnNewButton;
 	JComboBox comboBox;
 	JButton btnChatDirectly;
-	
+	JButton btnLeaveGroup;
 	public class p2pServer extends Thread{
 		private p2p peers;
 		private Socket p2pclient;
@@ -99,6 +101,7 @@ public class clientGui {
 							break;
 						}
 					}
+	
 
 	        } catch (Exception e1) {
 	            System.out.println(e1.getMessage());
@@ -274,6 +277,7 @@ public class clientGui {
 	                			textArea.append("Connection lost\n");
 	                			
 	                		}
+	                		
 	                		else
 	                		{
 	                			for(int i = 0; i<model.getSize();i++)
@@ -367,6 +371,21 @@ public class clientGui {
 								// TODO Auto-generated catch block
 								e.printStackTrace();
 							}	                		
+	                	else if(response.contains("NotInGroup"))
+	                	{
+	                		String groupname = response.split(":")[1].split("&")[0];
+	                		String [] groupusers = response.split(":")[1].split("&")[2].split(",");
+	                		ArrayList<String> groupusersx = new ArrayList <String>();
+	                		for(String s:groupusers)
+	                		{
+	                			groupusersx.add(s);
+	                		}
+	                		unJoinedGroupsInfo.put(groupname, groupusersx);
+	                		othergroupsmodel.addElement(groupname);
+	                		if(comboBox.getSelectedItem().toString().equals("other groups"))
+        					{
+        						list.setModel(othergroupsmodel);
+        					}
 	                	}
 	                	else if(response.contains("toGroup"))
 	                	{
@@ -403,6 +422,32 @@ public class clientGui {
 	                		String[] resAtt = response.split("out");
 	                		groupGui sendingto  = usergroups.get(resAtt[1]);
 	                		sendingto.setMessage(response);
+	                	}
+	                	else if(response.contains("Remove"))
+	                	{
+	                		String [] orders = response.split(":");
+	                		String removedClient = orders[1];
+	                		String inGroup = orders[3];
+	                		if(groupmodel.contains(inGroup))
+	                		{
+	                			groupGui reworked = usergroups.get(inGroup);
+	                			reworked.activeUsersList.remove(removedClient);
+	                			reworked.model.removeElement(removedClient);
+	                			reworked.listactiveusersingroup.setModel(reworked.model);
+	                		}
+	                	}
+	                	else if(response.contains("Add"))
+	                	{
+	                		String [] orders = response.split(":");
+	                		String AddClient = orders[1];
+	                		String inGroup = orders[3];
+	                		if(groupmodel.contains(inGroup))
+	                		{
+	                			groupGui reworked = usergroups.get(inGroup);
+	                			reworked.activeUsersList.add(0,AddClient);
+	                			reworked.model.addElement(AddClient);
+	                			reworked.listactiveusersingroup.setModel(reworked.model);
+	                		}
 	                	}
 	                	else if (response.contains(":"))
 	                	{
@@ -499,6 +544,7 @@ public class clientGui {
 					textArea_1.setEditable(true);
 					textField_1.setEditable(true);
 					btnNewButton_1.setEnabled(true);
+					btnLeaveGroup.setEnabled(true);
 				}
 				else
 				{
@@ -599,6 +645,7 @@ public class clientGui {
 		list.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
+	
 				
 				if(comboBox.getSelectedItem().toString().equals("active users"))
 				{
@@ -609,6 +656,52 @@ public class clientGui {
 				{
 					groupGui openSelected = usergroups.get(list.getSelectedValue().toString());
 					openSelected.frame.setVisible(true);
+				}
+				else if(comboBox.getSelectedItem().toString().equals("other groups"))
+				{
+					String groupname = list.getSelectedValue().toString();
+					ArrayList<String> groupusers = unJoinedGroupsInfo.get(groupname);
+					groupusers.add(0, textField.getText());
+					groupGui newgroup = new groupGui();
+            		String[] groupusersx = new String[groupusers.size()];
+            		groupusers.toArray(groupusersx);
+            		
+            		newgroup.setUser(textField.getText());
+            		newgroup.setActiveUsersList(groupusersx,groupusersx[groupusersx.length-1]);
+            		String usersString = "";
+            		for(int i = 0;i<groupusersx.length;i++)
+            		{
+            			if(i ==  (groupusersx.length-1))
+            				usersString += groupusersx[i];
+            			else
+            				usersString += groupusersx[i]+",";
+            		}
+            		String info = groupname+"&users&"+usersString+"&admin&"+groupusersx[groupusersx.length-1];
+                	newgroup.main(info,window,newgroup);
+                	//System.out.println(createdgroupName);
+                	usergroups.put(groupname, newgroup);
+                	groupmodel.addElement(groupname);
+                	othergroupsmodel.removeElement(groupname);
+                	unJoinedGroupsInfo.remove(groupname);
+                	if(comboBox.getSelectedItem().toString().equals("your groups"))
+    				{
+    					list.setModel(groupmodel);
+    				}
+    				else if(comboBox.getSelectedItem().toString().equals("active users"))
+    				{
+    					list.setModel(model);
+    				}
+    				else if(comboBox.getSelectedItem().toString().equals("other groups"))
+    				{
+    					list.setModel(othergroupsmodel);
+    				}
+                	textArea.append("u have Joined "+groupname+"\n");
+                	try {
+						dos.writeUTF("Add:"+textField.getText()+":To:"+groupname);
+					} catch (IOException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
 				}
 
 				
@@ -678,7 +771,7 @@ public class clientGui {
 		textField_1.setColumns(10);
 		
 		messageFromGroup = new JTextField();
-		messageFromGroup.setBounds(338, 249, 86, 20);
+		messageFromGroup.setBounds(10, 282, 86, 20);
 		frame.getContentPane().add(messageFromGroup);
 		messageFromGroup.setColumns(10);
 		messageFromGroup.getDocument().addDocumentListener(new DocumentListener() {
@@ -706,6 +799,61 @@ public class clientGui {
 	        	
 	        }
 	    });
+		btnLeaveGroup = new JButton("Leave group");
+		btnLeaveGroup.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				if(comboBox.getSelectedItem().toString().equals("your groups"))
+				{
+					if(list.isSelectionEmpty())
+					{
+						JOptionPane.showMessageDialog(frame,
+							    "please select a group first from your groups to leave it.",
+							    "Connection error",
+							    JOptionPane.ERROR_MESSAGE);
+					}
+					else
+					{
+						String group_name = list.getSelectedValue().toString();
+						 groupGui selected_group = usergroups.get(group_name);
+						 selected_group.frame.setVisible(false);
+						 if(selected_group.adminofgroup.equals(textField.getText()) && selected_group.adminofgroup!= null)
+						 {
+							 JOptionPane.showMessageDialog(frame,
+									    "you are the admin of this group , assign a new admin to be able to leave group.",
+									    "Connection error",
+									    JOptionPane.ERROR_MESSAGE);
+						 }
+						 else
+						 {
+							 ArrayList<String> usersingroup = selected_group.activeUsersList;
+							 usersingroup.remove(textField.getText());
+							 unJoinedGroupsInfo.put(group_name, usersingroup);
+							 groupmodel.removeElement(group_name);
+							 othergroupsmodel.addElement(group_name);
+							 usergroups.remove(group_name);
+							 try {
+								dos.writeUTF("Remove:"+textField.getText()+":From:"+group_name);
+							} catch (IOException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+						 }
+						 
+					}
+					 
+				}
+				else
+				{
+					JOptionPane.showMessageDialog(frame,
+						    "please select a group first from your groups to leave it.",
+						    "Connection error",
+						    JOptionPane.ERROR_MESSAGE);
+				}
+			}
+		});
+		btnLeaveGroup.setBounds(301, 249, 123, 23);
+		frame.getContentPane().add(btnLeaveGroup);
+		
 		messageFromGroup.setVisible(false);
 		btnNewButton_2.setEnabled(false);
 		btnNewButton_3.setEnabled(false);
@@ -713,7 +861,7 @@ public class clientGui {
 		textField_1.setEditable(false);
 		btnNewButton_1.setEnabled(false);
 		textArea.setEditable(false);
-		
+		btnLeaveGroup.setEnabled(false);
 		comboBox = new JComboBox();
 		comboBox.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -725,10 +873,14 @@ public class clientGui {
 				{
 					list.setModel(model);
 				}
+				else if(comboBox.getSelectedItem().toString().equals("other groups"))
+				{
+					list.setModel(othergroupsmodel);
+				}
+				
 			}
 		});
-		comboBox.setModel(new DefaultComboBoxModel(new String[] {"active users", "your groups"}));
-		comboBox.setEditable(true);
+		comboBox.setModel(new DefaultComboBoxModel(new String[] {"active users", "your groups", "other groups"}));
 		comboBox.setBounds(10, 55, 106, 20);
 		frame.getContentPane().add(comboBox);
 		 frame.addWindowListener(new WindowAdapter()
@@ -781,6 +933,8 @@ public class clientGui {
 			}
 		});			
 		frame.getContentPane().add(btnChatDirectly);
+		
+		
 		
 		
 	}

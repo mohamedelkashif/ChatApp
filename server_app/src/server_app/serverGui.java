@@ -45,6 +45,7 @@ public class serverGui {
 	ArrayList<String> ports = new ArrayList<>();
 	HashMap<String,String> groups = new HashMap<>();
 	HashMap<String,ArrayList<DataOutputStream>> dosesofgroups = new HashMap<String,ArrayList<DataOutputStream>>();
+	HashMap<String,ArrayList<String>> usernamesofgroups = new HashMap<String,ArrayList<String>>();
 	JPanel list_panel;
 	DefaultListModel model = new DefaultListModel();
 	JList list;
@@ -163,7 +164,9 @@ public class serverGui {
 		                	groups.put(order[5], order[3]);
 		                	String []sendees = order[1].split(",");
 		                	ArrayList<DataOutputStream> dosesofAgroup = new ArrayList<DataOutputStream>();
+		                	ArrayList<String> usernamesofAgroup = new ArrayList<String>();
 		                	for(String se : sendees){
+		                		usernamesofAgroup.add(se);
 		                		for(int i= 0; i < usernames.size() ; i++){
 		                			if(se.equals(usernames.get(i))){
 		                				DataOutputStream data = new DataOutputStream(clients.get(i)
@@ -174,6 +177,32 @@ public class serverGui {
 		                			}
 		                		}
 		                	}
+		                	ArrayList<String> usersNotInGroup = new ArrayList<String>();
+		                	ArrayList<Socket> socketsOfUsersNotInGroup = new ArrayList<Socket>();
+		                	for(int i = 0; i<usernames.size();i++)
+		                	{
+		                		usersNotInGroup.add(usernames.get(i));
+		                		socketsOfUsersNotInGroup.add(clients.get(i));
+		                	}
+		                	for(String se:sendees)
+		                	{
+		                		for(int i = 0 ;i<usersNotInGroup.size();i++)
+		                		{
+		                			if(se.equals(usersNotInGroup.get(i)))
+		                			{
+		                				usersNotInGroup.remove(i);
+		                				socketsOfUsersNotInGroup.remove(i);
+		                				i--;
+		                			}
+		                		}
+		                	}
+		                	for(int i = 0 ;i<usersNotInGroup.size();i++)
+	                		{
+		                		DataOutputStream data = new DataOutputStream(socketsOfUsersNotInGroup.get(i)
+		                				.getOutputStream());
+		                		data.writeUTF("NotInGroup:"+order[5]+"&users&"+order[1]+"&admin&"+ order[3]);
+	                		}
+		                	 usernamesofgroups.put(order[5], usernamesofAgroup);
 		                	 dosesofgroups.put(order[5], dosesofAgroup);
 		                	 System.out.println("Groups Available:" +dosesofgroups.size());
 		                }else if(AN.contains("FromGroup")){
@@ -239,6 +268,7 @@ public class serverGui {
 		                		data.writeUTF("Disconnect:"+user[1]);
 		                	}
 		                }
+		                
 		                else
 		                {
 		                	
@@ -251,6 +281,62 @@ public class serverGui {
 		                }
 
 		            }
+		                else if(AN.contains("Remove"))
+		                {
+		                	String [] orders = AN.split(":");
+		                	String removeClient = orders[1];
+		                	String fromGroup = orders[3];
+		                	ArrayList<DataOutputStream> datas = new ArrayList<DataOutputStream>();
+		                	ArrayList<String> users = new ArrayList<String>();
+		                	datas = dosesofgroups.get(fromGroup);
+		                	users = usernamesofgroups.get(fromGroup);
+		                	dosesofgroups.remove(fromGroup);
+		                	usernamesofgroups.remove(fromGroup);
+		                	
+		                	for(int i = 0 ;i<users.size();i++)
+		                	{
+		                		
+		                		if(removeClient.equals(users.get(i)))
+		                		{
+		                			System.out.println("a group dos got removed"+datas.size());
+		                			datas.remove(i);
+		                			users.remove(i);
+		                			System.out.println("a group dos got removed"+datas.size());
+		                		}
+		                	}
+		                	dosesofgroups.put(fromGroup,datas);
+		                	usernamesofgroups.put(fromGroup,users);
+		                	for(int i = 0 ;i<datas.size();i++)
+		                	{
+		                		datas.get(i).writeUTF("Remove:"+removeClient+":From:"+fromGroup);
+		                	}
+		                }
+		                else if(AN.contains("Add"))
+		                {
+		                	String [] orders = AN.split(":");
+		                	String addClient = orders[1];
+		                	String fromGroup = orders[3];
+		                	ArrayList<DataOutputStream> datas = new ArrayList<DataOutputStream>();
+		                	ArrayList<String> users = new ArrayList<String>();
+		                	datas = dosesofgroups.get(fromGroup);
+		                	for(DataOutputStream data :datas)
+		                	{
+		                		data.writeUTF(AN);
+		                	}
+		                	dosesofgroups.remove(fromGroup);
+		                	usernamesofgroups.remove(fromGroup);
+		                	for(int i = 0 ;i<usernames.size();i++)
+		                	{
+		                		if(addClient.equals(usernames.get(i)))
+		                		{
+		                			DataOutputStream addedDos = new DataOutputStream(clients.get(i).getOutputStream());
+		                			datas.add(0,addedDos);
+		                		}
+		                	}
+		                	users.add(0,addClient);
+		                	usernamesofgroups.put(fromGroup,users);
+		                	dosesofgroups.put(fromGroup,datas);
+		                }
 		                	else if(AN.contains("ChangeGroupAdmin")){
 		                	
 			                	groups.put(AN.split(":")[1],AN.split(":")[3]);
@@ -333,6 +419,8 @@ public class serverGui {
 		                else if(AN.contains("kickOff"))
 		                {
 		                	String[] data = AN.split("kickOff");
+		                	String groupname = data[0];
+		                	String username = data[1];
 		                	/*for(String group:groups)
 		                	{
 		                		if(group.equals(data[0]))
@@ -360,6 +448,26 @@ public class serverGui {
 		                		}
 		                		
 		                	}
+		                	ArrayList<DataOutputStream> datas = new ArrayList<DataOutputStream>();
+		                	ArrayList<String> users = new ArrayList<String>();
+		                	datas = dosesofgroups.get(groupname);
+		                	users = usernamesofgroups.get(groupname);
+		                	dosesofgroups.remove(groupname);
+		                	usernamesofgroups.remove(groupname);
+		                	
+		                	for(int i = 0 ;i<users.size();i++)
+		                	{
+		                		
+		                		if(username.equals(users.get(i)))
+		                		{
+		                			System.out.println("a group dos got removed"+datas.size());
+		                			datas.remove(i);
+		                			users.remove(i);
+		                			System.out.println("a group dos got removed"+datas.size());
+		                		}
+		                	}
+		                	dosesofgroups.put(groupname,datas);
+		                	usernamesofgroups.put(groupname,users);
 		                }
 		                else;
 		            }
