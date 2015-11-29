@@ -180,10 +180,14 @@ public class groupGui {
 	        			if(client.usergroups.get(resAtt[1]).activeUsersList.remove(resAtt[0]))
 	        			{
 	        				client.usergroups.get(resAtt[1]).model.clear();
-	        				for(String active:client.usergroups.get(resAtt[1]).activeUsersList)
+	        				//for(String active:client.usergroups.get(resAtt[1]).activeUsersList)
+	        				for(int i = 0 ;i< client.usergroups.get(resAtt[1]).activeUsersList.size();i++)
 	        				{
-	        					if(!active.equals(userx))
-	        						client.usergroups.get(resAtt[1]).model.addElement(active);
+	        						if(i == client.usergroups.get(resAtt[1]).activeUsersList.size() - 1)
+	        							client.usergroups.get(resAtt[1]).model.addElement(client.usergroups.get(resAtt[1]).activeUsersList.get(i)+"(Admin)");
+	        						else
+	        							client.usergroups.get(resAtt[1]).model.addElement(client.usergroups.get(resAtt[1]).activeUsersList.get(i));
+	        						
 	        				}
 	        				client.usergroups.get(resAtt[1]).listactiveusersingroup
 	        					.setModel(client.usergroups.get(resAtt[1]).model);
