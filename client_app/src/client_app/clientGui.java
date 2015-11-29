@@ -370,7 +370,8 @@ public class clientGui {
 							} catch (Exception e) {
 								// TODO Auto-generated catch block
 								e.printStackTrace();
-							}	                		
+							}	
+	                	}
 	                	else if(response.contains("NotInGroup"))
 	                	{
 	                		String groupname = response.split(":")[1].split("&")[0];
@@ -697,7 +698,7 @@ public class clientGui {
     				}
                 	textArea.append("u have Joined "+groupname+"\n");
                 	try {
-						dos.writeUTF("Add:"+textField.getText()+":To:"+groupname);
+                		(new DataOutputStream(client.getOutputStream())).writeUTF("Add:"+textField.getText()+":To:"+groupname);
 					} catch (IOException e1) {
 						// TODO Auto-generated catch block
 						e1.printStackTrace();
@@ -832,7 +833,7 @@ public class clientGui {
 							 othergroupsmodel.addElement(group_name);
 							 usergroups.remove(group_name);
 							 try {
-								dos.writeUTF("Remove:"+textField.getText()+":From:"+group_name);
+								 (new DataOutputStream(client.getOutputStream())).writeUTF("Remove:"+textField.getText()+":From:"+group_name);
 							} catch (IOException e) {
 								// TODO Auto-generated catch block
 								e.printStackTrace();
