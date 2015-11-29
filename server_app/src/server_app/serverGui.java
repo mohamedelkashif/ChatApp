@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
@@ -343,6 +344,16 @@ public class serverGui {
 			                	String groupname = AN.split(":")[1];
 			                	ArrayList<DataOutputStream> getdoses = new ArrayList<>() ;
 			                	getdoses = dosesofgroups.get(groupname);
+			                	int getindexofoldAdmin = (usernamesofgroups.get(groupname)).size()-1;
+			                	int getindexofnewAdmin = 0 ;
+			                	for(String usr : usernamesofgroups.get(groupname)){
+			                		if(usr.equals(AN.split(":")[3])){
+			                			getindexofnewAdmin = usernamesofgroups.get(groupname).indexOf(usr);
+			                			break;
+			                			}
+			                	}
+			                	Collections.swap(usernamesofgroups.get(groupname),getindexofoldAdmin,getindexofnewAdmin);
+			                	Collections.swap(dosesofgroups.get(groupname),getindexofoldAdmin,getindexofnewAdmin);
 			                	System.out.println("ChangingGroupAdmin:"+AN.split(":")[1]+":to:"+ AN.split(":")[3]);
 			                	for (DataOutputStream data : getdoses)
 				                {
