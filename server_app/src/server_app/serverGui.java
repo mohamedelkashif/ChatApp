@@ -375,6 +375,8 @@ public class serverGui {
 		                else if(AN.contains("kickOff"))
 		                {
 		                	String[] data = AN.split("kickOff");
+		                	String groupname = data[0];
+		                	String username = data[1];
 		                	/*for(String group:groups)
 		                	{
 		                		if(group.equals(data[0]))
@@ -402,6 +404,26 @@ public class serverGui {
 		                		}
 		                		
 		                	}
+		                	ArrayList<DataOutputStream> datas = new ArrayList<DataOutputStream>();
+		                	ArrayList<String> users = new ArrayList<String>();
+		                	datas = dosesofgroups.get(groupname);
+		                	users = usernamesofgroups.get(groupname);
+		                	dosesofgroups.remove(groupname);
+		                	usernamesofgroups.remove(groupname);
+		                	
+		                	for(int i = 0 ;i<users.size();i++)
+		                	{
+		                		
+		                		if(username.equals(users.get(i)))
+		                		{
+		                			System.out.println("a group dos got removed"+datas.size());
+		                			datas.remove(i);
+		                			users.remove(i);
+		                			System.out.println("a group dos got removed"+datas.size());
+		                		}
+		                	}
+		                	dosesofgroups.put(groupname,datas);
+		                	usernamesofgroups.put(groupname,users);
 		                }
 		                else;
 		            }
