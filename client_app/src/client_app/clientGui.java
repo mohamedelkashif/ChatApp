@@ -33,6 +33,8 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
 import javax.swing.event.ListSelectionListener;
+
+
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.AbstractListModel;
 import javax.swing.JComboBox;
@@ -44,6 +46,7 @@ public class clientGui {
 	JTextArea textArea_1; 
 	JButton btnNewButton_1;
 	Socket client;
+	ServerSocket cs;
 	JTextArea textArea;
 	private static JFrame frame;
 	JLabel lblAll;
@@ -55,29 +58,105 @@ public class clientGui {
 	private ArrayList<String> selectedActiveUsersToGroup = new ArrayList<String>();
 	private JTextField textField_1;
 	HashMap<String,groupGui> usergroups = new HashMap<String,groupGui>();
-	DataOutputStream dos;
-	DataInputStream dis;
+	//DataOutputStream dos;
+	//DataInputStream dis;
 	static clientGui window;
 	private JTextField messageFromGroup;
 	private JScrollPane scrollPane;
 	private JScrollPane scrollPane_1;
 	JButton btnNewButton;
 	JComboBox comboBox;
+	JButton btnChatDirectly;
+	
+	public class p2pServer extends Thread{
+		private p2p peers;
+		private Socket p2pclient;
+		private String sender;
+		private String reciever;
+		public p2pServer(Socket p2pclient,p2p newp2p,String sender,String reciever) {
+	        this.peers = newp2p;
+	        this.p2pclient = p2pclient;
+	        this.sender = sender;
+	        this.reciever = reciever;
+	    }		
+		public void run() {
+			try {
+					DataInputStream dis = new DataInputStream(p2pclient.getInputStream());
+					DataOutputStream dos = new DataOutputStream(p2pclient.getOutputStream());
+					while(true)
+					{
+						System.out.println("RUNNING 1111");
+						String input = dis.readUTF();
+						if(input.contains("sendTo"))
+						{
+							String[] att = input.split("sendTo");
+							peers.textArea.append(att[1]+"\n");
+						}
+						else if(input.contains("BYEBYE"))
+						{
+							dos.writeUTF("BYEBYE");
+							peers.getFrame().setVisible(false);
+							break;
+						}
+					}
 
+	        } catch (Exception e1) {
+	            System.out.println(e1.getMessage());
+	        }
+		}
+	}
+	public class p2pClient extends Thread{
+		private p2p peers;
+		private Socket c;
+		private String sender;
+		private String reciever;
+		public p2pClient(Socket c,p2p newp2p,String sender,String reciever) {
+			this.peers = newp2p;
+			this.c = c;
+			this.sender = sender;
+	        this.reciever = reciever;
+	    }		
+		public void run() {
+			try {				
+				DataInputStream dis = new DataInputStream(c.getInputStream());
+				DataOutputStream dos = new DataOutputStream(c.getOutputStream());
+				while(true)
+				{
+					System.out.println("RUNNING 2222");
+					String input = dis.readUTF();
+					if(input.contains("sendTo"))
+					{
+						String[] att = input.split("sendTo");
+						peers.textArea.append(att[1]+"\n");
+					}
+					else if(input.contains("BYEBYE"))
+					{
+						dos.writeUTF("BYEBYE");
+						peers.getFrame().setVisible(false);
+						break;
+					}
+				}
+
+	        } catch (Exception e1) {
+	            System.out.println(e1.getMessage());
+	        }
+		}
+	}
 	public class clientMain extends Thread{
-		public clientMain() {
-	        
+		private ServerSocket cs;
+		public clientMain(ServerSocket cs) {
+	        this.cs = cs;
 	    }
 		public void run() {
 		 try {
 	            //1.Create Client Socket and connect to the server
 	            client = new Socket("127.0.0.1", 1234);
 	            //2.if accepted create IO streams
-	            dos = new DataOutputStream(client.getOutputStream());
-	            dis = new DataInputStream(client.getInputStream());
+	            DataOutputStream dos = new DataOutputStream(client.getOutputStream());
+	            DataInputStream dis = new DataInputStream(client.getInputStream());
 	            //Scanner sc = new Scanner(System.in);
 
-	            dos.writeUTF("newClient:"+textField.getText());
+	            dos.writeUTF("newClient:"+cs.getLocalPort()+"&"+textField.getText());
 	            String userInput;
 	           
 	            	while (true) {
@@ -142,7 +221,7 @@ public class clientGui {
 	         				{
 	         					list.setModel(model);
 	         				}
-	                	}
+	                	}	                	
 	                	else if(response.contains("Disconnect"))
 	                	{
 	                		//for()
@@ -262,6 +341,33 @@ public class clientGui {
 		    				} 
 	                	//	newgroup.main();
 	                	}
+	                	else if(response.contains("openP2P:"))
+	                	{
+	                		String[] att = response.split(":");	                		
+	                		Socket c;
+	    	                c = cs.accept();	    	                
+	    	                p2p newp2p = new p2p(c,"server",textField.getText(),att[1]);
+	    	                newp2p.getFrame().setVisible(true);
+	    	                System.out.println("OPEN P2P SERVER");
+	    	                p2pServer ch = new p2pServer(c,newp2p,textField.getText(),att[1]);
+	    	                ch.start();
+	                	}
+	                	else if(response.contains("sendIP"))
+	                	{
+	                		String[] att = response.split("sendIP");	                		
+	                		try {
+								int port = Integer.parseInt(att[1]);
+								Socket c = new Socket("127.0.0.1", port);
+								p2p newp2p = new p2p(c,"client",textField.getText(),att[0]);
+								newp2p.getFrame().setVisible(true);
+								System.out.println("OPEN P2P CLIENT::"+port);								
+								p2pClient ch = new p2pClient(c,newp2p,textField.getText(),att[0]);
+								ch.start();
+							} catch (Exception e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}	                		
+	                	}
 	                	else if(response.contains("toGroup"))
 	                	{
 	                		String createdgroupName =response.split(":")[1];
@@ -376,16 +482,16 @@ public class clientGui {
 					btnNewButton.setEnabled(false);
 					btnNewButton_1.setEnabled(true);
 					Random rand = new Random();
-					int i = rand.nextInt((1500 - 1000) + 1) + 1000;
-					System.out.println(i);
+					int i = (2*rand.nextInt((1500 - 1000) + 1)) + 1000;					
 					try {
-						ServerSocket cs = new ServerSocket(i);
+						cs = new ServerSocket(i);
+						System.out.println(cs.getLocalPort());
+						clientMain clientThread = new  clientMain(cs);
+						clientThread.start();
 					} catch (IOException e1) {
 						// TODO Auto-generated catch block
 						e1.printStackTrace();
-					}
-					clientMain clientThread = new  clientMain();
-					clientThread.start();
+					}					
 					textField.setEnabled(false);
 					frame.setTitle("Client "+textField.getText()+" chat");
 					btnNewButton_2.setEnabled(true);
@@ -412,6 +518,7 @@ public class clientGui {
 				btnNewButton.setEnabled(true);
 				btnNewButton_1.setEnabled(false);
 				try {
+					DataOutputStream dos = new DataOutputStream(client.getOutputStream());
 					dos.writeUTF("$From"+textField.getText()+"$"+"Disconnect:"+textField.getText());
 					textArea.append("Connection lost\n");
 					client.close();
@@ -495,6 +602,7 @@ public class clientGui {
 				
 				if(comboBox.getSelectedItem().toString().equals("active users"))
 				{
+					btnChatDirectly.setVisible(true);
 					lblAll.setText("Chat with : "+list.getSelectedValue().toString());
 				}
 				else if(comboBox.getSelectedItem().toString().equals("your groups"))
@@ -534,6 +642,7 @@ public class clientGui {
     			    }
                 	userInput += textField.getText() ;
                 	try {
+                		DataOutputStream dos = new DataOutputStream(client.getOutputStream());
 						dos.writeUTF("$From"+textField.getText()+"$"+userInput + ":AdminOfGroup:"+textField.getText() +":GroupName:"+ textField_1.getText() );
 					} catch (IOException e) {
 						// TODO Auto-generated catch block
@@ -558,12 +667,13 @@ public class clientGui {
 				}
 			}
 		});
-		btnNewButton_3.setBounds(10, 249, 133, 23);
+		btnNewButton_3.setBounds(158, 250, 133, 20);
 		frame.getContentPane().add(btnNewButton_3);
 		
 		textField_1 = new JTextField();
 		textField_1.setToolTipText("Enter group name here");
-		textField_1.setBounds(158, 250, 133, 20);
+		textField_1.setBounds(10, 249, 133, 23);
+		
 		frame.getContentPane().add(textField_1);
 		textField_1.setColumns(10);
 		
@@ -582,6 +692,7 @@ public class clientGui {
 	        public void insertUpdate(DocumentEvent e) {
 	        	System.out.println("something updated neehaaa"+messageFromGroup.getText()+"\n");
 	        	try {
+	        		DataOutputStream dos = new DataOutputStream(client.getOutputStream());
 					dos.writeUTF(messageFromGroup.getText());
 				} catch (IOException e1) {
 					// TODO Auto-generated catch block
@@ -649,14 +760,38 @@ public class clientGui {
 	            }
 	        });
 		
+		btnChatDirectly = new JButton("Chat directly");
+		btnChatDirectly.setBounds(307, 53, 117, 25);
+		btnChatDirectly.setVisible(false);
+		btnChatDirectly.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				try {
+					client = new Socket("127.0.0.1", 1234);
+					DataOutputStream dosClient = new DataOutputStream(client.getOutputStream());
+					dosClient.writeUTF(textField.getText()+"getIP"+lblAll.getText()
+	            	.toString().split(": ")[1]);
+				} catch (UnknownHostException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}      
+	            
+			}
+		});			
+		frame.getContentPane().add(btnChatDirectly);
+		
+		
 	}
-	public DataOutputStream getDos()
+	public DataOutputStream getDos() throws IOException
 	{
-		return this.dos;
+		DataOutputStream dos = new DataOutputStream(client.getOutputStream());
+		return dos;
 	}
-	public DataInputStream getDis()
+	public DataInputStream getDis() throws IOException
 	{
-		return this.dis;
+		return new DataInputStream(client.getInputStream());
 	}
 	public void setMessage(String message)
 	{

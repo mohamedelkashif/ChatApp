@@ -42,6 +42,7 @@ public class serverGui {
 	ArrayList<Socket> clients = new ArrayList<>();
 	ArrayList<Map<String,ArrayList<Socket>>> groupsList = new ArrayList<>();
 	ArrayList<String> usernames = new ArrayList<>();
+	ArrayList<String> ports = new ArrayList<>();
 	HashMap<String,String> groups = new HashMap<>();
 	HashMap<String,ArrayList<DataOutputStream>> dosesofgroups = new HashMap<String,ArrayList<DataOutputStream>>();
 	JPanel list_panel;
@@ -94,7 +95,7 @@ public class serverGui {
 		        try {
 
 		        	DataInputStream dis ;
-			DataOutputStream dos;
+		        	DataOutputStream dos;
 		        	 dos = new DataOutputStream(client.getOutputStream());
 		             dis = new DataInputStream(client.getInputStream());
 		            
@@ -106,7 +107,9 @@ public class serverGui {
 		                if(AN.contains("newClient"))
 		                {
 		                	//doses.add(dos);
-		                	String []user = AN.split(":");
+		                	String[] att = AN.split(":");
+		                	String []user = att[1].split("&");
+		                	ports.add(user[0]);
 		                	//System.out.println(user[1]);
 		                	usernames.add(user[1]);
 		                	userlistener = user[1];
@@ -283,8 +286,49 @@ public class serverGui {
 		                			data.writeUTF(Message);
 		                			Message = "";
 			                	}
+			                	if(usernames.get(i).equals(message[0]) && !att[1].equals(""))
+			                	{			                		
+			                		DataOutputStream data = new DataOutputStream(clients.get(i)
+			                				.getOutputStream());
+			                		String Message = att[1];
+		                			data.writeUTF(Message);
+		                			Message = "";
+			                	}
 			                }
 			                txtrServerLogs.append("\n"+"Sent Stuff to the clients");
+		                }
+		                else if(AN.contains("getIP"))
+		                {
+		                	String[] att = AN.split("getIP");
+		                	String port = "";
+		                	for(int i=0;i<usernames.size();i++)
+		                	{
+		                		if(usernames.get(i).equals(att[1]))
+		                		{
+		                			port = ports.get(i);
+		                			DataOutputStream data = new DataOutputStream(clients.get(i)
+			                				.getOutputStream());
+			                		String Message = "openP2P:"+att[0];
+		                			data.writeUTF(Message);
+		                			System.out.println(Message);
+		                			Message = "";
+		                		}
+		                	}
+		                	if(!port.equals(""))
+		                	{
+		                		for(int i=0;i<usernames.size();i++)
+		                		{
+		                			if(usernames.get(i).equals(att[0]))
+			                		{
+			                			DataOutputStream data = new DataOutputStream(clients.get(i)
+				                				.getOutputStream());
+				                		String Message = att[1]+"sendIP"+port;
+			                			data.writeUTF(Message);
+			                			System.out.println(Message);
+			                			Message = "";
+			                		}
+		                		}
+		                	}
 		                }
 		                else if(AN.contains("kickOff"))
 		                {
@@ -428,9 +472,9 @@ public class serverGui {
 
 					
 					sv = new ServerSocket(1234);					
-					Random rand = new Random();
-					int i = rand.nextInt((1500 - 1000) + 1) + 1000;
-					System.out.println(i);
+					//Random rand = new Random();
+					//int i = rand.nextInt((1500 - 1000) + 1) + 1000;
+					//System.out.println(i);
 
 					servermain = new serverMain(sv);
 					servermain.start();
