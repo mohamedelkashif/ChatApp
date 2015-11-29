@@ -432,13 +432,18 @@ public class serverGui {
 		                	String[] data = AN.split("kickOff");
 		                	String groupname = data[0];
 		                	String username = data[1];
+		                	ArrayList<String> others = new ArrayList<>();
+		                	others = usernames;
 		                	for(int i=0;i<usernamesofgroups.get(data[0]).size();i++)
 		                	{
 		                		if(usernamesofgroups.get(data[0]).get(i).equals(data[1]))
 		                		{
+		                			dosesofgroups.get(data[0]).get(i).writeUTF("youKickedOff"+data[0]);
 		                			usernamesofgroups.get(data[0]).remove(i);
 		                			dosesofgroups.get(data[0]).remove(i);
 		                		}
+		                		dosesofgroups.get(data[0]).get(i).writeUTF(data[1]+"out"+data[0]);
+		                		others.remove(i);
 		                	}
 		                	/*for(String group:groups)
 		                	{
@@ -447,9 +452,10 @@ public class serverGui {
 		                			groups.remove(group);
 		                		}		                			
 		                	}*/
-		                	for(int i =0;i<usernames.size();i++)
+		                	
+		                	for(int i =0;i<others.size();i++)
 		                	{
-		                		if(usernames.get(i).equals(data[1]))
+		                		/*if(others.get(i).equals(data[1]))
 		                		{
 		                			DataOutputStream clientdos = new DataOutputStream(clients.get(i)
 			                				.getOutputStream());
@@ -457,14 +463,15 @@ public class serverGui {
 			                		clientdos.writeUTF(Message);
 		                			Message = "";
 		                		}
-		                		else
+		                		else if()
 		                		{
 		                			DataOutputStream clientdos = new DataOutputStream(clients.get(i)
 			                				.getOutputStream());
 			                		String Message = data[1]+"out"+data[0];
 			                		clientdos.writeUTF(Message);
 		                			Message = "";
-		                		}
+		                		}*/
+		                		dosesofgroups.get(data[0]).get(i).writeUTF(data[1]+"update"+data[0]);
 		                		
 		                	}
 		                	ArrayList<DataOutputStream> datas = new ArrayList<DataOutputStream>();

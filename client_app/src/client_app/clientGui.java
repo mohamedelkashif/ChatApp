@@ -424,6 +424,12 @@ public class clientGui {
 	                		groupGui sendingto  = usergroups.get(resAtt[1]);
 	                		sendingto.setMessage(response);
 	                	}
+	                	else if(response.contains("update"))
+	                	{
+	                		String[] resAtt = response.split("update");
+	                		groupGui sendingto  = usergroups.get(resAtt[1]);
+	                		sendingto.setMessage(response);
+	                	}
 	                	else if(response.contains("Remove"))
 	                	{
 	                		String [] orders = response.split(":");
