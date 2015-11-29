@@ -17,6 +17,8 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JOptionPane;
+
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import javax.swing.JTextArea;
@@ -136,20 +138,30 @@ public class groupGui {
 		kick = new JButton("Kick");
 		kick.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				System.out.println(client.usergroups.keySet());
-				groupGui gui = client.usergroups.get(groupname);
-				if(gui != null)
-					try {
-						client.client = new Socket("127.0.0.1", 1234);
-						DataOutputStream dos = new DataOutputStream(client.client.getOutputStream());
-						dos.writeUTF(groupname+"kickOff"+choice);
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-				else 
-					System.out.println("ERROR");
-				client.usergroups.remove(choice);
+				if(choice.contains("(Admin)"))
+				{
+					JOptionPane.showMessageDialog(frame,
+						    "You can't remove yourself from group.",
+						    "Remove Error",
+						    JOptionPane.ERROR_MESSAGE);
+				}
+				else
+				{
+					System.out.println(client.usergroups.keySet());
+					groupGui gui = client.usergroups.get(groupname);
+					if(gui != null)
+						try {
+							client.client = new Socket("127.0.0.1", 1234);
+							DataOutputStream dos = new DataOutputStream(client.client.getOutputStream());
+							dos.writeUTF(groupname+"kickOff"+choice);
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					else 
+						System.out.println("ERROR");
+					client.usergroups.remove(choice);
+				}
 			}
 		});
 		kick.setBounds(10, 221, 123, 23);
@@ -173,25 +185,28 @@ public class groupGui {
 	        		}
 	        	}
 	        	if(textFieldMessage.getText().contains("out"))
-	        	{
+	        	{	        		
 	        		String[] resAtt = textFieldMessage.getText().split("out");
 	        		if(client.usergroups.get(resAtt[1]) != null)
-	        		{
-	        			if(client.usergroups.get(resAtt[1]).activeUsersList.remove(resAtt[0]))
-	        			{
-	        				client.usergroups.get(resAtt[1]).model.clear();
+	        		{	        			
+	        			client.usergroups.get(resAtt[1]).activeUsersList.remove(resAtt[0]);
+	        			if(client.unJoinedGroupsInfo.size()>0)
+	        				client.unJoinedGroupsInfo.get(resAtt[1]).remove(resAtt[0]);	        			
+	        			client.usergroups.get(resAtt[1]).model.clear();
 	        				//for(String active:client.usergroups.get(resAtt[1]).activeUsersList)
 	        				for(int i = 0 ;i< client.usergroups.get(resAtt[1]).activeUsersList.size();i++)
 	        				{
 	        						if(i == client.usergroups.get(resAtt[1]).activeUsersList.size() - 1)
-	        							client.usergroups.get(resAtt[1]).model.addElement(client.usergroups.get(resAtt[1]).activeUsersList.get(i)+"(Admin)");
-	        						else
-	        							client.usergroups.get(resAtt[1]).model.addElement(client.usergroups.get(resAtt[1]).activeUsersList.get(i));
+	        						{
+	        							client.usergroups.get(resAtt[1]).activeUsersList.set(i,
+	        									client.usergroups.get(resAtt[1]).activeUsersList.get(i)+"(Admin)");
+	        						}
+	        						client.usergroups.get(resAtt[1]).model.addElement(client.usergroups.get(resAtt[1]).activeUsersList.get(i));
 	        						
 	        				}
 	        				client.usergroups.get(resAtt[1]).listactiveusersingroup
 	        					.setModel(client.usergroups.get(resAtt[1]).model);
-	        			}
+	        			
 	        		}
 	        	}
 	        	else

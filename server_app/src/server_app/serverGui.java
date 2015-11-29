@@ -432,6 +432,14 @@ public class serverGui {
 		                	String[] data = AN.split("kickOff");
 		                	String groupname = data[0];
 		                	String username = data[1];
+		                	for(int i=0;i<usernamesofgroups.get(data[0]).size();i++)
+		                	{
+		                		if(usernamesofgroups.get(data[0]).get(i).equals(data[1]))
+		                		{
+		                			usernamesofgroups.get(data[0]).remove(i);
+		                			dosesofgroups.get(data[0]).remove(i);
+		                		}
+		                	}
 		                	/*for(String group:groups)
 		                	{
 		                		if(group.equals(data[0]))
