@@ -739,7 +739,7 @@ public class clientGui {
 	            	btnNewButton.setEnabled(true);
 					btnNewButton_1.setEnabled(false);
 					try {
-						dos.writeUTF("$From"+textField.getText()+"$"+"Disconnect:"+textField.getText());
+						(new DataOutputStream(client.getOutputStream())).writeUTF("$From"+textField.getText()+"$"+"Disconnect:"+textField.getText());
 						textArea.append("Connection lost\n");
 						client.close();
 						//dos.close();
