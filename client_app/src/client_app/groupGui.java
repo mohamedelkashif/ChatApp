@@ -280,11 +280,18 @@ public class groupGui {
 				listactiveusersingroup.setModel(model);
 				}
 		}
-		
 	}
 	public void UpdateAdmin(String newadmin)
 	{
 		adminofgroup = newadmin;
+		int indexofpreadmin = 0;
+		
+		for(String usr : activeUsersList){
+			if(usr.equals(newadmin))
+				indexofpreadmin = activeUsersList.indexOf(usr);
+		}
+		activeUsersList.remove(indexofpreadmin);
+		activeUsersList.add(newadmin);
 		if(userx.equals(newadmin)){
 			btnNewButton_1.setEnabled(true);
 			kick.setEnabled(true);
@@ -298,6 +305,8 @@ public class groupGui {
 				model.addElement(s);
 			listactiveusersingroup.setModel(model);
 		}
+		//activeUsersList.set(activeUsersList.size() -1, adminofgroup);
+		System.out.println(activeUsersList);
 	}
 	public void disconnect(String name){
 		if(userx.equals(name)){
