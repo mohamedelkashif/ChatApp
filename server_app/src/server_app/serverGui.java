@@ -309,6 +309,28 @@ public class serverGui {
 		                		datas.get(i).writeUTF("Remove:"+removeClient+":From:"+fromGroup);
 		                	}
 		                }
+		                else if(AN.contains("Add"))
+		                {
+		                	String [] orders = AN.split(":");
+		                	String addClient = orders[1];
+		                	String fromGroup = orders[3];
+		                	ArrayList<DataOutputStream> datas = new ArrayList<DataOutputStream>();
+		                	datas = dosesofgroups.get(fromGroup);
+		                	for(DataOutputStream data :datas)
+		                	{
+		                		data.writeUTF(AN);
+		                	}
+		                	dosesofgroups.remove(fromGroup);
+		                	for(int i = 0 ;i<usernames.size();i++)
+		                	{
+		                		if(addClient.equals(usernames.get(i)))
+		                		{
+		                			DataOutputStream addedDos = new DataOutputStream(clients.get(i).getOutputStream());
+		                			datas.add(addedDos);
+		                		}
+		                	}
+		                	dosesofgroups.put(fromGroup,datas);
+		                }
 		                	else if(AN.contains("ChangeGroupAdmin")){
 		                	
 			                	groups.put(AN.split(":")[1],AN.split(":")[3]);

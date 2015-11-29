@@ -242,8 +242,9 @@ public class groupGui {
 	{
 		for(String s : list)
 		{
+			System.out.println(s);
 			activeUsersList.add(s);
-			if(!s.equals(userx))
+			if(!s.equals(admin))
 				model.addElement(s);
 			if(s.equals(admin))
 				model.addElement(s + "(Admin)");

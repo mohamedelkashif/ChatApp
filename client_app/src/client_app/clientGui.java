@@ -51,6 +51,7 @@ public class clientGui {
 	DefaultListModel othergroupsmodel = new DefaultListModel();
 	private JButton btnNewButton_3;
 	private ArrayList<String> selectedActiveUsersToGroup = new ArrayList<String>();
+	HashMap<String,ArrayList<String>> unJoinedGroupsInfo = new HashMap<String,ArrayList<String>>();
 	private JTextField textField_1;
 	HashMap<String,groupGui> usergroups = new HashMap<String,groupGui>();
 	DataOutputStream dos;
@@ -265,6 +266,13 @@ public class clientGui {
 	                	else if(response.contains("NotInGroup"))
 	                	{
 	                		String groupname = response.split(":")[1].split("&")[0];
+	                		String [] groupusers = response.split(":")[1].split("&")[2].split(",");
+	                		ArrayList<String> groupusersx = new ArrayList <String>();
+	                		for(String s:groupusers)
+	                		{
+	                			groupusersx.add(s);
+	                		}
+	                		unJoinedGroupsInfo.put(groupname, groupusersx);
 	                		othergroupsmodel.addElement(groupname);
 	                		if(comboBox.getSelectedItem().toString().equals("other groups"))
         					{
@@ -317,6 +325,19 @@ public class clientGui {
 	                			groupGui reworked = usergroups.get(inGroup);
 	                			reworked.activeUsersList.remove(removedClient);
 	                			reworked.model.removeElement(removedClient);
+	                			reworked.listactiveusersingroup.setModel(reworked.model);
+	                		}
+	                	}
+	                	else if(response.contains("Add"))
+	                	{
+	                		String [] orders = response.split(":");
+	                		String AddClient = orders[1];
+	                		String inGroup = orders[3];
+	                		if(groupmodel.contains(inGroup))
+	                		{
+	                			groupGui reworked = usergroups.get(inGroup);
+	                			reworked.activeUsersList.add(0,AddClient);
+	                			reworked.model.addElement(AddClient);
 	                			reworked.listactiveusersingroup.setModel(reworked.model);
 	                		}
 	                	}
@@ -509,6 +530,7 @@ public class clientGui {
 		list.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
+	
 				
 				if(comboBox.getSelectedItem().toString().equals("active users"))
 				{
@@ -521,8 +543,49 @@ public class clientGui {
 				}
 				else if(comboBox.getSelectedItem().toString().equals("other groups"))
 				{
-					/////// lesa hashoof ha3mel 2ah fe el beta3 dah
-					
+					String groupname = list.getSelectedValue().toString();
+					ArrayList<String> groupusers = unJoinedGroupsInfo.get(groupname);
+					groupusers.add(0, textField.getText());
+					groupGui newgroup = new groupGui();
+            		String[] groupusersx = new String[groupusers.size()];
+            		groupusers.toArray(groupusersx);
+            		
+            		newgroup.setUser(textField.getText());
+            		newgroup.setActiveUsersList(groupusersx,groupusersx[groupusersx.length-1]);
+            		String usersString = "";
+            		for(int i = 0;i<groupusersx.length;i++)
+            		{
+            			if(i ==  (groupusersx.length-1))
+            				usersString += groupusersx[i];
+            			else
+            				usersString += groupusersx[i]+",";
+            		}
+            		String info = groupname+"&users&"+usersString+"&admin&"+groupusersx[groupusersx.length-1];
+                	newgroup.main(info,window,newgroup);
+                	//System.out.println(createdgroupName);
+                	usergroups.put(groupname, newgroup);
+                	groupmodel.addElement(groupname);
+                	othergroupsmodel.removeElement(groupname);
+                	unJoinedGroupsInfo.remove(groupname);
+                	if(comboBox.getSelectedItem().toString().equals("your groups"))
+    				{
+    					list.setModel(groupmodel);
+    				}
+    				else if(comboBox.getSelectedItem().toString().equals("active users"))
+    				{
+    					list.setModel(model);
+    				}
+    				else if(comboBox.getSelectedItem().toString().equals("other groups"))
+    				{
+    					list.setModel(othergroupsmodel);
+    				}
+                	textArea.append("u have Joined "+groupname+"\n");
+                	try {
+						dos.writeUTF("Add:"+textField.getText()+":To:"+groupname);
+					} catch (IOException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
 				}
 
 				
