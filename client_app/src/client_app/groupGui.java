@@ -28,7 +28,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 public class groupGui {
-
+    String hostIp = "192.168.1.2";
 	public static  JFrame frame;
 	static JTextArea textAregroupmessg;
 	public static  String groupreq = "uu&users&nn,mm";
@@ -151,7 +151,7 @@ public class groupGui {
 					groupGui gui = client.usergroups.get(groupname);
 					if(gui != null)
 						try {
-							client.client = new Socket("127.0.0.1", 1234);
+							client.client = new Socket(hostIp, 1234);
 							DataOutputStream dos = new DataOutputStream(client.client.getOutputStream());
 							dos.writeUTF(groupname+"kickOff"+choice);
 						} catch (IOException e) {
