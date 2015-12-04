@@ -28,7 +28,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 public class groupGui {
-    String hostIp = "192.168.1.2";
+    String hostIp = "127.0.0.1";
 	public static  JFrame frame;
 	static JTextArea textAregroupmessg;
 	public static  String groupreq = "uu&users&nn,mm";
@@ -261,8 +261,9 @@ public class groupGui {
 		System.out.println("message is being set neehaaa\n");
 		textFieldMessage.setText(message);
 	}
-	public void setActiveUsersList(String[] list,String admin)
+	public void setActiveUsersList(String[] list,String admin, String Ip)
 	{
+		hostIp =Ip;
 		model.clear();
 		for(String s : list)
 		{

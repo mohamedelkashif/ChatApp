@@ -335,7 +335,7 @@ public class clientGui {
 	                		groupGui newgroup = new groupGui();
 	                		String createdgroupName = res[1].split("&")[0];
 	                		newgroup.setUser(textField.getText());
-	                		newgroup.setActiveUsersList(res[1].split("&")[2].split(","),res[1].split("&")[4]);
+	                		newgroup.setActiveUsersList(res[1].split("&")[2].split(","),res[1].split("&")[4],hostIp);
 	                		//groupMain groupThreadx = newgroup.new groupMain();
 	    					//groupThreadx.start();
 		                	newgroup.main(res[1],window,newgroup);
@@ -679,7 +679,7 @@ public class clientGui {
             		groupusers.toArray(groupusersx);
             		
             		newgroup.setUser(textField.getText());
-            		newgroup.setActiveUsersList(groupusersx,groupusersx[groupusersx.length-1]);
+            		newgroup.setActiveUsersList(groupusersx,groupusersx[groupusersx.length-1],hostIp);
             		String usersString = "";
             		for(int i = 0;i<groupusersx.length;i++)
             		{
@@ -957,7 +957,7 @@ public class clientGui {
 		frame.getContentPane().add(lblUsername);
 		
 		lblServerIp = new JLabel("Server IP");
-		lblServerIp.setBounds(123, 11, 46, 14);
+		lblServerIp.setBounds(123, 11, 73, 14);
 		frame.getContentPane().add(lblServerIp);
 		
 		
