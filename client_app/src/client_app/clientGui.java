@@ -41,7 +41,7 @@ import javax.swing.JComboBox;
 import javax.swing.DefaultComboBoxModel;
 
 public class clientGui {
-	String hostIp = "192.168.1.2";
+	String hostIp = "127.0.0.1";
 	JButton btnNewButton_2;
 	JTextArea textArea_1; 
 	JButton btnNewButton_1;
@@ -70,6 +70,9 @@ public class clientGui {
 	JComboBox comboBox;
 	JButton btnChatDirectly;
 	JButton btnLeaveGroup;
+	private JTextField textField_2;
+	private JLabel lblUsername;
+	private JLabel lblServerIp;
 	public class p2pServer extends Thread{
 		private p2p peers;
 		private Socket p2pclient;
@@ -529,10 +532,11 @@ public class clientGui {
 		btnNewButton = new JButton("Connect");
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if(!textField.getText().equals(""))
+				if(!textField.getText().equals("")&&!textField_2.getText().equals(""))
 				{
 					btnNewButton.setEnabled(false);
 					btnNewButton_1.setEnabled(true);
+					hostIp = textField_2.getText();
 					Random rand = new Random();
 					int i = (2*rand.nextInt((1500 - 1000) + 1)) + 1000;					
 					try {
@@ -545,6 +549,7 @@ public class clientGui {
 						e1.printStackTrace();
 					}					
 					textField.setEnabled(false);
+					textField_2.setEnabled(false);
 					frame.setTitle("Client "+textField.getText()+" chat");
 					btnNewButton_2.setEnabled(true);
 					btnNewButton_3.setEnabled(true);
@@ -562,7 +567,7 @@ public class clientGui {
 				}
 			}
 		});
-		btnNewButton.setBounds(135, 23, 89, 23);
+		btnNewButton.setBounds(219, 23, 89, 23);
 		frame.getContentPane().add(btnNewButton);
 		
 		btnNewButton_1 = new JButton("Disconnect");
@@ -591,7 +596,7 @@ public class clientGui {
 				btnNewButton_1.setEnabled(false);
 			}
 		});
-		btnNewButton_1.setBounds(234, 23, 106, 23);
+		btnNewButton_1.setBounds(318, 23, 106, 23);
 		frame.getContentPane().add(btnNewButton_1);
 		
 		scrollPane = new JScrollPane();
@@ -940,6 +945,20 @@ public class clientGui {
 			}
 		});			
 		frame.getContentPane().add(btnChatDirectly);
+		
+		textField_2 = new JTextField();
+		textField_2.setText(hostIp);
+		textField_2.setBounds(110, 24, 86, 20);
+		frame.getContentPane().add(textField_2);
+		textField_2.setColumns(10);
+		
+		lblUsername = new JLabel("Username");
+		lblUsername.setBounds(31, 11, 65, 14);
+		frame.getContentPane().add(lblUsername);
+		
+		lblServerIp = new JLabel("Server IP");
+		lblServerIp.setBounds(123, 11, 46, 14);
+		frame.getContentPane().add(lblServerIp);
 		
 		
 		
