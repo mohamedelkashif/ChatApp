@@ -41,7 +41,7 @@ import javax.swing.JComboBox;
 import javax.swing.DefaultComboBoxModel;
 
 public class clientGui {
-	
+	String hostIp = "192.168.1.2";
 	JButton btnNewButton_2;
 	JTextArea textArea_1; 
 	JButton btnNewButton_1;
@@ -153,7 +153,7 @@ public class clientGui {
 		public void run() {
 		 try {
 	            //1.Create Client Socket and connect to the server
-	            client = new Socket("127.0.0.1", 1234);
+	            client = new Socket(hostIp, 1234);
 	            //2.if accepted create IO streams
 	            DataOutputStream dos = new DataOutputStream(client.getOutputStream());
 	            DataInputStream dis = new DataInputStream(client.getInputStream());
@@ -361,7 +361,7 @@ public class clientGui {
 	                		String[] att = response.split("sendIP");	                		
 	                		try {
 								int port = Integer.parseInt(att[1]);
-								Socket c = new Socket("127.0.0.1", port);
+								Socket c = new Socket(hostIp, port);
 								p2p newp2p = new p2p(c,"client",textField.getText(),att[0]);
 								newp2p.getFrame().setVisible(true);
 								System.out.println("OPEN P2P CLIENT::"+port);								
@@ -611,7 +611,7 @@ public class clientGui {
                 
 				btnNewButton_2.setEnabled(false);
 				try {
-					client = new Socket("127.0.0.1", 1234);
+					client = new Socket(hostIp, 1234);
 					DataOutputStream dos = new DataOutputStream(client.getOutputStream());
 		            String userInput;
 					userInput = textArea_1.getText();
@@ -925,7 +925,7 @@ public class clientGui {
 		btnChatDirectly.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				try {
-					client = new Socket("127.0.0.1", 1234);
+					client = new Socket(hostIp, 1234);
 					DataOutputStream dosClient = new DataOutputStream(client.getOutputStream());
 					dosClient.writeUTF(textField.getText()+"getIP"+lblAll.getText()
 	            	.toString().split(": ")[1]);
