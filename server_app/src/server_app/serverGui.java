@@ -153,9 +153,9 @@ public class serverGui {
 		                	
 		                	
 		                }
-		                else if(AN.contains("$From"+userlistener+"$"))
-		                {
-		                System.out.println(AN);
+		                //else if(AN.contains("$From"+userlistener+"$"))
+		               // {
+		                //System.out.println(AN);
 		                if(AN.contains("CreateGroup")){
 		                	String []order = AN.split(":");
 		                	//System.out.println(AN);
@@ -270,18 +270,9 @@ public class serverGui {
 		                	}
 		                }
 		                
-		                else
-		                {
-		                	
-			                for (Socket c : clients)
-			                {
-			                	DataOutputStream data = new DataOutputStream(c.getOutputStream());		
-			                	data.writeUTF(AN.split(":")[1]);
-			                }
-			                txtrServerLogs.append("\n"+"Sent Stuff to the clients");
-		                }
+		               
 
-		            }
+		            //}
 		                else if(AN.contains("Remove"))
 		                {
 		                	String [] orders = AN.split(":");
@@ -495,7 +486,17 @@ public class serverGui {
 		                	dosesofgroups.put(groupname,datas);
 		                	usernamesofgroups.put(groupname,users);
 		                }
-		                else;
+		               
+		                	 else
+				                {
+				                	
+					                for (Socket c : clients)
+					                {
+					                	DataOutputStream data = new DataOutputStream(c.getOutputStream());		
+					                	data.writeUTF(AN.split(":")[1]);
+					                }
+					                txtrServerLogs.append("\n"+"Sent Stuff to the clients");
+				                }
 		            }
 		            
 		            //Close/release resources
