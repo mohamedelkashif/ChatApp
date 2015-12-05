@@ -41,7 +41,7 @@ import javax.swing.JComboBox;
 import javax.swing.DefaultComboBoxModel;
 
 public class clientGui {
-	String hostIp = "192.168.1.2";
+	String hostIp = "197.35.208.138";
 	JButton btnNewButton_2;
 	JTextArea textArea_1; 
 	JButton btnNewButton_1;
