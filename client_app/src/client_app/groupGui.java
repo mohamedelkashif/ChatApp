@@ -27,6 +27,10 @@ import java.awt.event.InputMethodEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
+/**
+ * @author hussein
+ *
+ */
 public class groupGui {
     String hostIp = "127.0.0.1";
 	public static  JFrame frame;
@@ -120,8 +124,6 @@ public class groupGui {
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				userInputingroup = textAreaGroup.getText() ;
-	               // System.out.println("gr"+userInputingroup);
-				   //dos.writeUTF("$From"+userx+"$"+"FromGroup:"+ groupname +":"+ userInputingroup);
 				System.out.println("i am "+userx);
 				client.setMessage("$From"+userx+"$"+"FromGroup:"+ groupname +":"+ userInputingroup);
 					
@@ -138,6 +140,13 @@ public class groupGui {
 		kick = new JButton("Kick");
 		kick.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
+				kickOffUser();
+			}
+
+			/**
+			 * kick off user from group 
+			 */
+			public void kickOffUser() {
 				if(choice.contains("(Admin)"))
 				{
 					JOptionPane.showMessageDialog(frame,
@@ -177,41 +186,15 @@ public class groupGui {
 	        public void insertUpdate(DocumentEvent e) {
 	        	if(textFieldMessage.getText().contains("youKickedOff"))
 	        	{
-	        		String[] resAtt = textFieldMessage.getText().split("KickedOff");
-	        		if(client.usergroups.get(resAtt[1]) != null)
-	        		{
-	        			client.usergroups.get(resAtt[1]).frame.setVisible(false);
-	        			client.usergroups.remove(resAtt[1]);
-	        		}
+	        		removeSelectedUser();
 	        	}
 	        	else if(textFieldMessage.getText().contains("update"))
 	        	{
-	        		String[] resAtt = textFieldMessage.getText().split("update");
-	        		if(client.unJoinedGroupsInfo.size()>0)
-	        			client.unJoinedGroupsInfo.get(resAtt[1]).remove(resAtt[0]);	  
+	        		updateOtherUsers();	  
 	        	}
 	        	else if(textFieldMessage.getText().contains("out"))
 	        	{	        		
-	        		String[] resAtt = textFieldMessage.getText().split("out");
-	        		if(client.usergroups.get(resAtt[1]) != null)
-	        		{	        			
-	        			client.usergroups.get(resAtt[1]).activeUsersList.remove(resAtt[0]);	        				      			
-	        			client.usergroups.get(resAtt[1]).model.clear();
-	        				//for(String active:client.usergroups.get(resAtt[1]).activeUsersList)
-	        				for(int i = 0 ;i< client.usergroups.get(resAtt[1]).activeUsersList.size();i++)
-	        				{
-	        						if(i == client.usergroups.get(resAtt[1]).activeUsersList.size() - 1)
-	        						{
-	        							client.usergroups.get(resAtt[1]).activeUsersList.set(i,
-	        									client.usergroups.get(resAtt[1]).activeUsersList.get(i)+"(Admin)");
-	        						}
-	        						client.usergroups.get(resAtt[1]).model.addElement(client.usergroups.get(resAtt[1]).activeUsersList.get(i));
-	        						
-	        				}
-	        				client.usergroups.get(resAtt[1]).listactiveusersingroup
-	        					.setModel(client.usergroups.get(resAtt[1]).model);
-	        			
-	        		}
+	        		updateGroup();
 	        	}
 	        	else
 	        	{
@@ -219,6 +202,53 @@ public class groupGui {
 		        	System.out.println("something updated neehaaa"+textFieldMessage.getText()+"\n");
 	        	}
 	        }
+
+			/**
+			 * update group after removing user
+			 */
+			public void updateGroup() {
+				String[] resAtt = textFieldMessage.getText().split("out");
+				if(client.usergroups.get(resAtt[1]) != null)
+				{	        			
+					client.usergroups.get(resAtt[1]).activeUsersList.remove(resAtt[0]);	        				      			
+					client.usergroups.get(resAtt[1]).model.clear();
+						//for(String active:client.usergroups.get(resAtt[1]).activeUsersList)
+						for(int i = 0 ;i< client.usergroups.get(resAtt[1]).activeUsersList.size();i++)
+						{
+								if(i == client.usergroups.get(resAtt[1]).activeUsersList.size() - 1)
+								{
+									client.usergroups.get(resAtt[1]).activeUsersList.set(i,
+											client.usergroups.get(resAtt[1]).activeUsersList.get(i)+"(Admin)");
+								}
+								client.usergroups.get(resAtt[1]).model.addElement(client.usergroups.get(resAtt[1]).activeUsersList.get(i));
+								
+						}
+						client.usergroups.get(resAtt[1]).listactiveusersingroup
+							.setModel(client.usergroups.get(resAtt[1]).model);
+					
+				}
+			}
+
+			/**
+			 * update other users of removing user
+			 */
+			public void updateOtherUsers() {
+				String[] resAtt = textFieldMessage.getText().split("update");
+				if(client.unJoinedGroupsInfo.size()>0)
+					client.unJoinedGroupsInfo.get(resAtt[1]).remove(resAtt[0]);
+			}
+
+			/**
+			 * remove the user and closes his chat window
+			 */
+			public void removeSelectedUser() {
+				String[] resAtt = textFieldMessage.getText().split("KickedOff");
+				if(client.usergroups.get(resAtt[1]) != null)
+				{
+					client.usergroups.get(resAtt[1]).frame.setVisible(false);
+					client.usergroups.remove(resAtt[1]);
+				}
+			}
 
 	        @Override
 	        public void changedUpdate(DocumentEvent arg0) {
@@ -232,6 +262,13 @@ public class groupGui {
 		 btnNewButton_1 = new JButton("Reset Admin");
 		btnNewButton_1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
+				resetAdmin();
+			}
+
+			/**
+			 * reset admin of group
+			 */
+			public void resetAdmin() {
 				int[] selectedIx = listactiveusersingroup.getSelectedIndices();      
                 if(selectedIx.length==1)
                 {
@@ -245,12 +282,12 @@ public class groupGui {
 		btnNewButton_1.setBounds(10, 255, 123, 23);
 		frame.getContentPane().add(btnNewButton_1);
 		btnNewButton_1.setEnabled(false);
-//		if(userx.equals(adminofgroup)){
-//			btnNewButton_1.setEnabled(true);
-//			kick.setEnabled(true);
-//		}
 	}
 
+	/**
+	 * set the user that creates the group
+	 * @param user username
+	 */
 	public void setUser(String user)
 	{
 		System.out.println("Setting the user to : "+user);
@@ -261,6 +298,12 @@ public class groupGui {
 		System.out.println("message is being set neehaaa\n");
 		textFieldMessage.setText(message);
 	}
+	/**
+	 * set active users in group
+	 * @param list list of active usernames
+	 * @param admin username of the admin
+	 * @param Ip ip of the client
+	 */
 	public void setActiveUsersList(String[] list,String admin, String Ip)
 	{
 		hostIp =Ip;
@@ -284,6 +327,10 @@ public class groupGui {
 			textAregroupmessg.append("u are the Admin of this Group \n only you Can Kick people\n");
 		}
 	}
+	/**
+	 * update active users in group
+	 * @param list list of usernames
+	 */
 	public void UpdateActiveUsersList(String[] list)
 	{
 		model.removeAllElements();
@@ -305,6 +352,10 @@ public class groupGui {
 				}
 		}
 	}
+	/**
+	 * update admin of group
+	 * @param newadmin username of the new admin
+	 */
 	public void UpdateAdmin(String newadmin)
 	{
 		adminofgroup = newadmin;
@@ -332,6 +383,10 @@ public class groupGui {
 		//activeUsersList.set(activeUsersList.size() -1, adminofgroup);
 		System.out.println(activeUsersList);
 	}
+	/**
+	 * disconnect user from group
+	 * @param name username of the user
+	 */
 	public void disconnect(String name){
 		if(userx.equals(name)){
 			frame.setVisible(false);

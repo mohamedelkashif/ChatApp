@@ -14,6 +14,10 @@ import javax.swing.JTextField;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 
+/**
+ * @author hussein
+ *
+ */
 public class p2p {
 
 	 private JFrame frame;
@@ -89,6 +93,14 @@ public class p2p {
 		btnSend.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				btnSend.setEnabled(false);
+				sendMSGP2P();
+				btnSend.setEnabled(true);
+			}
+
+			/**
+			 * send message using peer to peer
+			 */
+			public void sendMSGP2P() {
 				String message = "client sendTo"+sender+": "+txtMessage.getText();
 				if(type.equals("server"))
 				{
@@ -96,7 +108,6 @@ public class p2p {
 						DataOutputStream dos = new DataOutputStream(client.getOutputStream());
 						dos.writeUTF(message);
 					} catch (IOException e1) {
-						// TODO Auto-generated catch block
 						e1.printStackTrace();
 					}
 				}
@@ -105,13 +116,11 @@ public class p2p {
 					try {
 						DataOutputStream dos = new DataOutputStream(client.getOutputStream());
 						dos.writeUTF(message);
-					} catch (IOException e1) {
-						// TODO Auto-generated catch block
+					} catch (IOException e1) {				
 						e1.printStackTrace();
 					}
 				}
 				textArea.append(sender+": "+txtMessage.getText()+"\n");
-				btnSend.setEnabled(true);
 			}
 		});
 		btnSend.setBounds(321, 206, 117, 25);
@@ -125,6 +134,13 @@ public class p2p {
 		JButton btnClose = new JButton("Close");
 		btnClose.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				closeP2P();
+			}
+
+			/**
+			 * close P2P connection
+			 */
+			public void closeP2P() {
 				String message = "BYEBYE";
 				if(type.equals("server"))
 				{
@@ -132,7 +148,6 @@ public class p2p {
 						DataOutputStream dos = new DataOutputStream(client.getOutputStream());
 						dos.writeUTF(message);
 					} catch (IOException e1) {
-						// TODO Auto-generated catch block
 						e1.printStackTrace();
 					}
 				}
@@ -142,11 +157,9 @@ public class p2p {
 						DataOutputStream dos = new DataOutputStream(client.getOutputStream());
 						dos.writeUTF(message);
 					} catch (IOException e1) {
-						// TODO Auto-generated catch block
 						e1.printStackTrace();
 					}
 				}
-				//frame.setVisible(false);
 			}
 		});
 		btnClose.setBounds(158, 235, 117, 25);
