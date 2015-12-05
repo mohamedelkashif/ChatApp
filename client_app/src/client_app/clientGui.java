@@ -40,6 +40,10 @@ import javax.swing.AbstractListModel;
 import javax.swing.JComboBox;
 import javax.swing.DefaultComboBoxModel;
 
+/**
+ * @author hussein
+ *
+ */
 public class clientGui {
 	String hostIp = "197.35.208.138";
 	JButton btnNewButton_2;
@@ -73,136 +77,150 @@ public class clientGui {
 	private JTextField textField_2;
 	private JLabel lblUsername;
 	private JLabel lblServerIp;
+	/**
+	 * @author hussein
+	 *
+	 */
 	public class p2pServer extends Thread{
 		private p2p peers;
 		private Socket p2pclient;
 		private String sender;
 		private String reciever;
+		/**
+		 * Constructor for p2pServer Thread
+		 * @param p2pclient p2pclient that will connect to server
+		 * @param newp2p a new Gui p2p object for chatting
+		 * @param sender username of the sender of message
+		 * @param reciever username of the reciever of message
+		 */
 		public p2pServer(Socket p2pclient,p2p newp2p,String sender,String reciever) {
 	        this.peers = newp2p;
 	        this.p2pclient = p2pclient;
 	        this.sender = sender;
 	        this.reciever = reciever;
 	    }		
+		/* (non-Javadoc)
+		 * run method of the thread
+		 * @see java.lang.Thread#run()
+		 */
 		public void run() {
 			try {
-					DataInputStream dis = new DataInputStream(p2pclient.getInputStream());
-					DataOutputStream dos = new DataOutputStream(p2pclient.getOutputStream());
-					while(true)
-					{
-						System.out.println("RUNNING 1111");
-						String input = dis.readUTF();
-						if(input.contains("sendTo"))
-						{
-							String[] att = input.split("sendTo");
-							peers.textArea.append(att[1]+"\n");
-						}
-						else if(input.contains("BYEBYE"))
-						{
-							dos.writeUTF("BYEBYE");
-							peers.getFrame().setVisible(false);
-							break;
-						}
-					}
+					getInput_p2pServer();
 	
 
 	        } catch (Exception e1) {
 	            System.out.println(e1.getMessage());
 	        }
 		}
+		/**
+		 * gets input from client and appends it to textArea
+		 * @throws IOException
+		 */
+		public void getInput_p2pServer() throws IOException {
+			DataInputStream dis = new DataInputStream(p2pclient.getInputStream());
+			DataOutputStream dos = new DataOutputStream(p2pclient.getOutputStream());
+			while(true)
+			{
+				System.out.println("RUNNING 1111");
+				String input = dis.readUTF();
+				if(input.contains("sendTo"))
+				{
+					String[] att = input.split("sendTo");
+					peers.textArea.append(att[1]+"\n");
+				}
+				else if(input.contains("BYEBYE"))
+				{
+					dos.writeUTF("BYEBYE");
+					peers.getFrame().setVisible(false);
+					break;
+				}
+			}
+		}
 	}
+	/**
+	 * @author hussein
+	 *
+	 */
 	public class p2pClient extends Thread{
 		private p2p peers;
 		private Socket c;
 		private String sender;
 		private String reciever;
+		/**
+		 * @param c clientSocket that will connect to server
+		 * @param newp2p new p2p Gui for chatting
+		 * @param sender username of the sender of message
+		 * @param reciever username of the reciever of message
+		 */
 		public p2pClient(Socket c,p2p newp2p,String sender,String reciever) {
 			this.peers = newp2p;
 			this.c = c;
 			this.sender = sender;
 	        this.reciever = reciever;
 	    }		
+		/* (non-Javadoc)
+		 * run method of the thread
+		 * @see java.lang.Thread#run()
+		 */
 		public void run() {
 			try {				
-				DataInputStream dis = new DataInputStream(c.getInputStream());
-				DataOutputStream dos = new DataOutputStream(c.getOutputStream());
-				while(true)
-				{
-					System.out.println("RUNNING 2222");
-					String input = dis.readUTF();
-					if(input.contains("sendTo"))
-					{
-						String[] att = input.split("sendTo");
-						peers.textArea.append(att[1]+"\n");
-					}
-					else if(input.contains("BYEBYE"))
-					{
-						dos.writeUTF("BYEBYE");
-						peers.getFrame().setVisible(false);
-						break;
-					}
-				}
+				getInput_p2pClient();
 
 	        } catch (Exception e1) {
 	            System.out.println(e1.getMessage());
 	        }
 		}
+		/**
+		 * gets input from server and appends it to textArea
+		 * @throws IOException
+		 */
+		public void getInput_p2pClient() throws IOException {
+			DataInputStream dis = new DataInputStream(c.getInputStream());
+			DataOutputStream dos = new DataOutputStream(c.getOutputStream());
+			while(true)
+			{
+				System.out.println("RUNNING 2222");
+				String input = dis.readUTF();
+				if(input.contains("sendTo"))
+				{
+					String[] att = input.split("sendTo");
+					peers.textArea.append(att[1]+"\n");
+				}
+				else if(input.contains("BYEBYE"))
+				{
+					dos.writeUTF("BYEBYE");
+					peers.getFrame().setVisible(false);
+					break;
+				}
+			}
+		}
 	}
+	/**
+	 * @author hussein
+	 *
+	 */
 	public class clientMain extends Thread{
 		private ServerSocket cs;
+		/**
+		 * Constructor for client main thread
+		 * @param cs serverSocket that client will connect to
+		 */
 		public clientMain(ServerSocket cs) {
 	        this.cs = cs;
 	    }
+		/* (non-Javadoc)
+		 * run method of the main thread
+		 * @see java.lang.Thread#run()
+		 */
 		public void run() {
 		 try {
-	            //1.Create Client Socket and connect to the server
 	            client = new Socket(hostIp, 1234);
-	            //2.if accepted create IO streams
 	            DataOutputStream dos = new DataOutputStream(client.getOutputStream());
 	            DataInputStream dis = new DataInputStream(client.getInputStream());
-	            //Scanner sc = new Scanner(System.in);
-
 	            dos.writeUTF("newClient:"+cs.getLocalPort()+"&"+textField.getText());
-	            String userInput;
-	           
-	            	while (true) {
-	            		
-	       //System.out.print(selectedActiveUsersToGroup);
-	                //read from the user
-	            	//System.out.println("sent status"+btnNewButton_2.isEnabled());
-
-	                /*if(!btnNewButton_2.isEnabled())
-	                {
-		                userInput = textArea_1.getText();
-		                //userInput = "create"
-		                /*if(lblAll.getText().equals("All") && !!userInput.equals(""))
-		                {
-		                	dos.writeUTF(textField.getText()+"sendto"+"All:"+userInput );
-		                }
-		                else if(lblAll.getText().equals(list.getSelectedValue().toString()) && 
-		                		!userInput.equals(""))
-		                {
-		                	dos.writeUTF(textField.getText()+"sendto"+list.getSelectedValue()
-		                	.toString()+","+textField.getText()+": "+userInput);
-		                }
-		                if(!userInput.equals(""))
-		                {
-		                	//dos.writeUTF(textField.getText()+"sendto"+lblAll.getText()
-		                	//.toString()+","+textField.getText()+": "+userInput);
-		                dos.writeUTF(textField.getText()+"sendto"+lblAll.getText()
-	                	.toString().split(": ")[1]+","+textField.getText()+": "+userInput);
-		                }
-		                btnNewButton_2.setEnabled(true);
-		                
-	                }*/
-	                String response = "";
-	                //read the response from the server
-	                //dis.read
-	                //if(dis.readUTF() != null)
-	               // {
-	                //String server = dis.readUTF();
-            		//System.out.println(server);
-            		
+	            String userInput;	           
+	            	while (true) {	       
+	                String response = "";            		
 	                if(dis.available() >0)
 	                {
 	                	response = dis.readUTF();
@@ -210,284 +228,352 @@ public class clientGui {
 
 	                	if(response.contains("activeUsers"))
 	                	{
-	                		String[] users= response.split(",");
-	                		for(int i= 1 ;i<users.length;i++)
-	                		{
-	                			model.addElement(users[i]);
-	                		}
-	                		 if(comboBox.getSelectedItem().toString().equals("active users"))
-	         				{
-	         					list.setModel(model);
-	         				}
+	                		listActiveUsers(response);
 	                	}
 	                	else if(response.contains("updateUsers"))
 	                	{
-	                		model.addElement(response.split(":")[1]);
-	                		 if(comboBox.getSelectedItem().toString().equals("active users"))
-	         				{
-	         					list.setModel(model);
-	         				}
+	                		updateActiveUsers(response);
 	                	}	                	
 	                	else if(response.contains("Disconnect"))
 	                	{
-	                		//for()
-	                		model.removeElement(response.split(":")[1]);
-	                		 if(comboBox.getSelectedItem().toString().equals("active users"))
-	         				{
-	         					list.setModel(model);
-	         				}
-	                		textArea.setText(response.split(":")[1] +" "+"Removed");
+	                		disconnect(response);
 	                		
 	                	}
 	                	else if(response.contains("DisconnUser"))
 	                	{
-	                		System.out.println("henna cli we"+response.split(":")[1]);
-	                		String groupnamestosend =response.split(":")[5];
-	                		String[] useractive =response.split(":")[3].split(",");
-//	                		String[] acttivs = null ;
-//	                		for(int i = 1 ; i < useractive.length ;i++){
-//	                				acttivs[i-1] = useractive[i];
-//	                				System.out.println(acttivs[i-1]);
-//	                		}
-	                		
-	                			
-	                		for(String grupnme : groupnamestosend.split(",")){
-	                			if(!grupnme.equals("nullGroup")){
-			                		groupGui sendingtto  = usergroups.get(grupnme);
-			                		sendingtto.UpdateActiveUsersList(useractive);
-			                		sendingtto.disconnect(response.split(":")[1]);
-			                		System.out.println("henna cli we"+response.split(":")[1]);
-			                		}
-	                		}
+	                		disconnectUser(response);
 	                	}
 	                	else if(response.contains("Ban"))
 	            		{
-	                		System.out.println(response+" i am "+textField.getText());
-	                		if(response.split(":")[1].equals(textField.getText()))
-	                		{
-	                			model.removeAllElements();
-	                			list.setModel(model);
-	                			dis.close();
-	                			dos.close();
-	                			client.close();
-	                			btnNewButton.setEnabled(true);
-	                			btnNewButton_1.setEnabled(false);
-	                			btnNewButton_2.setEnabled(false);
-	                			btnNewButton_3.setEnabled(false);
-	                			textArea_1.setEnabled(false);
-	                			textField_1.setEnabled(false);
-	                			textField.setEnabled(true);
-	                			textArea.append("Connection lost\n");
-	                			
-	                		}
-	                		
-	                		else
-	                		{
-	                			for(int i = 0; i<model.getSize();i++)
-	                			{
-	                				if(model.get(i).toString().equals(response.split(":")[1]))
-	                				{
-	                					System.out.println("removing something");
-	                					model.remove(i);
-	                					textArea.append("\n user removed:"+response.split(":")[1]+"\n");
-	                				}
-	                				 if(comboBox.getSelectedItem().toString().equals("active users"))
-	                					{
-	                						list.setModel(model);
-	                					}
-	                			}
-	                			
-	                		}
-	                		}
-	            			//String []user = response.split(":");
-		                	//System.out.println(user[1]);
-		                	//usernames.remove(user[1]);
-		                	/*model.removeElement(response.split(":")[1]);
-		                	list.setModel(model);
-		                	textArea.append("\n user removed:"+response.split(":")[1]);
-		                	dos.writeUTF("connection lost!");
-		                	for (int i=0; i<usernames.size();i++)
-		                	{
-		                		System.out.println("username:"+usernames.get(i));
-		                		if(usernames.get(i).equals(response.split(":")[1]))
-		                		{
-		                			System.out.println(doses.size());
-		                			
-		                			doses.remove(i);
-		                			usernames.remove(i);
-		                			System.out.println(",ndvnk");
-		                			
-		                			System.out.println(doses.size());
-		                		
-		                		}
-		                	}
-		                	for(DataOutputStream data : doses){
-			                	//System.out.println(doses.size());
-			                	data.writeUTF("Ban:"+response.split(":")[1]);
-			                	}
-		                	client.close();
-	            		}*/
-
-	                	
+	                		banUser(dos, dis, response);
+	                		}                	
 	                	else if(response.contains("OpenGroupGui")){
-	                		String []res = response.split(":");
-	                		System.out.println(res[1]);
-	                		groupGui newgroup = new groupGui();
-	                		String createdgroupName = res[1].split("&")[0];
-	                		newgroup.setUser(textField.getText());
-	                		newgroup.setActiveUsersList(res[1].split("&")[2].split(","),res[1].split("&")[4],hostIp);
-	                		//groupMain groupThreadx = newgroup.new groupMain();
-	    					//groupThreadx.start();
-		                	newgroup.main(res[1],window,newgroup);
-		                	System.out.println(createdgroupName);
-		                	usergroups.put(createdgroupName, newgroup);
-		                	groupmodel.addElement(createdgroupName);
-		                	if(comboBox.getSelectedItem().toString().equals("your groups"))
-		    				{
-		    					list.setModel(groupmodel);
-		    				} 
-	                	//	newgroup.main();
+	                		openGroup(response); 	                	
 	                	}
 	                	else if(response.contains("openP2P:"))
 	                	{
-	                		String[] att = response.split(":");	                		
-	                		Socket c;
-	    	                c = cs.accept();	    	                
-	    	                p2p newp2p = new p2p(c,"server",textField.getText(),att[1]);
-	    	                newp2p.getFrame().setVisible(true);
-	    	                System.out.println("OPEN P2P SERVER");
-	    	                p2pServer ch = new p2pServer(c,newp2p,textField.getText(),att[1]);
-	    	                ch.start();
+	                		openP2PServer(response);
 	                	}
 	                	else if(response.contains("sendIP"))
 	                	{
-	                		String[] att = response.split("sendIP");	                		
-	                		try {
-								int port = Integer.parseInt(att[1]);
-								Socket c = new Socket(hostIp, port);
-								p2p newp2p = new p2p(c,"client",textField.getText(),att[0]);
-								newp2p.getFrame().setVisible(true);
-								System.out.println("OPEN P2P CLIENT::"+port);								
-								p2pClient ch = new p2pClient(c,newp2p,textField.getText(),att[0]);
-								ch.start();
-							} catch (Exception e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							}	
+	                		openP2PClient(response);	
 	                	}
 	                	else if(response.contains("NotInGroup"))
 	                	{
-	                		String groupname = response.split(":")[1].split("&")[0];
-	                		String [] groupusers = response.split(":")[1].split("&")[2].split(",");
-	                		ArrayList<String> groupusersx = new ArrayList <String>();
-	                		for(String s:groupusers)
-	                		{
-	                			groupusersx.add(s);
-	                		}
-	                		unJoinedGroupsInfo.put(groupname, groupusersx);
-	                		othergroupsmodel.addElement(groupname);
-	                		if(comboBox.getSelectedItem().toString().equals("other groups"))
-        					{
-        						list.setModel(othergroupsmodel);
-        					}
+	                		listOtherGroups(response);
 	                	}
 	                	else if(response.contains("toGroup"))
 	                	{
-	                		String createdgroupName =response.split(":")[1];
-	                		System.out.println("sending to group:"+createdgroupName);
-	                		groupGui sendingto  = usergroups.get(createdgroupName);
-	                		String [] mess = response.split(":");
-	                		String message = "";
-	                		for(int i = 2;i<mess.length;i++)
-	                		{
-	                			if(i == 2)
-	                			message += mess[i]+":";
-	                			else message += mess[i];
-	                		}
-	                		sendingto.setMessage(message);
-	                		sendingto.frame.setVisible(true);
+	                		sendToGroup(response);
 	                		
 	                	}
 
 	                	else if(response.contains("ChangingGroupAdmin")){
-	                		String groupnamestosend =response.split(":")[1];
-	                		String newadmin =response.split(":")[3];
-	                		groupGui sendingtto  = usergroups.get(groupnamestosend);
-	                		sendingtto.UpdateAdmin(newadmin);}
+	                		changeAdmin(response);}
 
 	                	else if(response.contains("youKickedOff"))
 	                	{
-	                		String[] resAtt = response.split("KickedOff");
-	                		groupGui sendingto  = usergroups.get(resAtt[1]);
-	                		sendingto.setMessage(response);
+	                		updateRemovedUser(response);
 	                	}
 	                	else if(response.contains("out"))
 	                	{
-	                		String[] resAtt = response.split("out");
-	                		groupGui sendingto  = usergroups.get(resAtt[1]);
-	                		sendingto.setMessage(response);
+	                		updateGroupList(response);
 	                	}
 	                	else if(response.contains("update"))
 	                	{
-	                		String[] resAtt = response.split("update");
-	                		groupGui sendingto  = usergroups.get(resAtt[1]);
-	                		sendingto.setMessage(response);
+	                		updateOtherGroupsList(response);
 	                	}
 	                	else if(response.contains("Remove"))
 	                	{
-	                		String [] orders = response.split(":");
-	                		String removedClient = orders[1];
-	                		String inGroup = orders[3];
-	                		if(groupmodel.contains(inGroup))
-	                		{
-	                			groupGui reworked = usergroups.get(inGroup);
-	                			reworked.activeUsersList.remove(removedClient);
-	                			reworked.model.removeElement(removedClient);
-	                			reworked.listactiveusersingroup.setModel(reworked.model);
-	                		}
+	                		removeUserFromGroup(response);
 	                	}
 	                	else if(response.contains("Add"))
 	                	{
-	                		String [] orders = response.split(":");
-	                		String AddClient = orders[1];
-	                		String inGroup = orders[3];
-	                		if(groupmodel.contains(inGroup))
-	                		{
-	                			groupGui reworked = usergroups.get(inGroup);
-	                			reworked.activeUsersList.add(0,AddClient);
-	                			reworked.model.addElement(AddClient);
-	                			reworked.listactiveusersingroup.setModel(reworked.model);
-	                		}
+	                		addUserToGroup(response);
 	                	}
 	                	else if (response.contains(":"))
 	                	{
-	                		String[] s = response.split(":",2);
-	                		lblAll.setText("Chat with : "+s[0]);
-	                		//System.out.println(response);
-		                	textArea.append(response+"\n");
+	                		showChatMSG(response);
 	                	}
-	                	else;
-	                	
-	                }
+	                	else;	                	
+	                }	            
 	                
-	                //Print response
-	                
-	                //}
-	                
-	            }
-	            
-	            //dis.close();
-	            //dos.close();
-	            //client.close();
-
+	            }	            
 	        } catch (Exception e) {
 	            System.out.println(e.getMessage());
 	        }
 		}
+		/**
+		 * update textArea with new chat message
+		 * @param response message from other client
+		 */
+		public void showChatMSG(String response) {
+			String[] s = response.split(":",2);
+			lblAll.setText("Chat with : "+s[0]);
+			textArea.append(response+"\n");
+		}
+		/**
+		 * add new user to group
+		 * @param response contains new username and group name
+		 */
+		public void addUserToGroup(String response) {
+			String [] orders = response.split(":");
+			String AddClient = orders[1];
+			String inGroup = orders[3];
+			if(groupmodel.contains(inGroup))
+			{
+				groupGui reworked = usergroups.get(inGroup);
+				reworked.activeUsersList.add(0,AddClient);
+				reworked.model.addElement(AddClient);
+				reworked.listactiveusersingroup.setModel(reworked.model);
+			}
+		}
+		/**
+		 * remove user from group
+		 * @param response contains username and group name
+		 */
+		public void removeUserFromGroup(String response) {
+			String [] orders = response.split(":");
+			String removedClient = orders[1];
+			String inGroup = orders[3];
+			if(groupmodel.contains(inGroup))
+			{
+				groupGui reworked = usergroups.get(inGroup);
+				reworked.activeUsersList.remove(removedClient);
+				reworked.model.removeElement(removedClient);
+				reworked.listactiveusersingroup.setModel(reworked.model);
+			}
+		}
+		/**
+		 * update groupList of other clients with removing a user
+		 * @param response message to be sent to groupGui
+		 */
+		public void updateOtherGroupsList(String response) {
+			String[] resAtt = response.split("update");
+			groupGui sendingto  = usergroups.get(resAtt[1]);
+			sendingto.setMessage(response);
+		}
+		/**
+		 * groupList of clients with removing a user
+		 * @param response message to be sent to groupGui
+		 */
+		public void updateGroupList(String response) {
+			String[] resAtt = response.split("out");
+			groupGui sendingto  = usergroups.get(resAtt[1]);
+			sendingto.setMessage(response);
+		}
+		/**
+		 * notify client that has been removed
+		 * @param response message to be sent to groupGui
+		 */
+		public void updateRemovedUser(String response) {
+			String[] resAtt = response.split("KickedOff");
+			groupGui sendingto  = usergroups.get(resAtt[1]);
+			sendingto.setMessage(response);
+		}
+		/**
+		 * changes admin of group
+		 * @param response contains new admin and group name
+		 */
+		public void changeAdmin(String response) {
+			String groupnamestosend =response.split(":")[1];
+			String newadmin =response.split(":")[3];
+			groupGui sendingtto  = usergroups.get(groupnamestosend);
+			sendingtto.UpdateAdmin(newadmin);
+		}
+		/**
+		 * send message to group
+		 * @param response contains group name and message
+		 */
+		public void sendToGroup(String response) {
+			String createdgroupName =response.split(":")[1];
+			System.out.println("sending to group:"+createdgroupName);
+			groupGui sendingto  = usergroups.get(createdgroupName);
+			String [] mess = response.split(":");
+			String message = "";
+			for(int i = 2;i<mess.length;i++)
+			{
+				if(i == 2)
+				message += mess[i]+":";
+				else message += mess[i];
+			}
+			sendingto.setMessage(message);
+			sendingto.frame.setVisible(true);
+		}
+		/**
+		 * list other groups that user isn't part of
+		 * @param response contains group name and user names
+		 */
+		public void listOtherGroups(String response) {
+			String groupname = response.split(":")[1].split("&")[0];
+			String [] groupusers = response.split(":")[1].split("&")[2].split(",");
+			ArrayList<String> groupusersx = new ArrayList <String>();
+			for(String s:groupusers)
+			{
+				groupusersx.add(s);
+			}
+			unJoinedGroupsInfo.put(groupname, groupusersx);
+			othergroupsmodel.addElement(groupname);
+			if(comboBox.getSelectedItem().toString().equals("other groups"))
+			{
+				list.setModel(othergroupsmodel);
+			}
+		}
+		/**
+		 * open p2p client socket and starts a new thread
+		 * @param response server IP and other client username
+		 */
+		public void openP2PClient(String response) {
+			String[] att = response.split("sendIP");	                		
+			try {
+				int port = Integer.parseInt(att[1]);
+				Socket c = new Socket(hostIp, port);
+				p2p newp2p = new p2p(c,"client",textField.getText(),att[0]);
+				newp2p.getFrame().setVisible(true);
+				System.out.println("OPEN P2P CLIENT::"+port);								
+				p2pClient ch = new p2pClient(c,newp2p,textField.getText(),att[0]);
+				ch.start();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		/**
+		 * open p2p server socket and accepts client to new thread
+		 * @param response client username
+		 * @throws IOException for creating new socket
+		 */
+		public void openP2PServer(String response) throws IOException {
+			String[] att = response.split(":");	                		
+			Socket c;
+			c = cs.accept();	    	                
+			p2p newp2p = new p2p(c,"server",textField.getText(),att[1]);
+			newp2p.getFrame().setVisible(true);
+			System.out.println("OPEN P2P SERVER");
+			p2pServer ch = new p2pServer(c,newp2p,textField.getText(),att[1]);
+			ch.start();
+		}
+		/**
+		 * create new group
+		 * @param response contains group name
+		 */
+		public void openGroup(String response) {
+			String []res = response.split(":");
+			System.out.println(res[1]);
+			groupGui newgroup = new groupGui();
+			String createdgroupName = res[1].split("&")[0];
+			newgroup.setUser(textField.getText());
+			newgroup.setActiveUsersList(res[1].split("&")[2].split(","),res[1].split("&")[4],hostIp);	                		
+			newgroup.main(res[1],window,newgroup);
+			System.out.println(createdgroupName);
+			usergroups.put(createdgroupName, newgroup);
+			groupmodel.addElement(createdgroupName);
+			if(comboBox.getSelectedItem().toString().equals("your groups"))
+			{
+				list.setModel(groupmodel);
+			}
+		}
+		/**
+		 * ban active user
+		 * @param dos socket output stream
+		 * @param dis socket input stream
+		 * @param response contains banned username
+		 * @throws IOException for closing input stream
+		 */
+		public void banUser(DataOutputStream dos, DataInputStream dis, String response) throws IOException {
+			System.out.println(response+" i am "+textField.getText());
+			if(response.split(":")[1].equals(textField.getText()))
+			{
+				model.removeAllElements();
+				list.setModel(model);
+				dis.close();
+				dos.close();
+				client.close();
+				btnNewButton.setEnabled(true);
+				btnNewButton_1.setEnabled(false);
+				btnNewButton_2.setEnabled(false);
+				btnNewButton_3.setEnabled(false);
+				textArea_1.setEnabled(false);
+				textField_1.setEnabled(false);
+				textField.setEnabled(true);
+				textArea.append("Connection lost\n");
+				
+			}
+			
+			else
+			{
+				for(int i = 0; i<model.getSize();i++)
+				{
+					if(model.get(i).toString().equals(response.split(":")[1]))
+					{
+						System.out.println("removing something");
+						model.remove(i);
+						textArea.append("\n user removed:"+response.split(":")[1]+"\n");
+					}
+					 if(comboBox.getSelectedItem().toString().equals("active users"))
+						{
+							list.setModel(model);
+						}
+				}
+				
+			}
+		}
+		/**
+		 * disconnect client form group
+		 * @param response contains group name and active user
+		 */
+		public void disconnectUser(String response) {
+			System.out.println("henna cli we"+response.split(":")[1]);
+			String groupnamestosend =response.split(":")[5];
+			String[] useractive =response.split(":")[3].split(",");	                			
+			for(String grupnme : groupnamestosend.split(",")){
+				if(!grupnme.equals("nullGroup")){
+					groupGui sendingtto  = usergroups.get(grupnme);
+					sendingtto.UpdateActiveUsersList(useractive);
+					sendingtto.disconnect(response.split(":")[1]);
+					System.out.println("henna cli we"+response.split(":")[1]);
+					}
+			}
+		}
+		/**
+		 * disconnect from server
+		 * @param response contains username that disconnected
+		 */
+		public void disconnect(String response) {
+			model.removeElement(response.split(":")[1]);
+			 if(comboBox.getSelectedItem().toString().equals("active users"))
+			{
+				list.setModel(model);
+			}
+			textArea.setText(response.split(":")[1] +" "+"Removed");
+		}
+		/**
+		 * update list of active users
+		 * @param response contains new username
+		 */
+		public void updateActiveUsers(String response) {
+			model.addElement(response.split(":")[1]);
+			 if(comboBox.getSelectedItem().toString().equals("active users"))
+			{
+				list.setModel(model);
+			}
+		}
+		/**
+		 * list active user
+		 * @param response contains active users' names
+		 */
+		public void listActiveUsers(String response) {
+			String[] users= response.split(",");
+			for(int i= 1 ;i<users.length;i++)
+			{
+				model.addElement(users[i]);
+			}
+			 if(comboBox.getSelectedItem().toString().equals("active users"))
+			{
+				list.setModel(model);
+			}
+		}
 		
-	}
-
-	
+	}	
 
 	/**
 	 * Launch the application.
@@ -532,6 +618,13 @@ public class clientGui {
 		btnNewButton = new JButton("Connect");
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				connect();
+			}
+
+			/**
+			 * connect to server
+			 */
+			public void connect() {
 				if(!textField.getText().equals("")&&!textField_2.getText().equals(""))
 				{
 					btnNewButton.setEnabled(false);
@@ -573,6 +666,13 @@ public class clientGui {
 		btnNewButton_1 = new JButton("Disconnect");
 		btnNewButton_1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				disconnect();
+			}
+
+			/**
+			 * disconnect from server
+			 */
+			public void disconnect() {
 				btnNewButton.setEnabled(true);
 				btnNewButton_1.setEnabled(false);
 				try {
@@ -614,6 +714,13 @@ public class clientGui {
 		btnNewButton_2.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
                 
+				sendMSG();
+			}
+
+			/**
+			 * send message to server
+			 */
+			public void sendMSG() {
 				btnNewButton_2.setEnabled(false);
 				try {
 					client = new Socket(hostIp, 1234);
@@ -621,17 +728,13 @@ public class clientGui {
 		            String userInput;
 					userInput = textArea_1.getText();
 	                if(!userInput.equals(""))
-	                {
-	                	//dos.writeUTF(textField.getText()+"sendto"+lblAll.getText()
-	                	//.toString()+","+textField.getText()+": "+userInput);*/
+	                {	                	
 	                dos.writeUTF(textField.getText()+"sendto"+lblAll.getText()
 	            	.toString().split(": ")[1]+","+textField.getText()+": "+userInput);
 	                }
 				} catch (UnknownHostException e1) {
-					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				} catch (IOException e1) {
-					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}				
                 btnNewButton_2.setEnabled(true);
@@ -646,19 +749,22 @@ public class clientGui {
 		
 		scrollPane_1 = new JScrollPane();
 		scrollPane_1.setBounds(10, 78, 103, 159);
-		frame.getContentPane().add(scrollPane_1);
-		
-		
-		
+		frame.getContentPane().add(scrollPane_1);		
 		list = new JList();
-
 		scrollPane_1.setViewportView(list);
-
 		list.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-	
 				
+				selectChat();
+
+				
+			}
+
+			/**
+			 * select user or group for chat
+			 */
+			public void selectChat() {
 				if(comboBox.getSelectedItem().toString().equals("active users"))
 				{
 					btnChatDirectly.setVisible(true);
@@ -690,7 +796,6 @@ public class clientGui {
             		}
             		String info = groupname+"&users&"+usersString+"&admin&"+groupusersx[groupusersx.length-1];
                 	newgroup.main(info,window,newgroup);
-                	//System.out.println(createdgroupName);
                 	usergroups.put(groupname, newgroup);
                 	groupmodel.addElement(groupname);
                 	othergroupsmodel.removeElement(groupname);
@@ -711,12 +816,9 @@ public class clientGui {
                 	try {
                 		(new DataOutputStream(client.getOutputStream())).writeUTF("Add:"+textField.getText()+":To:"+groupname);
 					} catch (IOException e1) {
-						// TODO Auto-generated catch block
 						e1.printStackTrace();
 					}
 				}
-
-				
 			}
 		});
 		list.setModel(new AbstractListModel() {
@@ -730,12 +832,18 @@ public class clientGui {
 		});
 		
 		list.setBounds(10, 78, 103, 159);
-		//list
 		btnNewButton_3 = new JButton("Create A Group");
 		btnNewButton_3.setToolTipText("Please select multiple users first");
 		btnNewButton_3.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				
+				createGroup();
+			}
+
+			/**
+			 * create a chat group
+			 */
+			public void createGroup() {
 				if(!textField_1.getText().equals(""))
 				{
 					String userInput = "CreateGroup:";
@@ -750,7 +858,6 @@ public class clientGui {
                 		DataOutputStream dos = new DataOutputStream(client.getOutputStream());
 						dos.writeUTF("$From"+textField.getText()+"$"+userInput + ":AdminOfGroup:"+textField.getText() +":GroupName:"+ textField_1.getText() );
 					} catch (IOException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
                     }
@@ -800,7 +907,6 @@ public class clientGui {
 	        		DataOutputStream dos = new DataOutputStream(client.getOutputStream());
 					dos.writeUTF(messageFromGroup.getText());
 				} catch (IOException e1) {
-					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
 	        }
@@ -814,6 +920,13 @@ public class clientGui {
 		btnLeaveGroup = new JButton("Leave group");
 		btnLeaveGroup.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
+				leaveGroup();
+			}
+
+			/**
+			 * leave group chat
+			 */
+			public void leaveGroup() {
 				if(comboBox.getSelectedItem().toString().equals("your groups"))
 				{
 					if(list.isSelectionEmpty())
@@ -846,7 +959,6 @@ public class clientGui {
 							 try {
 								 (new DataOutputStream(client.getOutputStream())).writeUTF("Remove:"+textField.getText()+":From:"+group_name);
 							} catch (IOException e) {
-								// TODO Auto-generated catch block
 								e.printStackTrace();
 							}
 						 }
@@ -906,7 +1018,6 @@ public class clientGui {
 						(new DataOutputStream(client.getOutputStream())).writeUTF("$From"+textField.getText()+"$"+"Disconnect:"+textField.getText());
 						textArea.append("Connection lost\n");
 						client.close();
-						//dos.close();
 						textField.setEnabled(true);
 						btnNewButton.setEnabled(true);
 						btnNewButton_3.setEnabled(false);
@@ -915,7 +1026,6 @@ public class clientGui {
 						btnNewButton_2.setEnabled(false);
 						textArea.setText("Connection lost !");
 					} catch (IOException e1) {
-						// TODO Auto-generated catch block
 						e1.printStackTrace();
 					}
 					btnNewButton.setEnabled(true);
@@ -935,10 +1045,8 @@ public class clientGui {
 					dosClient.writeUTF(textField.getText()+"getIP"+lblAll.getText()
 	            	.toString().split(": ")[1]);
 				} catch (UnknownHostException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}      
 	            
