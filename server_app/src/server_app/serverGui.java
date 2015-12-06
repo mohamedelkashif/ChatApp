@@ -419,7 +419,7 @@ public class serverGui {
 			                		{
 			                			DataOutputStream data = new DataOutputStream(clients.get(i)
 				                				.getOutputStream());
-				                		String Message = att[1]+"sendIP"+port+"&"+ip;
+				                		String Message = att[1]+"sendIP"+port+"sendIP"+ip;
 			                			data.writeUTF(Message);
 			                			System.out.println(Message);
 			                			Message = "";

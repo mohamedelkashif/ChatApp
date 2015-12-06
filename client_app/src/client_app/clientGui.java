@@ -382,11 +382,11 @@ public class clientGui {
 	                	}
 	                	else if(response.contains("sendIP"))
 	                	{
-	                		String[] att = response.split("sendIP");
-	                		String[] dat = att[1].split("&");
+	                		String[] att = response.split("sendIP");	                		
 	                		try {
-								int port = Integer.parseInt(dat[0]);
-								Socket c = new Socket(dat[1], port);
+								int port = Integer.parseInt(att[1]);
+								System.out.println(att[2]);
+								Socket c = new Socket(att[2], port);
 								p2p newp2p = new p2p(c,"client",textField.getText(),att[0]);
 								newp2p.getFrame().setVisible(true);
 								System.out.println("OPEN P2P CLIENT::"+port);								
