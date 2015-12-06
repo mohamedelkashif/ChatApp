@@ -12,10 +12,14 @@ import java.awt.event.ActionListener;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.net.Inet4Address;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
@@ -44,6 +48,7 @@ public class serverGui {
 	ArrayList<Map<String,ArrayList<Socket>>> groupsList = new ArrayList<>();
 	ArrayList<String> usernames = new ArrayList<>();
 	ArrayList<String> ports = new ArrayList<>();
+	ArrayList<String> IPs = new ArrayList<String>();
 	HashMap<String,String> groups = new HashMap<>();
 	HashMap<String,ArrayList<DataOutputStream>> dosesofgroups = new HashMap<String,ArrayList<DataOutputStream>>();
 	HashMap<String,ArrayList<String>> usernamesofgroups = new HashMap<String,ArrayList<String>>();
@@ -114,6 +119,8 @@ public class serverGui {
 		                	ports.add(user[0]);
 		                	//System.out.println(user[1]);
 		                	usernames.add(user[1]);
+		                	IPs.add(user[2]);
+		                	System.out.println(user[2]);
 		                	userlistener = user[1];
 		                	//System.out.println("created a new user :" + userlistener);
 
@@ -153,10 +160,43 @@ public class serverGui {
 		                	
 		                	
 		                }
+		                else if (AN.contains("sendto"))
+		                {
+		                	String[] message = AN.split("sendto",2);
+		                	String[] att = message[1].split(",",2);
+		                	System.out.println(att[0]);
+			                /*for (DataOutputStream data : doses)
+			                {
+			                	System.out.println(data.toString());
+			                	if(data.equals(att[0]))
+			                		data.writeUTF(att[1]);
+			                }*/
+		                	for (int i =0;i<usernames.size();i++)
+		                	{
+			                	System.out.println(usernames.get(i));
+			                	if(usernames.get(i).equals(att[0]) && !att[1].equals(""))
+			                	{			                		
+			                		DataOutputStream data = new DataOutputStream(clients.get(i)
+			                				.getOutputStream());
+			                		String Message = att[1];
+		                			data.writeUTF(Message);
+		                			Message = "";
+			                	}
+			                	if(usernames.get(i).equals(message[0]) && !att[1].equals(""))
+			                	{			                		
+			                		DataOutputStream data = new DataOutputStream(clients.get(i)
+			                				.getOutputStream());
+			                		String Message = att[1];
+		                			data.writeUTF(Message);
+		                			Message = "";
+			                	}
+			                }
+			                txtrServerLogs.append("\n"+"Sent Stuff to the clients");
+		                }
 		                //else if(AN.contains("$From"+userlistener+"$"))
 		               // {
 		                //System.out.println(AN);
-		                if(AN.contains("CreateGroup")){
+		                else if(AN.contains("CreateGroup")){
 		                	String []order = AN.split(":");
 		                	//System.out.println(AN);
 		                	
@@ -351,49 +391,18 @@ public class serverGui {
 			                		data.writeUTF("ChangingGroupAdmin:"+AN.split(":")[1]+":to:"+ AN.split(":")[3]);
 				                }
 			                	
-			                }
-		                else if (AN.contains("sendto"))
-		                {
-		                	String[] message = AN.split("sendto",2);
-		                	String[] att = message[1].split(",",2);
-		                	System.out.println(att[0]);
-			                /*for (DataOutputStream data : doses)
-			                {
-			                	System.out.println(data.toString());
-			                	if(data.equals(att[0]))
-			                		data.writeUTF(att[1]);
-			                }*/
-		                	for (int i =0;i<usernames.size();i++)
-		                	{
-			                	System.out.println(usernames.get(i));
-			                	if(usernames.get(i).equals(att[0]) && !att[1].equals(""))
-			                	{			                		
-			                		DataOutputStream data = new DataOutputStream(clients.get(i)
-			                				.getOutputStream());
-			                		String Message = att[1];
-		                			data.writeUTF(Message);
-		                			Message = "";
-			                	}
-			                	if(usernames.get(i).equals(message[0]) && !att[1].equals(""))
-			                	{			                		
-			                		DataOutputStream data = new DataOutputStream(clients.get(i)
-			                				.getOutputStream());
-			                		String Message = att[1];
-		                			data.writeUTF(Message);
-		                			Message = "";
-			                	}
-			                }
-			                txtrServerLogs.append("\n"+"Sent Stuff to the clients");
-		                }
+			                }		                
 		                else if(AN.contains("getIP"))
 		                {
 		                	String[] att = AN.split("getIP");
 		                	String port = "";
+		                	String ip = "";
 		                	for(int i=0;i<usernames.size();i++)
 		                	{
 		                		if(usernames.get(i).equals(att[1]))
 		                		{
 		                			port = ports.get(i);
+		                			ip = IPs.get(i);
 		                			DataOutputStream data = new DataOutputStream(clients.get(i)
 			                				.getOutputStream());
 			                		String Message = "openP2P:"+att[0];
@@ -402,7 +411,7 @@ public class serverGui {
 		                			Message = "";
 		                		}
 		                	}
-		                	if(!port.equals(""))
+		                	if(!port.equals("") && !ip.equals(""))
 		                	{
 		                		for(int i=0;i<usernames.size();i++)
 		                		{
@@ -410,7 +419,7 @@ public class serverGui {
 			                		{
 			                			DataOutputStream data = new DataOutputStream(clients.get(i)
 				                				.getOutputStream());
-				                		String Message = att[1]+"sendIP"+port;
+				                		String Message = att[1]+"sendIP"+port+"&"+ip;
 			                			data.writeUTF(Message);
 			                			System.out.println(Message);
 			                			Message = "";
@@ -606,7 +615,27 @@ public class serverGui {
 				try {
 
 					
-					sv = new ServerSocket(1234);					
+					sv = new ServerSocket(1234);
+					//System.out.println(InetAddress.getLocalHost().getHostAddress());
+					String ip = "";
+		            Enumeration e1 = NetworkInterface.getNetworkInterfaces();
+					while(e1.hasMoreElements())
+					{
+					    NetworkInterface n = (NetworkInterface) e1.nextElement();
+					    Enumeration ee = n.getInetAddresses();
+					    while (ee.hasMoreElements())
+					    {
+					        InetAddress i = (InetAddress) ee.nextElement();
+					        //System.out.println(i.getHostAddress());
+					        String s = i.getHostAddress();
+					        if(s.contains("192"))
+					        {
+					        	ip = s;
+					        	System.out.println(ip);
+					        	break;
+					        }
+					    }
+					}
 					//Random rand = new Random();
 					//int i = rand.nextInt((1500 - 1000) + 1) + 1000;
 					//System.out.println(i);

@@ -14,9 +14,12 @@ import java.awt.event.ActionListener;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.net.UnknownHostException;
 import java.util.Random;
@@ -161,8 +164,26 @@ public class clientGui {
 	            DataOutputStream dos = new DataOutputStream(client.getOutputStream());
 	            DataInputStream dis = new DataInputStream(client.getInputStream());
 	            //Scanner sc = new Scanner(System.in);
-
-	            dos.writeUTF("newClient:"+cs.getLocalPort()+"&"+textField.getText());
+	            String ip = "";
+	            Enumeration e1 = NetworkInterface.getNetworkInterfaces();
+				while(e1.hasMoreElements())
+				{
+				    NetworkInterface n = (NetworkInterface) e1.nextElement();
+				    Enumeration ee = n.getInetAddresses();
+				    while (ee.hasMoreElements())
+				    {
+				        InetAddress i = (InetAddress) ee.nextElement();
+				        System.out.println(i.getHostAddress());
+				        String s = i.getHostAddress();
+				        if(s.contains("192"))
+				        {
+				        	ip = s;
+				        	System.out.println(ip);
+				        	break;
+				        }
+				    }
+				}
+	            dos.writeUTF("newClient:"+cs.getLocalPort()+"&"+textField.getText()+"&"+ip);
 	            String userInput;
 	           
 	            	while (true) {
@@ -361,10 +382,11 @@ public class clientGui {
 	                	}
 	                	else if(response.contains("sendIP"))
 	                	{
-	                		String[] att = response.split("sendIP");	                		
+	                		String[] att = response.split("sendIP");
+	                		String[] dat = att[1].split("&");
 	                		try {
-								int port = Integer.parseInt(att[1]);
-								Socket c = new Socket(hostIp, port);
+								int port = Integer.parseInt(dat[0]);
+								Socket c = new Socket(dat[1], port);
 								p2p newp2p = new p2p(c,"client",textField.getText(),att[0]);
 								newp2p.getFrame().setVisible(true);
 								System.out.println("OPEN P2P CLIENT::"+port);								
